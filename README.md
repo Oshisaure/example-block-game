@@ -8,7 +8,7 @@ A simple open source block game to show a working implementation of my block gam
 Powered by [Lua](https://www.lua.org/about.html) and [Love2D](https://love2d.org/)
 
 ### ok cool how do I play
-If you want something that works, go to the releases page and get the build for your platform.  
+If you want something that works, go to [the releases page](https://github.com/Oshisaure/example-block-game/releases) and get the build for your platform.  
 If you are on linux you get the appropriate [Love2D build](https://github.com/love2d/love/releases/tag/11.3) for your distro, and run the .love file from the latest example block game release with it.  
 
 However if you would rather be up to date with all the lastest tiniest changes that may or may not function you can clone the repository and follow [these instructions](https://love2d.org/wiki/Getting_Started) to set it up.  
