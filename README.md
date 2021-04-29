@@ -1,5 +1,5 @@
 ![GitHub](https://img.shields.io/github/license/Oshisaure/example-block-game)
-![Love2D version](https://img.shields.io/badge/Love2D-v11.3-blue)
+[![Love2D version](https://img.shields.io/badge/Love2D-v11.3-blue)](https://github.com/love2d/love/releases/tag/11.3)
 ![GitHub all releases](https://img.shields.io/github/downloads/Oshisaure/example-block-game/total)
 
 # example block game
@@ -8,10 +8,11 @@ A simple open source block game to show a working implementation of my block gam
 Powered by [Lua](https://www.lua.org/about.html) and [Love2D](https://love2d.org/)
 
 ### ok cool how do I play
-First, get [Love2D v11.3](https://github.com/love2d/love/releases/tag/11.3) and install it.  
-Next, download this repository as a zip file (click on the green Code button then click Download ZIP) and change the extension from `.zip` to `.love`.  
-You should be able to double-click the `.love` file and it should open with Love2D.  
-Then you can go setup your controls and have fun with the game hopefully.  
+If you want something that works, go to the releases page and get the build for your platform.  
+If you are on linux you get the appropriate [Love2D build](https://github.com/love2d/love/releases/tag/11.3) for your distro, and run the .love file from the latest example block game release with it.  
+
+However if you would rather be up to date with all the lastest tiniest changes that may or may not function you can clone the repository and follow [these instructions](https://love2d.org/wiki/Getting_Started) to set it up.  
+Be careful though because I may be dumb and render the whole thing unusable sometimes due to being bad at programming.
 
 ### do you mind if I mod this?
 No, this is open source for a reason. Go ahead and fork this to your heart's contents, as long as you keep in mind the license.  
