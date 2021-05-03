@@ -31,6 +31,12 @@ Board = {
 	-- mainbag = {'I', 'L', 'J', 'S', 'Z', 'T', 'O', 'F5l', 'F5r', 'I5', 'L5l', 'L5r', 'N5l', 'N5r', 'P5l', 'P5r', 'T5', 'U5', 'V5', 'W5', 'X5', 'Y5l', 'Y5r', 'Z5l', 'Z5r' },
 	-- mainbag = {'I', 'L', 'J', 'S', 'Z', 'T', 'O', 'F5l', 'F5r', 'I5', 'L5l', 'L5r', 'N5l', 'N5r', 'P5l', 'P5r', 'T5', 'U5', 'V5', 'W5', 'X5', 'Y5l', 'Y5r', 'Z5l', 'Z5r', 'w6' },
 	events = {"update", "shift", "drop", "place", "hold", "drawpiece", "drawfield", "drawnext", "drawghost"},
+    
+    getScore = function(board, linecount)
+        local base = linecount * (linecount + 1)       -- 0,  2,  6, 12, 20
+        if board.spin then base = 2^(linecount+2) end  -- 4,  8, 16, 32, 64
+        return base * board.level * 1000
+    end,
 	
 	check_cell = function(board, x, y)
 		-- returns true if cell is blocked/oob
@@ -130,7 +136,8 @@ Board = {
 				if y > board.max_y then board.max_y = y end
 				board.grid[x][y] = true
 			end
-			-- then check lines and nil the current piece to signify spawn delay started
+
+			-- then check lines 
 			local ln = board:clear_lines()
 			if board.piece.parent then
                 local counts = board.stat[board.spin][board.piece.parent]
@@ -142,14 +149,41 @@ Board = {
 				board.last_spin = board.spin
 				board.last_id = board.piece.parent
 			end
-			board.piece = nil
 			
+            -- update score and line clear animation if necessary
+            board.lastscore = board:getScore(ln)
+			board.score = board.score + board.lastscore
+			board.drop_points = 0
+            if ln >= 1 then
+                board.animation_time = board.line_delay
+                local s = board.size
+                local w, h = board.canvas:getDimensions()
+                local px, py = board.position_x*w, board.position_y*h
+                local start_x, start_y = (board.piece.x-5.5)*s+px, (11.5-board.piece.y)*s+py
+                local text = love.graphics.newText(MenuFont, "+"..CommaValue(board.lastscore))
+                board:add_draw_item("overlay", function(board)
+                    local t = 1-board.animation_time/board.line_delay
+                    if t >= 1 then
+                        text:release()
+                        board:drop_lines()
+                        board.spawn_timer = board.spawn_delay - board.spawn_delay_after_line
+                        return true
+                    end
+                    
+                    love.graphics.setColor(HSVA(360*t, 0.3, 1))
+                    love.graphics.draw(text, start_x, start_y)
+                end)
+            end
+
 			-- check level up
 			board.percentile = board.percentile + ln
 			board.lines = board.lines + ln
 			if     board.level_type == "10L" and board.level * 10 <= board.lines then board:setLV(board.level + 1)
 			elseif board.level_type == "SEC" and board.percentile >= 100         then board:setLV(board.level + 1); board.percentile = board.percentile % 100
 			end
+            
+            -- nil the current piece to signify spawn delay started
+			board.piece = nil
 		end
 		board:call_events("place", "after")
 		-- print("called post-place event")
@@ -210,14 +244,22 @@ Board = {
 							return {x-5.5+vx*t, 3*t2*t2*G - vy*t2 - y + 10.5, vr*t}
 						end
 					})
-					for y2 = y, board.max_y do
-						board.grid[x][y2] = board.grid[x][y2+1]
-					end
+                    board.grid[x][y] = nil
 				end
 			end
 		end
 		return ln
 	end,
+    
+    drop_lines = function(board)
+		for _, y in ipairs(board.last_lines) do
+            for x = 1, 10 do
+                for y2 = y, board.max_y do
+                    board.grid[x][y2] = board.grid[x][y2+1]
+                end
+            end
+        end
+    end,
 	
 	shuffle_bag = function(board)
 		-- for every place in the list pick an element at random and put it in that place
@@ -357,6 +399,7 @@ Board = {
 		newlevel = math.min(newlevel, #board.speedcurve)
         board.level = newlevel
         for k, v in pairs(board.speedcurve[newlevel]) do board[k] = v end
+        SetBGM(math.ceil(newlevel/10))
     end,
 	
 	add_event = function(board, where, when, action)
@@ -516,7 +559,9 @@ Board = {
 					local old_height = board.piece.y + 1 - board.gravity_acc
 					board.gravity_acc = board.gravity_acc + dt * board.gravity + (input.softdrop and 60*dt or 0)
                     local fall_force = board.gravity + (input.softdrop and 60 or 0)
+					local fall_height = 0
 					if input.harddrop then
+						fall_height = board.gravity_acc
                         board.gravity_acc = math.huge
                         fall_force = math.huge
                     end
@@ -525,7 +570,18 @@ Board = {
 						board.gravity_acc = board.gravity_acc - 1
 						board.cur_lock = 0
 						board.spin = false
+						if(input.harddrop) then 
+							fall_height = fall_height + 1
+							board.drop_points = math.floor(fall_height*fall_height)
+						elseif(input.softdrop) then
+							board.drop_points = board.drop_points + 1
+							board.score = board.score + 1
+						end
 						-- fall_dist = fall_dist + 1
+					end
+					if(fall_height > 0) then
+						board.score = board.score + math.floor(fall_height*fall_height)
+						print(fall_height)
 					end
 					if board:check_collision_with(board.piece) then
                         board.last_collision_down = board.time
@@ -754,6 +810,14 @@ Board = {
 		board.max_y = 0
 		board.pieces = 0
 		board.lines = 0
+		board.score = 0
+		board.drop_points = 0
+		board.score_popup = {
+			x=0,
+			y=0,
+			yv=0,
+			value=0
+		}
         board.percentile = 0
         board.level = 1
         board.time = -2
@@ -857,6 +921,7 @@ Board = {
 			field_canvas = love.graphics.newCanvas(),
 			glow_canvas = love.graphics.newCanvas(),
 			overlay_canvas = love.graphics.newCanvas(),
+			getScore = Board.getScore,
 			check_cell = Board.check_cell,
 			check_collision_with = Board.check_collision_with,
 			rotate_cw = Board.rotate_cw,
@@ -868,6 +933,7 @@ Board = {
 			add_trails = Board.add_trails,
 			place = Board.place,
 			clear_lines = Board.clear_lines,
+            drop_lines = Board.drop_lines,
 			shuffle_bag = Board.shuffle_bag,
 			pull_next = Board.pull_next,
 			get_piece = Board.get_piece,

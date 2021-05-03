@@ -84,6 +84,11 @@ function FormatTime(s)
     return string.format("%02d\'%02d\"%02d", min, sec, math.floor(cen*100))
 end
 
+function CommaValue(n) -- credit http://richard.warburton.it
+	local left,num,right = string.match(n,'^([^%d]*%d)(%d*)(.-)$')
+	return left..(num:reverse():gsub('(%d%d%d)','%1,'):reverse())..right
+end
+
 function nBool(b) return b and 1 or 0 end
 
 function AvgArrays(base, ...)

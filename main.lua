@@ -67,6 +67,7 @@ function love.load()
 	-- Games.ss = Board.new(Levels["serv"], os.time(), BlockSize, BlockCanvas, 0.5 - 0.23, 0.5)
     
     TitleText = love.graphics.newText(TitleFont, "EXAMPLE BLOCK GAME")
+    ScoreText = love.graphics.newText(TitleFont)
     
     -- ShaderXD = love.graphics.newShader("shaders/chroma-misalign.glsl")
     ShaderBG      = {
@@ -132,6 +133,9 @@ function love.update(dt)
 				hold     = CheckKeyInput(KeyBindings.hold     ) or CheckPadInput(CurrentController, PadBindings.hold     ),
 			}, dt)
             SetBGM(Game.BGM)
+            Game.display_score = Game.score - (Game.score - (Game.display_score or 0)) * 0.001^dt
+            ScoreText:set(CommaValue(math.floor(Game.display_score+0.5)))
+            
 			-- bottomtext = "LV. "..(Game.level_type == "10L" and Game.level_name or Game.level*100+Game.percentile-100).."\nLines: "..Game.lines.."\n"..FormatTime(Game.time)
 			--[[
 			UpdateTime = UpdateTime + dt
@@ -340,6 +344,7 @@ function love.draw()
         love.graphics.draw(CanvasBG)
         love.graphics.setColor(1,1,1)
         love.graphics.draw(Game.canvas)
+        -- love.graphics.draw(Game.overlay_canvas)
         
 		-- love.graphics.draw(Game.canvas, -Width*0.23, 0)
         -- love.graphics.setShader()
@@ -376,16 +381,20 @@ function love.draw()
         love.graphics.printf("LEVEL", Width*0.75, Height*0.40, Width*0.2, "left")
         love.graphics.printf("LINES", Width*0.75, Height*0.50, Width*0.2, "left")
         love.graphics.printf("TIME ", Width*0.75, Height*0.60, Width*0.2, "left")
-        
         love.graphics.setFont(MenuFont)
-        love.graphics.printf(Game.level_name,       Width*0.75, Height*0.425, Width*0.2, "right")
-        love.graphics.printf(Game.lines,            Width*0.75, Height*0.525, Width*0.2, "right")
-        love.graphics.printf(FormatTime(Game.time), Width*0.75, Height*0.625, Width*0.2, "right")
+        love.graphics.printf("SCORE", Width*0.75, Height*0.80, Width*0.2, "right")
+        
+        love.graphics.printf(Game.level_name,        Width*0.75, Height*0.425, Width*0.2, "right")
+        love.graphics.printf(Game.lines,             Width*0.75, Height*0.525, Width*0.2, "right")
+        love.graphics.printf(FormatTime(Game.time),  Width*0.75, Height*0.625, Width*0.2, "right")
+        
+        love.graphics.draw(ScoreText, Width*0.95, Height*0.85, 0, 1, 1, ScoreText:getWidth(), 0, -0.3)
         
         -- love.graphics.setColor(0.5, 0.5, 0.5)
 		-- love.graphics.print("Bag:"..table.concat(Game.bag).."\nHistory:"..table.concat(Game.history), Width*0.62, Height*0.86)
 	end
     
+    love.graphics.setFont(MenuFont)
     love.graphics.setColor(1,1,1)
     love.graphics.print(love.timer.getFPS().."FPS")
 end
