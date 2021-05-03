@@ -51,6 +51,7 @@ function love.load()
     }
     for _, track in pairs(BGM) do
         track:setLooping(true)
+        track:setVolume(tostring(Config.bgm_volume)/100)
     end
 	BlockSize = Height/40
 	BlockCanvas = love.graphics.newCanvas(BlockSize,BlockSize)

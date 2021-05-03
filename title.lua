@@ -88,7 +88,7 @@ table.insert(gamemodes, {x = 0, y =  0.7, label = "BACK", action_e = change("mai
 Title.play = Menu.new(MenuFont, gamemodes)
 
 Title.settings = Menu.new(MenuFont, {
-	{x = 0, y = -0.5, label = ("< BGM VOLUME: %d%% >"):format(Config.bgm_volume),
+	{x = 0, y = -0.5, label = ("< BGM VOLUME : %d%% >"):format(Config.bgm_volume),
 		action_e = function(button)
 			local n = (tonumber(Config.bgm_volume) + 5) % 105
 			Config.bgm_volume = tostring(n)
