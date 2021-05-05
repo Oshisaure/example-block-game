@@ -389,7 +389,8 @@ function love.draw()
         love.graphics.printf(Game.lines,             Width*0.75, Height*0.525, Width*0.2, "right")
         love.graphics.printf(FormatTime(Game.time),  Width*0.75, Height*0.625, Width*0.2, "right")
         
-        love.graphics.draw(ScoreText, Width*0.95, Height*0.85, 0, 1, 1, ScoreText:getWidth(), 0, -0.3)
+        local stw, sth = ScoreText:getDimensions()
+        love.graphics.draw(ScoreText, Width*0.95-stw/2, Height*0.85+sth/2, math.log(math.max(Game.score-Game.display_score, 0)+1)/math.log(Game.score+2)*0.1, 1, 1, stw/2, sth/2, -0.3)
         
         -- love.graphics.setColor(0.5, 0.5, 0.5)
 		-- love.graphics.print("Bag:"..table.concat(Game.bag).."\nHistory:"..table.concat(Game.history), Width*0.62, Height*0.86)
