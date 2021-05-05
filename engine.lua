@@ -158,20 +158,42 @@ Board = {
                 board.animation_time = board.line_delay
                 local s = board.size
                 local w, h = board.canvas:getDimensions()
+                local x, y = board.piece.x, board.piece.y
                 local px, py = board.position_x*w, board.position_y*h
-                local start_x, start_y = (board.piece.x-5.5)*s+px, (11.5-board.piece.y)*s+py
+                local start_x, start_y = (x-5.5)*s+px, (11.5-y)*s+py
                 local text = love.graphics.newText(MenuFont, "+"..CommaValue(board.lastscore))
+                local starttime = board.time
                 board:add_draw_item("overlay", function(board)
-                    local t = 1-board.animation_time/board.line_delay
+                    local t = board.time - starttime
                     if t >= 1 then
                         text:release()
+                        return true
+                    end
+                    
+                    local xoff, yoff = start_x, start_y
+                    -- if t < 0.5 then
+                        -- xoff = px + math.cos(math.pi*t) * (start_x-px)
+                        -- yoff = start_y + s*20 * (2*t) * (2*t-2)
+                    -- elseif t < 0.75 then
+                        -- local t2 = 2*t-1
+                        -- xoff = px + (x>5 and -10 or 10) * s * math.sin(math.pi*t2)
+                        -- yoff = h*0.85 + (h*0.85 - start_y + s*20) * (2*t) * (2*t-2)
+                    -- else
+                        -- local t2 = 2*t-1
+                        -- xoff = px + 10*s - (x>5 and 20 or 0) * s * math.sin(math.pi*t2)
+                        -- yoff = h*0.85 + (h*0.85 - start_y + s*20) * (2*t) * (2*t-2)
+                    -- end
+                    
+                    love.graphics.setColor(HSVA(360*t, 0.5, 1))
+                    love.graphics.draw(text, xoff, yoff, 0, 1, 1, text:getWidth()/2, text:getHeight()/2)
+                end)
+                board:add_event("update", "before", function(board)
+                    if board.animation_time <= 0 then
                         board:drop_lines()
                         board.spawn_timer = board.spawn_delay - board.spawn_delay_after_line
                         return true
                     end
-                    
-                    love.graphics.setColor(HSVA(360*t, 0.3, 1))
-                    love.graphics.draw(text, start_x, start_y)
+                    return false
                 end)
             end
 
@@ -559,9 +581,7 @@ Board = {
 					local old_height = board.piece.y + 1 - board.gravity_acc
 					board.gravity_acc = board.gravity_acc + dt * board.gravity + (input.softdrop and 60*dt or 0)
                     local fall_force = board.gravity + (input.softdrop and 60 or 0)
-					local fall_height = 0
 					if input.harddrop then
-						fall_height = board.gravity_acc
                         board.gravity_acc = math.huge
                         fall_force = math.huge
                     end
@@ -570,19 +590,13 @@ Board = {
 						board.gravity_acc = board.gravity_acc - 1
 						board.cur_lock = 0
 						board.spin = false
-						if(input.harddrop) then 
-							fall_height = fall_height + 1
-							board.drop_points = math.floor(fall_height*fall_height)
-						elseif(input.softdrop) then
+						if(input.softdrop and not input.harddrop) then
 							board.drop_points = board.drop_points + 1
 							board.score = board.score + 1
 						end
 						-- fall_dist = fall_dist + 1
 					end
-					if(fall_height > 0) then
-						board.score = board.score + math.floor(fall_height*fall_height)
-						print(fall_height)
-					end
+                    
 					if board:check_collision_with(board.piece) then
                         board.last_collision_down = board.time
                         board.last_collision_down_impact_force = ImpactFormula(math.min(fall_force, 1200))
@@ -592,7 +606,12 @@ Board = {
 					board.gravity_acc = math.min(1, board.gravity_acc)
 					board.piece.y = board.piece.y + 1
                     
-					board:add_trails(old_height - (board.piece.y - board.gravity_acc))
+                    local fall_height = old_height - (board.piece.y - board.gravity_acc)
+					if input.harddrop then
+						board.score = board.score + math.floor(fall_height*fall_height)
+						print(fall_height)
+					end
+					board:add_trails(fall_height)
 				end
 			else
 			-- in spawn delay

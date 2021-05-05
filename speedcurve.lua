@@ -18,7 +18,7 @@
 
 Levels = {
     {name = "Beginner", description = "An easier 10-level mode for people who are new to block games",
-     LV = "10L", prev = 5, hold = true, colour = {0.75,0.95,1.00,1},
+     LV = "10L", prev = 7, hold = true, colour = {0.75,0.95,1.00,1},
 		{level_name = "01", gravity = 0.15, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 1},
 		{level_name = "02", gravity = 0.25, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 1},
 		{level_name = "03", gravity = 0.40, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 1},
@@ -33,7 +33,7 @@ Levels = {
     },
     
     {name = "Standard", description = "A fairly balanced 20-level mode going from slow to fast gravity",
-     LV = "10L", prev = 5, hold = true, colour = {0.85,0.85,0.85,1},
+     LV = "10L", prev = 6, hold = true, colour = {0.85,0.85,0.85,1},
 		{level_name = "01", gravity = 1.0, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 1},
 		{level_name = "02", gravity = 1.1, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 1},
 		{level_name = "03", gravity = 1.2, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 1},
@@ -114,6 +114,16 @@ Levels = {
 		
 		{level_name = "MX", gravity = math.huge, lock_delay = 0.20, spawn_delay = 0.25, spawn_delay_after_line = 0.20, line_delay = 0.1, AS_delay = 0.1, BGM = 4},  --5.0PPS
 	},
+    
+    {name = "Master", description = "A 30-level mode that starts on infinite gravity, yet keeps going faster",
+     LV = "10L", prev = 3, hold = true, colour = {0.35,0.10,0.15,1},
+		{level_name = "M01", gravity = math.huge, lock_delay = 1, spawn_delay = 0.25, spawn_delay_after_line = 0.20, line_delay = 0.2, AS_delay = 0.1, BGM = 4},
+    },
+    
+    {name = "Classic", description = "\"Block game is easy with hold and lock delay\" -- clueless block game non-player",
+     LV = "10L", prev = 1, hold = false, colour = {0.60,0.95,0.85,1},
+		{level_name = "00", gravity = 1, lock_delay = 1, spawn_delay = 0.25, spawn_delay_after_line = 0.20, line_delay = 0.2, AS_delay = 0.1, BGM = 4},
+    },
     
 	-- Practice level (low-g)
 	{name = "Zero-G Practice", description = "A practice mode with no gravity and infinite time to place your piece",

@@ -73,7 +73,7 @@ local gamemodes = {}
 for i, mode in ipairs(Levels) do
     if mode.name ~= "Death" then -- keep that for carnival?
         table.insert(gamemodes, 
-            {x = 0, y = -0.7+0.2*i, label = mode.name,
+            {x = 0, y = -0.5+0.1*i, label = mode.name,
                 action_e = function()
                     Game = Games[i]
                     SetBGM(Game.BGM)
