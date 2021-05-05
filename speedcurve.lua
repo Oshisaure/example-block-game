@@ -122,7 +122,41 @@ Levels = {
     
     {name = "Classic", description = "\"Block game is easy with hold and lock delay\" -- clueless block game non-player",
      LV = "10L", prev = 1, hold = false, colour = {0.60,0.95,0.85,1},
-		{level_name = "00", gravity = 1, lock_delay = 1, spawn_delay = 0.25, spawn_delay_after_line = 0.20, line_delay = 0.2, AS_delay = 0.1, BGM = 4},
+		{level_name = "00", gravity = 01.25, lock_delay = 1/01.25, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "01", gravity = 01.48, lock_delay = 1/01.48, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "02", gravity = 01.75, lock_delay = 1/01.75, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "03", gravity = 02.06, lock_delay = 1/02.06, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "04", gravity = 02.44, lock_delay = 1/02.44, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+
+		{level_name = "05", gravity = 02.88, lock_delay = 1/02.88, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "06", gravity = 03.41, lock_delay = 1/03.41, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "07", gravity = 04.03, lock_delay = 1/04.03, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "08", gravity = 04.76, lock_delay = 1/04.76, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "09", gravity = 05.63, lock_delay = 1/05.63, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+
+		{level_name = "10", gravity = 06.66, lock_delay = 1/06.66, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "11", gravity = 07.87, lock_delay = 1/07.87, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "12", gravity = 09.30, lock_delay = 1/09.30, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "13", gravity = 11.00, lock_delay = 1/11.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "14", gravity = 13.00, lock_delay = 1/13.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+
+		{level_name = "15", gravity = 15.37, lock_delay = 1/15.37, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "16", gravity = 18.16, lock_delay = 1/18.16, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "17", gravity = 21.47, lock_delay = 1/21.47, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "18", gravity = 25.37, lock_delay = 1/25.37, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "19", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+
+		{level_name = "20", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "21", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "22", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "23", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "24", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+
+		{level_name = "25", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "26", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "27", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "28", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		{level_name = "29", gravity = 60.00, lock_delay = 1/60.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
     },
     
 	-- Practice level (low-g)
