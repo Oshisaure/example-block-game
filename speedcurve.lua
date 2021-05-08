@@ -128,13 +128,13 @@ Levels = {
 	-- Practice level (low-g)
 	{name = "Zero-G Practice", description = "A practice mode with no gravity and infinite time to place your piece",
      LV = "10L", prev = 5, hold = true, colour = {0.65,0.75,0.80,1},
-		{level_name = "Practice", gravity = 0, lock_delay = math.huge, spawn_delay = 0.5, AS_delay = 0.25},
+		{level_name = "Practice", gravity = 0, lock_delay = math.huge, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25},
 	},
 	
 	-- Practice level (inf-g)
 	{name = "Max-G Practice", description = "A practice mode with infinite gravity but infinite time to place your piece",
      LV = "10L", prev = 5, hold = true, colour = {0.85,0.55,0.55,1},
-		{level_name = "Practice", gravity = math.huge, lock_delay = math.huge, spawn_delay = 0.5, AS_delay = 0.25},
+		{level_name = "Practice", gravity = math.huge, lock_delay = math.huge, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25},
 	},
     
 	--TGM2 Death
