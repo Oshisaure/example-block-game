@@ -421,7 +421,6 @@ Board = {
 		newlevel = math.min(newlevel, #board.speedcurve)
         board.level = newlevel
         for k, v in pairs(board.speedcurve[newlevel]) do board[k] = v end
-        SetBGM(math.ceil(newlevel/10))
     end,
 	
 	add_event = function(board, where, when, action)
