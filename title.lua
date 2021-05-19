@@ -213,5 +213,5 @@ Title.graphics = Menu.new(MenuFont, {
 			Config.sway_bounciness = tostring(n)
 		end,
 	},
-	{x = 0, y =  0.3, label = "BACK", action_e = change("main")},
+	{x = 0, y =  0.3, label = "BACK", action_e = change("settings")},
 })

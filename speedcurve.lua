@@ -202,7 +202,7 @@ Levels = {
 	-- Practice level (inf-g)
 	{name = "Max-G Practice", description = "A practice mode with infinite gravity but infinite time to place your piece",
      LV = "10L", prev = 5, hold = true, colour = {0.85,0.55,0.55,1}, BG = "practice2",
-		{level_name = "Practice", gravity = math.huge, lock_delay = math.huge, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 5},
+		{level_name = "Practice", gravity = math.huge, lock_delay = math.huge, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 4},
 	},
     
 	--TGM2 Death
