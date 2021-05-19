@@ -584,7 +584,7 @@ Board = {
                         board.gravity_acc = math.huge
                         fall_force = math.huge
                     end
-					while not board:check_collision_with(board.piece) and board.gravity_acc > 1 do
+					while not board:check_collision_with(board.piece) and board.gravity_acc >= 1 do
 						board.piece.y = board.piece.y - 1
 						board.gravity_acc = board.gravity_acc - 1
 						board.cur_lock = 0
