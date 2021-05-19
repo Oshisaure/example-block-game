@@ -44,10 +44,12 @@ function love.load()
     
     BGM = {
     ["menu"] = love.audio.newSource("assets/bgm/D_DM2INT.it"                       , "stream"),
+               love.audio.newSource("assets/bgm/aftertouch(loop).mod"              , "stream"),
                love.audio.newSource("assets/bgm/fod_ohclatenightearlymorningjam.it", "stream"),
                love.audio.newSource("assets/bgm/crema_lubricante_v3.mod"           , "stream"),
                love.audio.newSource("assets/bgm/thinking_of_tit.xm"                , "stream"),
                love.audio.newSource("assets/bgm/SHADOW(LOOP).XM"                   , "stream"),
+               love.audio.newSource("assets/bgm/aryx.s3m"                          , "stream"),
     }
     for _, track in pairs(BGM) do
         track:setLooping(true)
@@ -71,10 +73,15 @@ function love.load()
     ScoreText = love.graphics.newText(TitleFont)
     
     -- ShaderXD = love.graphics.newShader("shaders/chroma-misalign.glsl")
-    ShaderBG      = {
-        love.graphics.newShader("shaders/bg1.glsl")
+    ShaderBG = {
+        practice  = love.graphics.newShader("shaders/bgpractice.glsl"),
+        practice2 = love.graphics.newShader("shaders/bgpractice2.glsl"),
+        original  = love.graphics.newShader("shaders/bg1.glsl"),
+        master    = love.graphics.newShader("shaders/bg10.glsl"),
+        menu      = love.graphics.newShader("shaders/bgmenu.glsl"),
     }
-    ShaderBG.menu = love.graphics.newShader("shaders/bgmenu.glsl")
+    ShaderBG.practice :send("moontex", love.graphics.newImage("assets/texture/lroc_color_poles_2k.png"))
+    ShaderBG.practice2:send("moontex", love.graphics.newImage("assets/texture/lroc_color_poles_2k.png"))
     ShaderBlur    = love.graphics.newShader("shaders/blur.glsl")
     ShaderRainbow = love.graphics.newShader("shaders/rainbow.glsl")
     CanvasBG      = love.graphics.newCanvas()
@@ -256,7 +263,6 @@ function love.draw()
         love.graphics.setCanvas(CanvasRainbow)
         love.graphics.clear(0,0,0,0)
         if Title.current == "main" then
-            love.graphics.setShader(ShaderRainbow)
             local w, h = TitleText:getDimensions()
             love.graphics.draw(TitleText, Width*0.5, Height*0.2, math.sin(os.clock()*0.5)*0.2, 1, 1, w/2, h/2, -math.cos(os.clock()*0.5)*0.4, 0)
         end
@@ -264,13 +270,13 @@ function love.draw()
         love.graphics.setShader()
         love.graphics.setCanvas(CanvasBG)
 		love.graphics.draw(Title[Title.current].text)
-        love.graphics.draw(CanvasRainbow)
+        DrawRainbow(CanvasRainbow)
         love.graphics.setCanvas()
 		love.graphics.setColor(0.3,0.3,0.3)
         love.graphics.draw(CanvasBG)
 		love.graphics.setColor(1,1,1)
 		love.graphics.draw(Title[Title.current].text)
-        love.graphics.draw(CanvasRainbow)
+        DrawRainbow(CanvasRainbow)
 	elseif STATE == "battle2P" then
 		Games.P1:draw()
 		Games.P2:draw()
@@ -337,7 +343,7 @@ function love.draw()
         ShaderXD:send("time", os.clock())
         --]]
         
-        RenderBGShader(1)
+        RenderBGShader(Game.speedcurve.BG)
         love.graphics.setCanvas(CanvasBG)
         love.graphics.draw(Game.canvas)
         love.graphics.setCanvas()

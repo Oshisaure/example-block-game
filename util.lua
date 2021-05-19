@@ -180,6 +180,15 @@ function DrawBlurred(drawable, ...)
     love.graphics.setColor(r, g, b, a)
 end
 
+function DrawRainbow(drawable, ...)
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.setShader(ShaderRainbow)
+    love.graphics.draw(drawable, ...)
+    love.graphics.setColor(r, g, b, a)
+    love.graphics.setShader()
+end
+
 function RenderBGShader(id)
     id = id or "menu"
     
