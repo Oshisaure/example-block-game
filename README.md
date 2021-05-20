@@ -1,6 +1,6 @@
-![GitHub](https://img.shields.io/github/license/Oshisaure/example-block-game)
+[![GitHub](https://img.shields.io/github/license/Oshisaure/example-block-game)](https://github.com/Oshisaure/example-block-game/blob/master/LICENSE)
 [![Love2D version](https://img.shields.io/badge/Love2D-v11.3-blue)](https://github.com/love2d/love/releases/tag/11.3)
-![GitHub all releases](https://img.shields.io/github/downloads/Oshisaure/example-block-game/total)
+[![GitHub all releases](https://img.shields.io/github/downloads/Oshisaure/example-block-game/total)](https://github.com/Oshisaure/example-block-game/releases)
 
 # example block game
 A simple open source block game to show a working implementation of my block game engine
@@ -21,5 +21,7 @@ Although do keep in mind that I am still working on this so things like score sy
 ### credits and stuff
 BGM credits listed in /assets/bgm/credits.txt along with links to the original downloads  
 Font made by [MarkGamed7794](https://github.com/MarkGamed7794) using Fontstruct, more info in /assets/font/readme.txt and /assets/font/license.txt  
+Moon rendered using [texture and displacement map from NASA's Scientific Visualization Studio](
+https://svs.gsfc.nasa.gov/4720)  
 Shoutouts to the cool block game nerds who make up the communities I've been hanging around in for the past few years  
 And of course many thanks to you for checking out my example block game <3
