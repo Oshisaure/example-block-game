@@ -4,8 +4,9 @@ uniform float time;
 #define PI  3.141592653589793238463
 #define TAU 6.283185307179586476925
 
-#define SCREENHEIGHT .5
+#define SCREENHEIGHT .35
 uniform Image moontex;
+uniform Image moonnor;
 
 const vec3 LIGHTDIR = normalize(vec3( -20.,  -40.,  -50.));
 const vec3 amigapos  = vec3(0., 52., 10.);
@@ -22,6 +23,7 @@ struct ballpoint {
     float longitude;
     float latitude;
     vec3 normal;
+    mat3 normaltransform;
 };
 
 ballpoint pointOnBall(vec3 uvdir, vec3 ballpos, float ballsize, vec3 ballaxis, vec3 ballback, vec3 ballleft) {
@@ -44,10 +46,19 @@ ballpoint pointOnBall(vec3 uvdir, vec3 ballpos, float ballsize, vec3 ballaxis, v
         // shoutouts to https://stackoverflow.com/questions/5674149/3d-coordinates-on-a-sphere-to-latitude-and-longitude
         float longitude = .5*PI-acos(dot(surfacevec, ballaxis));
         float latitude  = atan(dot(ballback, surfacevec), dot(ballleft, surfacevec));
-        
-        return ballpoint(true, longitude, latitude, surfacevec);
+        float clo = cos(longitude), slo = sin(longitude);
+        float cla = cos(latitude) , sla = sin(latitude) ;
+        mat3 transform = mat3(ballback, ballaxis, ballleft)
+                       * mat3(cla, 0  ,-sla,
+                              0  , 1  , 0  ,
+                              sla, 0  , cla)
+                       * mat3(1  , 0  , 0  ,
+                              0  , clo,-slo,
+                              0  , slo, clo)
+                       ;
+        return ballpoint(true, longitude, latitude, surfacevec, transform);
     }
-    return ballpoint(false, 0., 0., vec3(0.));
+    return ballpoint(false, 0., 0., vec3(0.), mat3(0.));
 }
 
 //from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83 //
@@ -86,9 +97,8 @@ float fbm(vec2 x) {
 #ifdef PIXEL
 vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
     //scaling uvs
-    float aspectratio = love_ScreenSize.y/love_ScreenSize.x;
     vec2 uv2 = uvs - .5;
-    uv2.y *= aspectratio;
+    uv2.x *= love_ScreenSize.x/love_ScreenSize.y;
     uv2 *= 2*SCREENHEIGHT;
 
     // background colour
@@ -107,18 +117,25 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
         newpixel.xyz = vec3(1.,red,red) * dot(amigapoint.normal, LIGHTDIR) * 2.;
         
     } else {
-        // floating amigaball
+        // floating moon
         vec3 moonpos  = vec3(150., -70.+10.*cos(time*.2), 400.);
         vec3 moonaxis = normalize(vec3(.3, cos(time*.04), sin(time*.04)));
         vec3 moonback = normalize(cross(moonaxis, vec3(0.,0.,1.)));
         vec3 moonleft = cross(moonaxis, moonback);
+        // vec3 moonpos  = vec3(150., -70, 400.);
+        // vec3 moonaxis = vec3(0.,1.,0.);
+        // vec3 moonback = vec3(0.,0.,1.);
+        // vec3 moonleft = cross(moonaxis, moonback);
+        
         
         ballpoint moonpoint = pointOnBall(uvdir, moonpos, 100., moonaxis, moonback, moonleft);
         if (moonpoint.valid) {
-            moonpoint.latitude = mod(moonpoint.latitude + time*.1, TAU);
+            moonpoint.latitude = mod(moonpoint.latitude, TAU);
             // moon texture
             newpixel = Texel(moontex, vec2(moonpoint.latitude/TAU, moonpoint.longitude/PI +.5));
-            newpixel.xyz *= dot(moonpoint.normal, LIGHTDIR);
+            // adjusting normal with normalmap
+            vec3 mapnormal = Texel(moonnor, vec2(moonpoint.latitude/TAU, moonpoint.longitude/PI +.5)).xyz * 2. - 1.;
+            newpixel.xyz *= dot(moonpoint.normaltransform * mapnormal, LIGHTDIR);
         } else {
             // space clouds background
             newpixel.xyz += vec3(.7, .1, .3) * sqrt(fbm(15*uv2+time*vec2(.2, .1)) * fbm(10*uv2.yx+time*vec2(.1,-.2)))*2;

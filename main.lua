@@ -80,13 +80,27 @@ function love.load()
         master    = love.graphics.newShader("shaders/bg10.glsl"),
         menu      = love.graphics.newShader("shaders/bgmenu.glsl"),
     }
-    ShaderBG.practice :send("moontex", love.graphics.newImage("assets/texture/lroc_color_poles_2k.png"))
-    ShaderBG.practice2:send("moontex", love.graphics.newImage("assets/texture/lroc_color_poles_2k.png"))
     ShaderBlur    = love.graphics.newShader("shaders/blur.glsl")
     ShaderRainbow = love.graphics.newShader("shaders/rainbow.glsl")
     CanvasBG      = love.graphics.newCanvas()
     CanvasBGprev  = love.graphics.newCanvas()
     CanvasRainbow = love.graphics.newCanvas()
+    
+    local moontex = love.graphics.newImage("assets/texture/lroc_color_poles_2k.png")
+    local moondis = love.graphics.newImage("assets/texture/ldem_4_uint.png")
+    local moondw, moondh = moondis:getDimensions()
+    local moonnor = love.graphics.newCanvas(moondw, moondh)
+    local normalshader = love.graphics.newShader("shaders/displacementnormals.glsl")
+    normalshader:send("off", {1/moondw, 1/moondh, 0})
+    love.graphics.setCanvas(moonnor)
+    love.graphics.setShader(normalshader)
+    love.graphics.draw(moondis)
+    love.graphics.setCanvas()
+    love.graphics.setShader()
+    ShaderBG.practice :send("moontex", moontex)
+    ShaderBG.practice :send("moonnor", moonnor)
+    ShaderBG.practice2:send("moontex", moontex)
+    ShaderBG.practice2:send("moonnor", moonnor)
 	--[==[
 	ServerThreadUDP = love.thread.newThread([[
 		require("netserver")
@@ -350,6 +364,7 @@ function love.draw()
         love.graphics.setColor(0.4,0.4,0.4)
         love.graphics.draw(CanvasBG)
         love.graphics.setColor(1,1,1)
+        -- [===[ activate this block comment to render none of the HUD and only the BG
         love.graphics.draw(Game.canvas)
         -- love.graphics.draw(Game.overlay_canvas)
         
@@ -400,6 +415,8 @@ function love.draw()
         
         -- love.graphics.setColor(0.5, 0.5, 0.5)
 		-- love.graphics.print("Bag:"..table.concat(Game.bag).."\nHistory:"..table.concat(Game.history), Width*0.62, Height*0.86)
+        
+        --]===]
 	end
     
     love.graphics.setFont(MenuFont)

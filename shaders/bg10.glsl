@@ -51,6 +51,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
     float s = sin(angle);
     vec2 uv2 = mat2(c, -s, s, c)*(uvs - .5);
     uv2.y = abs(uv2.y);
+    uv2.x *= love_ScreenSize.x/love_ScreenSize.y;
     vec2 skypoint = vec2(uv2.x/uv2.y, 10.*time-1./uv2.y);
     // lightning
     float lightningintensity = 1-fract(time*.4);
