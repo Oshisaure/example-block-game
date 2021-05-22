@@ -550,10 +550,12 @@ Board = {
 				end -- should reset DAS on L+R to avoid the piece flying across the screen in a L-(L+R)-R sequence of inputs
 				if board.AS_timer == 0 or board.AS_timer >= board.AS_delay then
 					board.piece.x = board.piece.x + board.AS_dir
-					if board.AS_timer >= board.AS_delay then board.AS_timer = board.AS_timer - board.AS_repeat end
 					if board:check_collision_with(board.piece) then
 						if board.AS_dir == 1 then board.last_collision_right = board.time else board.last_collision_left = board.time end
 						board.piece.x = board.piece.x - board.AS_dir
+                        board.AS_timer = board.AS_delay
+                    else
+                        if board.AS_timer >= board.AS_delay then board.AS_timer = board.AS_timer - board.AS_repeat end
 					end
 					board:update_ghost() -- update ghost when the piece moves
 				end
