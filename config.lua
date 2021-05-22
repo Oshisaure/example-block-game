@@ -110,6 +110,9 @@ ConfigDefaults = {
 	sway_bounciness = "5",
 	sway_amplitude  = "5",
 	sway_speed      = "5",
+    
+    bg_brightness    = "40",
+    use_glsl_shaders = "O",
 }
 
 KeyBindings = {}

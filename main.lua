@@ -101,6 +101,21 @@ function love.load()
     ShaderBG.practice :send("moonnor", moonnor)
     ShaderBG.practice2:send("moontex", moontex)
     ShaderBG.practice2:send("moonnor", moonnor)
+    
+    --[[
+    Width = 3840
+    Height = 2160
+    CanvasBG      = love.graphics.newCanvas(Width, Height)
+    CanvasBGprev  = love.graphics.newCanvas(Width, Height)
+    PrerenderShaders()
+    Prerendered_frames["master"]:newImageData():encode("png", "master_bg_4k.png")
+    Prerendered_frames["practice"]:newImageData():encode("png", "practice_bg_4k.png")
+    Prerendered_frames["practice2"]:newImageData():encode("png", "practice2_bg_4k.png")
+	Width, Height = love.graphics.getDimensions()
+    CanvasBG      = love.graphics.newCanvas()
+    CanvasBGprev  = love.graphics.newCanvas()
+    --]]
+    if Config.use_glsl_shaders == "X" then PrerenderShaders() end
 	--[==[
 	ServerThreadUDP = love.thread.newThread([[
 		require("netserver")
@@ -271,7 +286,7 @@ function love.draw()
     if STATE == "splash" then
         DrawSplashScreen()
 	elseif STATE == "menu" or STATE == "keyinput" or STATE == "padinput" then
-        RenderBGShader()
+        RenderBG()
 		love.graphics.setColor(1,1,1)
         
         love.graphics.setCanvas(CanvasRainbow)
@@ -283,10 +298,12 @@ function love.draw()
         
         love.graphics.setShader()
         love.graphics.setCanvas(CanvasBG)
+		love.graphics.setColor(.5,.5,.5)
 		love.graphics.draw(Title[Title.current].text)
         DrawRainbow(CanvasRainbow)
         love.graphics.setCanvas()
-		love.graphics.setColor(0.3,0.3,0.3)
+        local b = tonumber(Config.bg_brightness)/100
+		love.graphics.setColor(b, b, b)
         love.graphics.draw(CanvasBG)
 		love.graphics.setColor(1,1,1)
 		love.graphics.draw(Title[Title.current].text)
@@ -357,11 +374,12 @@ function love.draw()
         ShaderXD:send("time", os.clock())
         --]]
         
-        RenderBGShader(Game.speedcurve.BG)
+        RenderBG(Game.speedcurve.BG)
         love.graphics.setCanvas(CanvasBG)
         love.graphics.draw(Game.canvas)
         love.graphics.setCanvas()
-        love.graphics.setColor(0.4,0.4,0.4)
+        local b = tonumber(Config.bg_brightness)/100
+		love.graphics.setColor(b, b, b)
         love.graphics.draw(CanvasBG)
         love.graphics.setColor(1,1,1)
         -- [===[ activate this block comment to render none of the HUD and only the BG

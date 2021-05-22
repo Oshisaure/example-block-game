@@ -642,7 +642,7 @@ Piece = {
             piece.x = x + kick[1]
             piece.y = y + kick[2]
 			if not board:check_collision_with(piece) then
-                print(id, kickid, "CW", kick[1], kick[2], n)
+                -- print(id, kickid, "CW", kick[1], kick[2], n)
 				return kick
 			end
         end
@@ -674,7 +674,7 @@ Piece = {
             piece.x = x + kick[1]
             piece.y = y + kick[2]
 			if not board:check_collision_with(piece) then
-                print(id, kickid, "CCW", kick[1], kick[2], n)
+                -- print(id, kickid, "CCW", kick[1], kick[2], n)
 				return kick
 			end
         end

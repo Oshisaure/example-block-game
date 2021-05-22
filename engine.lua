@@ -385,7 +385,6 @@ Board = {
 	end,
 	
 	add_trails = function(board, dist)
-        print(dist)
         local _c = love.graphics.getCanvas()
         local sc = board.size
 		local piece = board.piece
@@ -608,7 +607,6 @@ Board = {
                     local fall_height = old_height - (board.piece.y - board.gravity_acc)
 					if input.harddrop then
 						board.score = board.score + math.floor(fall_height*fall_height)
-						print(fall_height)
 					end
 					board:add_trails(fall_height)
 				end

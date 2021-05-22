@@ -181,12 +181,30 @@ function DrawBlurred(drawable, ...)
 end
 
 function DrawRainbow(drawable, ...)
-    local r, g, b, a = love.graphics.getColor()
-    love.graphics.setColor(1,1,1,1)
     love.graphics.setShader(ShaderRainbow)
     love.graphics.draw(drawable, ...)
-    love.graphics.setColor(r, g, b, a)
     love.graphics.setShader()
+end
+
+Prerendered_frames = {}
+function PrerenderShaders()
+    for k, v in pairs(ShaderBG) do
+        if Prerendered_frames[k] then Prerendered_frames[k]:release() end
+        local c = love.graphics.newCanvas(Width, Height)
+        love.graphics.setCanvas(CanvasBG)
+        love.graphics.clear(0,0,0,1)
+        local tmin, tmax, dt = 998, 1001, 0.02
+        for t = tmin, tmax, dt do
+            pcall(function() v:send("time", t) end)
+            pcall(function() v:send("dt", dt)   end)
+            RenderBGShader(k)
+        end
+        love.graphics.setCanvas(c)
+        love.graphics.draw(CanvasBG)
+        Prerendered_frames[k] = c
+    end
+    
+    love.graphics.setCanvas()
 end
 
 function RenderBGShader(id)
@@ -203,6 +221,25 @@ function RenderBGShader(id)
     love.graphics.setShader()
     love.graphics.setCanvas(CanvasBG)
     love.graphics.draw(CanvasBGprev)
+    
+    love.graphics.pop()
+    love.graphics.setCanvas(_c)
+    love.graphics.setColor(r, g, b, a)
+end
+
+function RenderBG(id)
+    if Config.use_glsl_shaders == "O" then
+        return RenderBGShader(id)
+    end
+    id = id or "menu"
+    
+    local _c = love.graphics.getCanvas()
+    local r, g, b, a = love.graphics.getColor()
+    love.graphics.push()
+    love.graphics.origin()
+    love.graphics.setCanvas(CanvasBG)
+    
+    love.graphics.draw(Prerendered_frames[id])
     
     love.graphics.pop()
     love.graphics.setCanvas(_c)

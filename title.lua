@@ -177,7 +177,7 @@ Title.graphics = Menu.new(MenuFont, {
 			Config.sway_amplitude = tostring(n)
 		end,
 	},
-	{x = 0, y = -0.1,
+	{x = 0, y = -0.2,
 		label = ("MATRIX SWAY SPEED: <%s%s>"):format(("|"):rep(tonumber(Config.sway_speed)), ("."):rep(10 - tonumber(Config.sway_speed))),
 		action_e = function(button)
 			local n = (tonumber(Config.sway_speed) % 10) + 1
@@ -195,7 +195,7 @@ Title.graphics = Menu.new(MenuFont, {
 			Config.sway_speed = tostring(n)
 		end,
 	},
-	{x = 0, y =  0.1,
+	{x = 0, y = -0.1,
 		label = ("MATRIX SWAY BOUNCINESS: <%s%s>"):format(("|"):rep(tonumber(Config.sway_bounciness)), ("."):rep(10 - tonumber(Config.sway_bounciness))),
 		action_e = function(button)
 			local n = (tonumber(Config.sway_bounciness) % 10) + 1
@@ -213,5 +213,45 @@ Title.graphics = Menu.new(MenuFont, {
 			Config.sway_bounciness = tostring(n)
 		end,
 	},
-	{x = 0, y =  0.3, label = "BACK", action_e = change("settings")},
+	{x = 0, y =  0.1, label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness),
+		action_e = function(button)
+			local n = (tonumber(Config.bg_brightness) + 5) % 105
+			Config.bg_brightness = tostring(n)
+			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
+            SaveConfig()
+		end,
+		action_r = function(button)
+			local n = math.min(tonumber(Config.bg_brightness) + 5, 100)
+			Config.bg_brightness = tostring(n)
+			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
+            SaveConfig()
+		end,
+		action_l = function(button)
+			local n = math.max(tonumber(Config.bg_brightness) - 5, 0)
+			Config.bg_brightness = tostring(n)
+			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
+            SaveConfig()
+		end,
+    },
+	{x = 0, y =  0.3, label = ("< USE GLSL SHADERS : %s >"):format(Config.use_glsl_shaders),
+		action_e = function(button)
+			Config.use_glsl_shaders = (Config.use_glsl_shaders == "O" and "X" or "O")
+			button.label = ("< USE GLSL SHADERS : %s >"):format(Config.use_glsl_shaders)
+            if Config.use_glsl_shaders == "X" then PrerenderShaders() end
+            SaveConfig()
+		end,
+		action_r = function(button)
+			Config.use_glsl_shaders = (Config.use_glsl_shaders == "O" and "X" or "O")
+			button.label = ("< USE GLSL SHADERS : %s >"):format(Config.use_glsl_shaders)
+            if Config.use_glsl_shaders == "X" then PrerenderShaders() end
+            SaveConfig()
+		end,
+		action_l = function(button)
+			Config.use_glsl_shaders = (Config.use_glsl_shaders == "O" and "X" or "O")
+			button.label = ("< USE GLSL SHADERS : %s >"):format(Config.use_glsl_shaders)
+            if Config.use_glsl_shaders == "X" then PrerenderShaders() end
+            SaveConfig()
+		end,
+    },
+	{x = 0, y =  0.7, label = "BACK", action_e = change("settings")},
 })
