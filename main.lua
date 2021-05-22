@@ -391,7 +391,9 @@ function love.draw()
 		-- love.graphics.printf(bottomtext, -Width*0.23, Height*0.86, Width, "center")
         local w7, w6 = Width*0.5-7*Game.size, Width*0.5-6*Game.size
         love.graphics.setFont(MenuFont)
-        love.graphics.printf("HOLD", 0,        Height*0.2, w7, "right")
+        if Game.allow_hold then
+            love.graphics.printf("HOLD",    0, Height*0.2, w7, "right")
+        end
         love.graphics.printf("NEXT", Width-w7, Height*0.2, w7, "left")
         love.graphics.setFont(HUDFont)
         love.graphics.printf("LINE CLEAR STATISTICS", 0, Height*0.4, w6, "center")
