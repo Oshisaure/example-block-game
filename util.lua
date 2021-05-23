@@ -161,15 +161,19 @@ function DrawBlurred(drawable, ...)
     love.graphics.setCanvas(buffercanvas)
     love.graphics.clear(0,0,0,1)
     
-    love.graphics.setShader(ShaderBlur)
+    if tonumber(Config.blur_spread) > 0 then
+        love.graphics.setShader(ShaderBlur)
+        ShaderBlur:send("Spread", tonumber(Config.blur_spread))
+        ShaderBlur:send("Direction", {0,1})
+    end
     love.graphics.setBlendMode("add")
-    ShaderBlur:send("Spread", 10)
-    ShaderBlur:send("Direction", {0,1})
     love.graphics.draw(drawable, ...)
     
     love.graphics.setCanvas(_c)
     love.graphics.setColor(1,1,1,1)
-    ShaderBlur:send("Direction", {1,0})
+    if tonumber(Config.blur_spread) > 0 then
+        ShaderBlur:send("Direction", {1,0})
+    end
     love.graphics.push()
     love.graphics.origin()
     love.graphics.draw(buffercanvas)
@@ -228,7 +232,7 @@ function RenderBGShader(id)
 end
 
 function RenderBG(id)
-    if Config.use_glsl_shaders == "O" then
+    if Config.dynamic_bg == "O" then
         return RenderBGShader(id)
     end
     id = id or "menu"

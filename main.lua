@@ -115,7 +115,7 @@ function love.load()
     CanvasBG      = love.graphics.newCanvas()
     CanvasBGprev  = love.graphics.newCanvas()
     --]]
-    if Config.use_glsl_shaders == "X" then PrerenderShaders() end
+    if Config.dynamic_bg == "X" then PrerenderShaders() end
 	--[==[
 	ServerThreadUDP = love.thread.newThread([[
 		require("netserver")

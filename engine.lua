@@ -523,7 +523,7 @@ Board = {
 		board.last_clear = 0
 		board.last_spin = false
 		board.last_id = nil
-        board:darken_glow(dt*3)
+        board:darken_glow(dt*15/tonumber(Config.trail_duration))
         
 		board:call_events("update", "before")
         

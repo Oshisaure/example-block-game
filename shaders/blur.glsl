@@ -7,16 +7,18 @@ float gaussian(float x) {
 
 #ifdef PIXEL
 vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
-    vec4 result = vec4(0.);
+    vec3 result = vec3(0.);
     float weightsum = 0.;
-    for (int i = 0; i <= Spread; i++) {
-        vec2 vtex = i*Direction/love_ScreenSize.xy;
-        float weight = gaussian(length(vtex));
+    for (int i = 0; i <= 10; i++) {
+        vec2 vtex = i*Direction*Spread/4000;
+        float weight = gaussian(length(vtex)*Spread);
         weightsum += weight;
-        result += .5*weight*(Texel(image, uvs + vtex) + Texel(image, uvs - vtex));
+        vec3 left  = Texel(image, uvs - vtex).xyz;
+        vec3 right = Texel(image, uvs + vtex).xyz;
+        result += .5*weight*(left + right);
     }
     
-    return vec4(result.xyz/weightsum, 1.);
+    return vec4(result/weightsum, 1.);
 }
 #endif
 

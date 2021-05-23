@@ -233,25 +233,61 @@ Title.graphics = Menu.new(MenuFont, {
             SaveConfig()
 		end,
     },
-	{x = 0, y =  0.3, label = ("< USE GLSL SHADERS : %s >"):format(Config.use_glsl_shaders),
+	{x = 0, y =  0.2, label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg),
 		action_e = function(button)
-			Config.use_glsl_shaders = (Config.use_glsl_shaders == "O" and "X" or "O")
-			button.label = ("< USE GLSL SHADERS : %s >"):format(Config.use_glsl_shaders)
-            if Config.use_glsl_shaders == "X" then PrerenderShaders() end
+			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
+			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
+            if Config.dynamic_bg == "X" then PrerenderShaders() end
             SaveConfig()
 		end,
 		action_r = function(button)
-			Config.use_glsl_shaders = (Config.use_glsl_shaders == "O" and "X" or "O")
-			button.label = ("< USE GLSL SHADERS : %s >"):format(Config.use_glsl_shaders)
-            if Config.use_glsl_shaders == "X" then PrerenderShaders() end
+			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
+			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
+            if Config.dynamic_bg == "X" then PrerenderShaders() end
             SaveConfig()
 		end,
 		action_l = function(button)
-			Config.use_glsl_shaders = (Config.use_glsl_shaders == "O" and "X" or "O")
-			button.label = ("< USE GLSL SHADERS : %s >"):format(Config.use_glsl_shaders)
-            if Config.use_glsl_shaders == "X" then PrerenderShaders() end
+			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
+			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
+            if Config.dynamic_bg == "X" then PrerenderShaders() end
             SaveConfig()
 		end,
     },
+	{x = 0, y =  0.3,
+		label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(tonumber(Config.blur_spread)), ("."):rep(10 - tonumber(Config.blur_spread))),
+		action_e = function(button)
+			local n = (tonumber(Config.blur_spread) % 10)
+			button.label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
+			Config.blur_spread = tostring(n)
+		end,
+		action_r = function(button)
+			local n = math.min(10, tonumber(Config.blur_spread) + 1)
+			button.label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
+			Config.blur_spread = tostring(n)
+		end,
+		action_l = function(button)
+			local n = math.max(0, tonumber(Config.blur_spread) - 1)
+			button.label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
+			Config.blur_spread = tostring(n)
+		end,
+	},
+	{x = 0, y =  0.4,
+		label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(tonumber(Config.trail_duration)), ("."):rep(10 - tonumber(Config.trail_duration))),
+		action_e = function(button)
+			local n = (tonumber(Config.trail_duration) % 10)
+			button.label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
+			Config.trail_duration = tostring(n)
+		end,
+		action_r = function(button)
+			local n = math.min(10, tonumber(Config.trail_duration) + 1)
+			button.label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
+			Config.trail_duration = tostring(n)
+		end,
+		action_l = function(button)
+			local n = math.max(0, tonumber(Config.trail_duration) - 1)
+			button.label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
+			Config.trail_duration = tostring(n)
+		end,
+	},
 	{x = 0, y =  0.7, label = "BACK", action_e = change("settings")},
 })

@@ -111,8 +111,10 @@ ConfigDefaults = {
 	sway_amplitude  = "5",
 	sway_speed      = "5",
     
-    bg_brightness    = "40",
-    use_glsl_shaders = "O",
+    bg_brightness  = "40",
+    dynamic_bg     = "O",
+    blur_spread    = "5",
+    trail_duration = "5",
 }
 
 KeyBindings = {}
