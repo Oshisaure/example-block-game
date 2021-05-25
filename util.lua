@@ -190,23 +190,23 @@ function DrawRainbow(drawable, ...)
     love.graphics.setShader()
 end
 
-Prerendered_frames = {}
-function PrerenderShaders()
-    for k, v in pairs(ShaderBG) do
-        if Prerendered_frames[k] then Prerendered_frames[k]:release() end
-        local c = love.graphics.newCanvas(Width, Height)
+Prerendered_frame = nil
+function PrerenderBG(id)
+    id = id or "menu"
+    -- for k, v in pairs(ShaderBG) do
+        if Prerendered_frame then Prerendered_frame:release() end
+        Prerendered_frame = love.graphics.newCanvas(Width, Height)
         love.graphics.setCanvas(CanvasBG)
         love.graphics.clear(0,0,0,1)
-        local tmin, tmax, dt = 998, 1001, 0.02
+        local tmin, tmax, dt = 998.5, 1001.5, 0.02
         for t = tmin, tmax, dt do
-            pcall(function() v:send("time", t) end)
-            pcall(function() v:send("dt", dt)   end)
-            RenderBGShader(k)
+            pcall(function() ShaderBG[id]:send("time", t) end)
+            pcall(function() ShaderBG[id]:send("dt", dt)   end)
+            RenderBGShader(id)
         end
-        love.graphics.setCanvas(c)
+        love.graphics.setCanvas(Prerendered_frame)
         love.graphics.draw(CanvasBG)
-        Prerendered_frames[k] = c
-    end
+    -- end
     
     love.graphics.setCanvas()
 end
@@ -243,7 +243,7 @@ function RenderBG(id)
     love.graphics.origin()
     love.graphics.setCanvas(CanvasBG)
     
-    love.graphics.draw(Prerendered_frames[id])
+    love.graphics.draw(Prerendered_frame)
     
     love.graphics.pop()
     love.graphics.setCanvas(_c)

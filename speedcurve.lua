@@ -18,7 +18,7 @@
 
 Levels = {
     {name = "Beginner", description = "An easier 10-level mode for people who are new to block games",
-     LV = "10L", prev = 7, hold = true, colour = {0.75,0.95,1.00,1}, BG = "original",
+     LV = "10L", prev = 7, hold = true, colour = {0.75,0.95,1.00,1}, BG = "beginner",
 		{level_name = "01", gravity = 0.15, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 1},
 		{level_name = "02", gravity = 0.25, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 1},
 		{level_name = "03", gravity = 0.40, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 1},

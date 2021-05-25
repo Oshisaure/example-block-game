@@ -78,6 +78,7 @@ for i, mode in ipairs(Levels) do
                     Game = Games[i]
                     SetBGM(Game.BGM)
                     Game:reset(os.time())
+                    if Config.dynamic_bg == "X" then PrerenderBG(Game.speedcurve.BG) end
                     STATE = "ingame"
                 end,
             }
@@ -237,19 +238,19 @@ Title.graphics = Menu.new(MenuFont, {
 		action_e = function(button)
 			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
 			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
-            if Config.dynamic_bg == "X" then PrerenderShaders() end
+            if Config.dynamic_bg == "X" then PrerenderBG() end
             SaveConfig()
 		end,
 		action_r = function(button)
 			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
 			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
-            if Config.dynamic_bg == "X" then PrerenderShaders() end
+            if Config.dynamic_bg == "X" then PrerenderBG() end
             SaveConfig()
 		end,
 		action_l = function(button)
 			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
 			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
-            if Config.dynamic_bg == "X" then PrerenderShaders() end
+            if Config.dynamic_bg == "X" then PrerenderBG() end
             SaveConfig()
 		end,
     },

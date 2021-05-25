@@ -76,15 +76,13 @@ function love.load()
     ShaderBG = {
         practice  = love.graphics.newShader("shaders/bgpractice.glsl"),
         practice2 = love.graphics.newShader("shaders/bgpractice2.glsl"),
+        beginner  = love.graphics.newShader("shaders/bgbeginner.glsl"),
         original  = love.graphics.newShader("shaders/bg1.glsl"),
         master    = love.graphics.newShader("shaders/bg10.glsl"),
         menu      = love.graphics.newShader("shaders/bgmenu.glsl"),
     }
     ShaderBlur    = love.graphics.newShader("shaders/blur.glsl")
     ShaderRainbow = love.graphics.newShader("shaders/rainbow.glsl")
-    CanvasBG      = love.graphics.newCanvas()
-    CanvasBGprev  = love.graphics.newCanvas()
-    CanvasRainbow = love.graphics.newCanvas()
     
     local moontex = love.graphics.newImage("assets/texture/lroc_color_poles_2k.png")
     local moondis = love.graphics.newImage("assets/texture/ldem_4_uint.png")
@@ -107,15 +105,22 @@ function love.load()
     Height = 2160
     CanvasBG      = love.graphics.newCanvas(Width, Height)
     CanvasBGprev  = love.graphics.newCanvas(Width, Height)
-    PrerenderShaders()
-    Prerendered_frames["master"]:newImageData():encode("png", "master_bg_4k.png")
-    Prerendered_frames["practice"]:newImageData():encode("png", "practice_bg_4k.png")
-    Prerendered_frames["practice2"]:newImageData():encode("png", "practice2_bg_4k.png")
+    PrerenderBG("beginner")
+    print("prerendered")
+    local dat = Prerendered_frame:newImageData()
+    print("imagedata")
+    dat:encode("png", "beginner_bg_4k.png")
+    print("encode")
+    dat:release()
+    print("release")
+    CanvasBG    :release()
+    CanvasBGprev:release()
 	Width, Height = love.graphics.getDimensions()
+    --]]
     CanvasBG      = love.graphics.newCanvas()
     CanvasBGprev  = love.graphics.newCanvas()
-    --]]
-    if Config.dynamic_bg == "X" then PrerenderShaders() end
+    CanvasRainbow = love.graphics.newCanvas()
+    if Config.dynamic_bg == "X" then PrerenderBG() end
 	--[==[
 	ServerThreadUDP = love.thread.newThread([[
 		require("netserver")
@@ -450,6 +455,7 @@ function love.keypressed(key)
 		Game:setLV(1)
 		-- DisconnectServer()
 		bottomtext = ""
+        if Config.dynamic_bg == "X" then PrerenderBG() end
 		STATE = "menu"
         SetBGM("menu")
     --[[

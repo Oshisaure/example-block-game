@@ -256,13 +256,13 @@ Board = {
 				for x = 1, 10 do
 					local G = math.min(30, board.gravity)
 					local gv = math.max(1, G)
-					local vx, vy, vr = board.random:random()*100-50, (board.random:random()*5+5)*gv^0.5, (board.random:random()*100-50) * (board.spin and 50 or 1)
+					local vx, vy, vr = board.random:random()*150-75, (board.random:random()*5+5)*gv^0.5, (board.random:random()*150-75) * (board.spin and 50 or 1)
 					table.insert(board.animate, {
 						object = board.block_mesh,
 						startt = board.time,
-						endt = board.time + 10,
+						endt = board.time + 15,
 						func = function(t)
-							local t2 = 20*t
+							local t2 = 30*t
 							return {x-5.5+vx*t, 3*t2*t2*G - vy*t2 - y + 10.5, vr*t}
 						end
 					})
