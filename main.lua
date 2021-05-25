@@ -49,7 +49,7 @@ function love.load()
                love.audio.newSource("assets/bgm/crema_lubricante_v3.mod"           , "stream"),
                love.audio.newSource("assets/bgm/thinking_of_tit.xm"                , "stream"),
                love.audio.newSource("assets/bgm/SHADOW(LOOP).XM"                   , "stream"),
-               love.audio.newSource("assets/bgm/aryx.s3m"                          , "stream"),
+               love.audio.newSource("assets/bgm/aryx(T67).s3m"                     , "stream"),
     }
     for _, track in pairs(BGM) do
         track:setLooping(true)

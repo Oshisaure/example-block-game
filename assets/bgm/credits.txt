@@ -26,6 +26,6 @@
     loop edit of Into the Shadow by Elwood
     modarchive link - https://modarchive.org/module.php?54298
 
-- LEVEL M21-M30: aryx.s3m
-    aryx by Karsten Koch
+- LEVEL M21-M30: aryx(T67).s3m
+    faster edit of aryx by Karsten Koch
     modarchive link - https://modarchive.org/module.php?34036
