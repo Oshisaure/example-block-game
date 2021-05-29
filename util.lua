@@ -89,6 +89,27 @@ function CommaValue(n) -- credit http://richard.warburton.it
 	return left..(num:reverse():gsub('(%d%d%d)','%1,'):reverse())..right
 end
 
+function LineClearName(count)
+    -- normal range
+    if count <= 0 then return ""       end
+    if count == 1 then return "SINGLE" end
+    if count == 2 then return "DOUBLE" end
+    if count == 3 then return "TRIPLE" end
+    if count == 4 then return "QUAD"   end
+    -- pento?
+    if count == 5 then return "QUINT"  end
+    -- zone??
+    if count == 20 then return "FULL-TUPLE" end
+    if count == 21 then return "KIRB-TUPLE" end
+    if count == 22 then return "EXTRA-TUPLE" end
+    if count == 23 then return "ULTIMA-TUPLE" end
+    if count == 24 then return "INFINI-TUPLE" end
+    -- zone pento??? (really this is just in case)
+    if count >= 25 then return "ALEPH"..(count-25).."-TUPLE" end
+    -- general case
+    return count.."-TUPLE"
+end
+
 function nBool(b) return b and 1 or 0 end
 
 function AvgArrays(base, ...)

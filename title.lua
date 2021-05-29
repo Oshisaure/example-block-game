@@ -78,6 +78,7 @@ for i, mode in ipairs(Levels) do
                     Game = Games[i]
                     SetBGM(Game.BGM)
                     Game:reset(os.time())
+                    Game.display_score = 9999999999 -- 9,999,999,999
                     if Config.dynamic_bg == "X" then PrerenderBG(Game.speedcurve.BG) end
                     STATE = "ingame"
                 end,

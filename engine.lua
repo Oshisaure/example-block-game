@@ -151,17 +151,34 @@ Board = {
 			end
 			
             -- update score and line clear animation if necessary
-            board.lastscore = board:getScore(ln)
-			board.score = board.score + board.lastscore
+            board.last_score = board:getScore(ln)
+			board.score = board.score + board.last_score
 			board.drop_points = 0
             if ln >= 1 then
+                table.insert(board.recent_actions, 1, {
+                    time   = board.time,
+                    label  = (board.last_spin and (board.piece.parent.."-SPIN ") or "") .. LineClearName(ln),
+                    score  = board.last_score,
+                    colour = AvgArrays(board.piece.colour, {1,1,1,1}),
+                })
+                if board:is_grid_empty() then
+                    table.insert(board.recent_actions, 1, {
+                        time   = board.time,
+                        label  = "PERFECT CLEAR!!!",
+                        score  = 1000000,
+                        colour = nil,
+                    })
+                    board.all_clears = board.all_clears + 1
+                    board.score = board.score + 1000000
+                end
                 board.animation_time = board.line_delay
+                --[[
                 local s = board.size
                 local w, h = board.canvas:getDimensions()
                 local x, y = board.piece.x, board.piece.y
                 local px, py = board.position_x*w, board.position_y*h
                 local start_x, start_y = (x-5.5)*s+px, (11.5-y)*s+py
-                local text = love.graphics.newText(MenuFont, "+"..CommaValue(board.lastscore))
+                local text = love.graphics.newText(MenuFont, "+"..CommaValue(board.last_score))
                 local starttime = board.time
                 board:add_draw_item("overlay", function(board)
                     local t = board.time - starttime
@@ -187,6 +204,7 @@ Board = {
                     love.graphics.setColor(HSVA(360*t, 0.5, 1))
                     love.graphics.draw(text, xoff, yoff, 0, 1, 1, text:getWidth()/2, text:getHeight()/2)
                 end)
+                --]]
                 board:add_event("update", "before", function(board)
                     if board.animation_time <= 0 then
                         board:drop_lines()
@@ -195,6 +213,13 @@ Board = {
                     end
                     return false
                 end)
+            elseif board.last_spin then
+                table.insert(board.recent_actions, 1, {
+                    time   = board.time,
+                    label  = board.piece.parent.."-SPIN",
+                    score  = board.last_score,
+                    colour = AvgArrays(board.piece.colour, {1,1,1,1}),
+                })
             end
 
 			-- check level up
@@ -282,6 +307,17 @@ Board = {
             end
         end
     end,
+    
+	is_grid_empty = function(board)
+		for y = board.max_y, 1, -1 do
+			for x = 1, 10 do
+				if board.grid[x][y] then
+                    return false
+				end
+			end
+		end
+		return true
+	end,
 	
 	shuffle_bag = function(board)
 		-- for every place in the list pick an element at random and put it in that place
@@ -528,6 +564,7 @@ Board = {
 		board:call_events("update", "before")
         
 		if board.time >= 0 and board.animation_time <= 0 then
+            board.last_score = board.score
 			if board.piece then
 			-- not in spawn delay
 				-- rotation
@@ -828,14 +865,11 @@ Board = {
 		board.max_y = 0
 		board.pieces = 0
 		board.lines = 0
+        board.all_clears = 0
 		board.score = 0
+		board.last_score = 0
 		board.drop_points = 0
-		board.score_popup = {
-			x=0,
-			y=0,
-			yv=0,
-			value=0
-		}
+		board.recent_actions = {}
         board.percentile = 0
         board.level = 1
         board.time = -2
@@ -952,6 +986,7 @@ Board = {
 			place = Board.place,
 			clear_lines = Board.clear_lines,
             drop_lines = Board.drop_lines,
+            is_grid_empty = Board.is_grid_empty,
 			shuffle_bag = Board.shuffle_bag,
 			pull_next = Board.pull_next,
 			get_piece = Board.get_piece,

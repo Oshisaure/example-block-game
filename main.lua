@@ -69,8 +69,9 @@ function love.load()
 	-- Games.P2 = Board.new(Levels["vs"], os.time(), BlockSize, BlockCanvas, 0.5 + 0.23, 0.5)
 	-- Games.ss = Board.new(Levels["serv"], os.time(), BlockSize, BlockCanvas, 0.5 - 0.23, 0.5)
     
-    TitleText = love.graphics.newText(TitleFont, "EXAMPLE BLOCK GAME")
-    ScoreText = love.graphics.newText(TitleFont)
+    TitleText  = love.graphics.newText(TitleFont, "EXAMPLE BLOCK GAME")
+    ScoreText  = love.graphics.newText(TitleFont)
+    ScorePopup = love.graphics.newText(HUDFont)
     
     -- ShaderXD = love.graphics.newShader("shaders/chroma-misalign.glsl")
     ShaderBG = {
@@ -175,7 +176,7 @@ function love.update(dt)
 				hold     = CheckKeyInput(KeyBindings.hold     ) or CheckPadInput(CurrentController, PadBindings.hold     ),
 			}, dt)
             SetBGM(Game.BGM)
-            Game.display_score = Game.score - (Game.score - (Game.display_score or 0)) * 0.001^dt
+            Game.display_score = Game.score - (Game.score - Game.display_score) * 0.001^dt
             ScoreText:set(CommaValue(math.floor(Game.display_score+0.5)))
             
 			-- bottomtext = "LV. "..(Game.level_type == "10L" and Game.level_name or Game.level*100+Game.percentile-100).."\nLines: "..Game.lines.."\n"..FormatTime(Game.time)
@@ -416,14 +417,38 @@ function love.draw()
 				love.graphics.print(Game.stat[lc[2]][id][lc[1]], w6*(0.20+0.1*k), Height*(0.45+0.025*j))
 			end
 		end
+        love.graphics.setColor(1, 1, 1)
 		-- if Game.stat[true]["I"][4] and Game.stat[true]["I"][4] > 0 then
 			-- love.graphics.setColor(1, 1, 1)
 			-- love.graphics.print("Spin-4", w6*0.05, Height*(0.45+0.025*10))
 			-- love.graphics.setColor(unpack(Piece.colours["I"]))
 			-- love.graphics.print(Game.stat[true]["I"][4], w6*(0.20+0.01), Height*(0.45+0.025*10))
 		-- end
+        if Game.all_clears > 0 then
+            love.graphics.printf("PERFECT CLEARS:", w6*0.05, Height*(0.55+0.025*#LineClearTypes), w6*0.90, "left")
+            love.graphics.printf(Game.all_clears  , w6*0.05, Height*(0.55+0.025*#LineClearTypes), w6*0.90, "right")
+        end
         
-		love.graphics.setColor(1, 1, 1)
+        local lastentry
+        repeat
+            lastentry = table.remove(Game.recent_actions)
+        until (not lastentry) or lastentry.time + 3 > Game.time
+        table.insert(Game.recent_actions, lastentry)
+        local yscoff = 0
+        for i, entry in ipairs(Game.recent_actions) do
+            local t = (Game.time - entry.time)/3
+            local ysc, xsc = 1-(1-t)^15, 1-t^10
+            yscoff = yscoff + ysc
+            ScorePopup:setf(entry.label.."\n+"..CommaValue(entry.score), w6*0.9, "right")
+            if entry.colour then
+                love.graphics.setColor(entry.colour)
+                love.graphics.draw(ScorePopup, Width-w6*xsc, Height*(0.80-yscoff*0.05), 0, 1, ysc, 0, 0, -0.3)
+            else
+                DrawRainbow(ScorePopup, Width-w6*xsc, Height*(0.80-yscoff*0.05), 0, 1, ysc, 0, 0, -0.3)
+            end
+        end
+        
+        love.graphics.setColor(1,1,1,1)
         love.graphics.setFont(HUDFont)
         love.graphics.printf("LEVEL", Width*0.75, Height*0.40, Width*0.2, "left")
         love.graphics.printf("LINES", Width*0.75, Height*0.50, Width*0.2, "left")
