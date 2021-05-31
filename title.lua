@@ -76,9 +76,9 @@ for i, mode in ipairs(Levels) do
             {x = 0, y = -0.5+0.1*i, label = mode.name,
                 action_e = function()
                     Game = Games[i]
-                    SetBGM(Game.BGM)
                     Game:reset(os.time())
-                    Game.display_score = 9999999999 -- 9,999,999,999
+                    SetBGM(Game.BGM)
+                    Game.display_score = 999999999 -- 999,999,999
                     if Config.dynamic_bg == "X" then PrerenderBG(Game.speedcurve.BG) end
                     STATE = "ingame"
                 end,
@@ -161,7 +161,7 @@ Title.keyconf = Menu.new(MenuFont, keySettingsItems)
 Title.padconf = Menu.new(MenuFont, padSettingsItems)
 
 Title.graphics = Menu.new(MenuFont, {
-	{x = 0, y = -0.3,
+	{x = 0, y = -0.4,
 		label = ("MATRIX SWAY AMPLITUDE: <%s%s>"):format(("|"):rep(tonumber(Config.sway_amplitude)), ("."):rep(10 - tonumber(Config.sway_amplitude))),
 		action_e = function(button)
 			local n = (tonumber(Config.sway_amplitude) + 1) % 10
@@ -179,7 +179,7 @@ Title.graphics = Menu.new(MenuFont, {
 			Config.sway_amplitude = tostring(n)
 		end,
 	},
-	{x = 0, y = -0.2,
+	{x = 0, y = -0.3,
 		label = ("MATRIX SWAY SPEED: <%s%s>"):format(("|"):rep(tonumber(Config.sway_speed)), ("."):rep(10 - tonumber(Config.sway_speed))),
 		action_e = function(button)
 			local n = (tonumber(Config.sway_speed) % 10) + 1
@@ -197,7 +197,7 @@ Title.graphics = Menu.new(MenuFont, {
 			Config.sway_speed = tostring(n)
 		end,
 	},
-	{x = 0, y = -0.1,
+	{x = 0, y = -0.2,
 		label = ("MATRIX SWAY BOUNCINESS: <%s%s>"):format(("|"):rep(tonumber(Config.sway_bounciness)), ("."):rep(10 - tonumber(Config.sway_bounciness))),
 		action_e = function(button)
 			local n = (tonumber(Config.sway_bounciness) % 10) + 1
@@ -215,23 +215,43 @@ Title.graphics = Menu.new(MenuFont, {
 			Config.sway_bounciness = tostring(n)
 		end,
 	},
-	{x = 0, y =  0.1, label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness),
+	-- {x = 0, y =  0.0, label = ("< FULLSCREEN : %s >"):format(Config.vsync),
+		-- action_e = function(button)
+			-- Config.vsync = (Config.vsync == "O" and "X" or "O")
+			-- button.label = ("< VSYNC : %s >"):format(Config.vsync)
+            -- love.window.setVSync(Config.vsync == "O")
+            -- SaveConfig()
+		-- end,
+		-- action_r = function(button)
+			-- Config.vsync = (Config.vsync == "O" and "X" or "O")
+			-- button.label = ("< VSYNC : %s >"):format(Config.vsync)
+            -- love.window.setVSync(Config.vsync == "O")
+            -- SaveConfig()
+		-- end,
+		-- action_l = function(button)
+			-- Config.vsync = (Config.vsync == "O" and "X" or "O")
+			-- button.label = ("< VSYNC : %s >"):format(Config.vsync)
+            -- love.window.setVSync(Config.vsync == "O")
+            -- SaveConfig()
+		-- end,
+    -- },
+	{x = 0, y =  0.1, label = ("< VSYNC : %s >"):format(Config.vsync),
 		action_e = function(button)
-			local n = (tonumber(Config.bg_brightness) + 5) % 105
-			Config.bg_brightness = tostring(n)
-			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
+			Config.vsync = (Config.vsync == "O" and "X" or "O")
+			button.label = ("< VSYNC : %s >"):format(Config.vsync)
+            love.window.setVSync(Config.vsync == "O")
             SaveConfig()
 		end,
 		action_r = function(button)
-			local n = math.min(tonumber(Config.bg_brightness) + 5, 100)
-			Config.bg_brightness = tostring(n)
-			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
+			Config.vsync = (Config.vsync == "O" and "X" or "O")
+			button.label = ("< VSYNC : %s >"):format(Config.vsync)
+            love.window.setVSync(Config.vsync == "O")
             SaveConfig()
 		end,
 		action_l = function(button)
-			local n = math.max(tonumber(Config.bg_brightness) - 5, 0)
-			Config.bg_brightness = tostring(n)
-			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
+			Config.vsync = (Config.vsync == "O" and "X" or "O")
+			button.label = ("< VSYNC : %s >"):format(Config.vsync)
+            love.window.setVSync(Config.vsync == "O")
             SaveConfig()
 		end,
     },
@@ -255,7 +275,27 @@ Title.graphics = Menu.new(MenuFont, {
             SaveConfig()
 		end,
     },
-	{x = 0, y =  0.3,
+	{x = 0, y =  0.3, label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness),
+		action_e = function(button)
+			local n = (tonumber(Config.bg_brightness) + 5) % 105
+			Config.bg_brightness = tostring(n)
+			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
+            SaveConfig()
+		end,
+		action_r = function(button)
+			local n = math.min(tonumber(Config.bg_brightness) + 5, 100)
+			Config.bg_brightness = tostring(n)
+			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
+            SaveConfig()
+		end,
+		action_l = function(button)
+			local n = math.max(tonumber(Config.bg_brightness) - 5, 0)
+			Config.bg_brightness = tostring(n)
+			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
+            SaveConfig()
+		end,
+    },
+	{x = 0, y =  0.4,
 		label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(tonumber(Config.blur_spread)), ("."):rep(10 - tonumber(Config.blur_spread))),
 		action_e = function(button)
 			local n = (tonumber(Config.blur_spread) % 10)
@@ -273,7 +313,7 @@ Title.graphics = Menu.new(MenuFont, {
 			Config.blur_spread = tostring(n)
 		end,
 	},
-	{x = 0, y =  0.4,
+	{x = 0, y =  0.5,
 		label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(tonumber(Config.trail_duration)), ("."):rep(10 - tonumber(Config.trail_duration))),
 		action_e = function(button)
 			local n = (tonumber(Config.trail_duration) % 10)

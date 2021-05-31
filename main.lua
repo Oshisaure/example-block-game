@@ -32,7 +32,10 @@ function love.load()
 	-- require("netclient")
 	require("menu")
 	require("title")
+	require("pause")
 	require("splash")
+    
+    love.window.setVSync(Config.vsync == "O")
     
     --[[
     BGMSD = love.sound.newSoundData("assets/bounce.mp3")
@@ -41,6 +44,8 @@ function love.load()
     print(BGM:getChannelCount())
     print(BGMSD:getSampleRate())
 	--]]
+    
+
     
     BGM = {
     ["menu"] = love.audio.newSource("assets/bgm/D_DM2INT.it"                       , "stream"),
@@ -398,9 +403,9 @@ function love.draw()
         local w7, w6 = Width*0.5-7*Game.size, Width*0.5-6*Game.size
         love.graphics.setFont(MenuFont)
         if Game.allow_hold then
-            love.graphics.printf("HOLD",    0, Height*0.2, w7, "right")
+            love.graphics.printf("HOLD",    0, Height*0.15, w7, "right")
         end
-        love.graphics.printf("NEXT", Width-w7, Height*0.2, w7, "left")
+        love.graphics.printf("NEXT", Width-w7, Height*0.15, w7, "left")
         love.graphics.setFont(HUDFont)
         love.graphics.printf("LINE CLEAR STATISTICS", 0, Height*0.4, w6, "center")
         
@@ -467,6 +472,7 @@ function love.draw()
 		-- love.graphics.print("Bag:"..table.concat(Game.bag).."\nHistory:"..table.concat(Game.history), Width*0.62, Height*0.86)
         
         --]===]
+        if STATE == "pause" then DrawPause() end
 	end
     
     love.graphics.setFont(MenuFont)
@@ -475,7 +481,7 @@ function love.draw()
 end
 
 function love.keypressed(key)
-	if STATE == "ingame" and key == "return" and Game.dead then
+	if STATE == "ingame" and (key == "return" or key == KeyBindings.pause) and Game.dead then
 		Game:reset(os.time())
 		Game:setLV(1)
 		-- DisconnectServer()
@@ -483,6 +489,8 @@ function love.keypressed(key)
         if Config.dynamic_bg == "X" then PrerenderBG() end
 		STATE = "menu"
         SetBGM("menu")
+	elseif STATE == "ingame" and key == KeyBindings.pause then
+        STATE = "pause"
     --[[
 	elseif STATE == "ingame" then
         if key == "kp8" then Game.position_y = Game.position_y - 0.1 end
@@ -513,9 +521,10 @@ function love.keypressed(key)
 		Title.padconf:updateSelected("kek")
 		SaveConfig()
 		STATE = "menu"
-		
 	elseif STATE == "menu" then
 		Title[Title.current]:updateSelected(key)
+	elseif STATE == "pause" then
+		Pause:updateSelected(key)
 	end
 end
 
@@ -531,6 +540,19 @@ function love.gamepadpressed(joystick, button)
 		Title.padconf:updateSelected("kek")
 		SaveConfig()
 		STATE = "menu"
+    elseif STATE == "ingame" then
+        if button == PadBindings.pause then
+            if Game.dead then
+                Game:setLV(1)
+                Game:reset(os.time())
+                bottomtext = ""
+                if Config.dynamic_bg == "X" then PrerenderBG() end
+                STATE = "menu"
+                SetBGM("menu")
+            else
+                STATE = "pause"
+            end
+        end
     else
         local boop = MenuPadControls[button]
         if boop then love.keypressed(boop) end
@@ -540,15 +562,30 @@ end
 function love.gamepadaxis(joystick, axis, value)
     CurrentController = joystick
     local dz = tonumber(Config.pad_deadzone)
-	if STATE == "padinput" and (value*100 > dz or -value*100 > dz) then
+    if not (value*100 > dz or -value*100 > dz) then return end
+    local input = axis..(value > 0 and "+" or "-")
+    
+	if STATE == "padinput" then
 		local id = Title.padconf.highlight - 1
 		local field = Bindlist[id][1]
-        local input = axis..(value > 0 and "+" or "-")
 		Config["pad_"..field] = input
 		PadBindings[field] = input
 		Title.padconf.items[id+1].label = ("%s : %s"):format(Bindlist[id][2], input:upper())
 		Title.padconf:updateSelected("kek")
 		SaveConfig()
 		STATE = "menu"
+    elseif STATE == "ingame" then
+        if input == PadBindings.pause then
+            if Game.dead then
+                Game:setLV(1)
+                Game:reset(os.time())
+                bottomtext = ""
+                if Config.dynamic_bg == "X" then PrerenderBG() end
+                STATE = "menu"
+                SetBGM("menu")
+            else
+                STATE = "pause"
+            end
+        end
 	end
 end

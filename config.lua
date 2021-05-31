@@ -115,6 +115,7 @@ ConfigDefaults = {
     dynamic_bg     = "O",
     blur_spread    = "5",
     trail_duration = "5",
+    vsync          = "O",
 }
 
 KeyBindings = {}
