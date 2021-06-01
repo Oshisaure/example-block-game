@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ]==]
 
-Pause = Menu.new(MenuFont, {
+Pause = Menu.new("Menu", {
 	{x = 0, y = -0.2, label = "RESUME",  action_e = function(button)
         STATE = "ingame"
         button.parent.highlight = 1
@@ -28,13 +28,15 @@ Pause = Menu.new(MenuFont, {
         button.parent.highlight = 1
     end},
 	{x = 0, y =  0.2, label = "QUIT",    action_e = function(button)
-        STATE = "menu"
+        if Config.dynamic_bg == "X" then PrerenderBG() end
+		Game:reset(os.time())
+		Game:setLV(1)
+		STATE = "menu"
         SetBGM("menu")
-        button.parent.highlight = 1
     end},
 })
 
-local pausetext = love.graphics.newText(TitleFont, "GAME PAUSED")
+local pausetext = love.graphics.newText(Font.Title, "GAME PAUSED")
 function DrawPause()
     local _c = love.graphics.getCanvas()
     love.graphics.setCanvas(CanvasRainbow)

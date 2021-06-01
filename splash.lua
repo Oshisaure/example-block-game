@@ -20,8 +20,7 @@ local splashlogo = love.graphics.newImage("assets/splashscreen/splashlogo.png")
 local splashbg   = love.graphics.newImage("assets/splashscreen/splashbg.png")
 local splashtext = love.graphics.newImage("assets/splashscreen/splashtext.png")
 local splashtime = 0
-local splashscale = Height/900
-local splashcanvas = love.graphics.newCanvas(Width/splashscale, Height/splashscale)
+local splashcanvas = love.graphics.newCanvas(1600, 900)
 
 
 function ResetSplashScreen(t) splashtime = t or 0 end -- idk maybe itll be useful
@@ -56,5 +55,5 @@ function DrawSplashScreen()
     love.graphics.setCanvas(_c)
     love.graphics.pop()
     love.graphics.setColor(1,1,1,1)
-    love.graphics.draw(splashcanvas, 0, 0, 0, splashscale, splashscale)--, -splashcanvas:getWidth()/2, -splashcanvas:getHeight()/2)
+    love.graphics.draw(splashcanvas, Width/2, Height/2, 0, Height/900, Height/900, splashcanvas:getWidth()/2, splashcanvas:getHeight()/2)
 end

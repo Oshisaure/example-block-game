@@ -18,12 +18,10 @@
 
 function love.load()
 	Width, Height = love.graphics.getDimensions()
-	HUDFont = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.floor(Height/50))
-	MenuFont = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.floor(Height/32))
-	TitleFont = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.floor(Height/16))
-
 	require("util")
 	require("config")
+    ProcessResize(Width, Height, true)
+    
 	require("piece")
 	require("engine")
 	require("speedcurve")
@@ -35,7 +33,7 @@ function love.load()
 	require("pause")
 	require("splash")
     
-    love.window.setVSync(Config.vsync == "O")
+    love.window.setVSync(BoolNumber(Config.vsync == "O"))
     
     --[[
     BGMSD = love.sound.newSoundData("assets/bounce.mp3")
@@ -61,22 +59,22 @@ function love.load()
         track:setVolume(tostring(Config.bgm_volume)/100)
     end
 	BlockSize = Height/40
-	BlockCanvas = love.graphics.newCanvas(BlockSize,BlockSize)
-	love.graphics.setCanvas(BlockCanvas)
-	love.graphics.setColor(1,1,1,1)
-	love.graphics.rectangle("fill",0,0,BlockSize,BlockSize)
-	love.graphics.setCanvas()
+	-- BlockCanvas = love.graphics.newCanvas(BlockSize,BlockSize)
+	-- love.graphics.setCanvas(BlockCanvas)
+	-- love.graphics.setColor(1,1,1,1)
+	-- love.graphics.rectangle("fill",0,0,BlockSize,BlockSize)
+	-- love.graphics.setCanvas()
 	Games = {}
 	for i = 1, #Levels do
-		Games[i] = Board.new(Levels[i], os.time(), BlockSize, BlockCanvas, 0.5, 0.5)
+		Games[i] = Board.new(Levels[i], os.time(), BlockSize, 0.5, 0.5)
 	end
 	-- Games.P1 = Board.new(Levels["vs"], os.time(), BlockSize, BlockCanvas, 0.5 - 0.23, 0.5)
 	-- Games.P2 = Board.new(Levels["vs"], os.time(), BlockSize, BlockCanvas, 0.5 + 0.23, 0.5)
 	-- Games.ss = Board.new(Levels["serv"], os.time(), BlockSize, BlockCanvas, 0.5 - 0.23, 0.5)
     
-    TitleText  = love.graphics.newText(TitleFont, "EXAMPLE BLOCK GAME")
-    ScoreText  = love.graphics.newText(TitleFont)
-    ScorePopup = love.graphics.newText(HUDFont)
+    TitleText  = love.graphics.newText(Font.Title, "EXAMPLE BLOCK GAME")
+    ScoreText  = love.graphics.newText(Font.Title)
+    ScorePopup = love.graphics.newText(Font.HUD)
     
     -- ShaderXD = love.graphics.newShader("shaders/chroma-misalign.glsl")
     ShaderBG = {
@@ -123,10 +121,7 @@ function love.load()
     CanvasBGprev:release()
 	Width, Height = love.graphics.getDimensions()
     --]]
-    CanvasBG      = love.graphics.newCanvas()
-    CanvasBGprev  = love.graphics.newCanvas()
-    CanvasRainbow = love.graphics.newCanvas()
-    if Config.dynamic_bg == "X" then PrerenderBG() end
+    
 	--[==[
 	ServerThreadUDP = love.thread.newThread([[
 		require("netserver")
@@ -149,7 +144,7 @@ function love.load()
 		{2, true, "Spin-2"},
 		{3, true, "Spin-3"},
 	}
-	love.graphics.setFont(MenuFont)
+	love.graphics.setFont(Font.Menu)
 	
 	bottomtext = ""
 	STATE = "splash"
@@ -401,12 +396,12 @@ function love.draw()
         -- love.graphics.setShader()
 		-- love.graphics.printf(bottomtext, -Width*0.23, Height*0.86, Width, "center")
         local w7, w6 = Width*0.5-7*Game.size, Width*0.5-6*Game.size
-        love.graphics.setFont(MenuFont)
+        love.graphics.setFont(Font.Menu)
         if Game.allow_hold then
             love.graphics.printf("HOLD",    0, Height*0.15, w7, "right")
         end
         love.graphics.printf("NEXT", Width-w7, Height*0.15, w7, "left")
-        love.graphics.setFont(HUDFont)
+        love.graphics.setFont(Font.HUD)
         love.graphics.printf("LINE CLEAR STATISTICS", 0, Height*0.4, w6, "center")
         
 		for k, id in ipairs(Piece.IDs) do
@@ -414,7 +409,7 @@ function love.draw()
 			love.graphics.print(id, w6*(0.20+0.1*k), Height*0.45)
 		end
 		for i, lc in ipairs(LineClearTypes) do
-			local j = i + (i > 4 and 1 or 0) -- skip a line between regular and spin clears
+			local j = i + BoolNumber(i > 4) -- skip a line between regular and spin clears
 			love.graphics.setColor(1, 1, 1)
 			love.graphics.print(lc[3], w6*0.05, Height*(0.45+0.025*j))
 			for k, id in ipairs(Piece.IDs) do
@@ -454,11 +449,11 @@ function love.draw()
         end
         
         love.graphics.setColor(1,1,1,1)
-        love.graphics.setFont(HUDFont)
+        love.graphics.setFont(Font.HUD)
         love.graphics.printf("LEVEL", Width*0.75, Height*0.40, Width*0.2, "left")
         love.graphics.printf("LINES", Width*0.75, Height*0.50, Width*0.2, "left")
         love.graphics.printf("TIME ", Width*0.75, Height*0.60, Width*0.2, "left")
-        love.graphics.setFont(MenuFont)
+        love.graphics.setFont(Font.Menu)
         love.graphics.printf("SCORE", Width*0.75, Height*0.80, Width*0.2, "right")
         
         love.graphics.printf(Game.level_name,        Width*0.75, Height*0.425, Width*0.2, "right")
@@ -475,7 +470,7 @@ function love.draw()
         if STATE == "pause" then DrawPause() end
 	end
     
-    love.graphics.setFont(MenuFont)
+    love.graphics.setFont(Font.Menu)
     love.graphics.setColor(1,1,1)
     love.graphics.print(love.timer.getFPS().."FPS")
 end
@@ -588,4 +583,8 @@ function love.gamepadaxis(joystick, axis, value)
             end
         end
 	end
+end
+
+function love.resize(w, h)
+    ProcessResize(w, h)
 end

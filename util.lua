@@ -110,7 +110,7 @@ function LineClearName(count)
     return count.."-TUPLE"
 end
 
-function nBool(b) return b and 1 or 0 end
+function BoolNumber(b) return b and 1 or 0 end
 
 function AvgArrays(base, ...)
 	local arg = {...}
@@ -175,7 +175,7 @@ function UpdateShadersUniforms(dt)
     end
 end
 
-local buffercanvas = love.graphics.newCanvas()
+local buffercanvas
 function DrawBlurred(drawable, ...)
     local _c = love.graphics.getCanvas()
     local r, g, b, a = love.graphics.getColor()
@@ -212,8 +212,10 @@ function DrawRainbow(drawable, ...)
 end
 
 Prerendered_frame = nil
+local currentbg = "menu"
 function PrerenderBG(id)
     id = id or "menu"
+    currentbg = id
     -- for k, v in pairs(ShaderBG) do
         if Prerendered_frame then Prerendered_frame:release() end
         Prerendered_frame = love.graphics.newCanvas(Width, Height)
@@ -269,4 +271,48 @@ function RenderBG(id)
     love.graphics.pop()
     love.graphics.setCanvas(_c)
     love.graphics.setColor(r, g, b, a)
+end
+
+
+function ProcessResize(w, h, first)
+	Width, Height = w, h
+    if not first then
+        for _, font in pairs(Font) do font:release() end
+        CanvasBG     :release()
+        CanvasBGprev :release()
+        CanvasRainbow:release()
+        buffercanvas:release()
+        for _, game in pairs(Games) do
+            game.size = h/40
+			game.canvas        :release()
+			game.field_canvas  :release()
+			game.glow_canvas   :release()
+			game.overlay_canvas:release()
+			game.canvas         = love.graphics.newCanvas(w, h)
+			game.field_canvas   = love.graphics.newCanvas(w, h)
+			game.glow_canvas    = love.graphics.newCanvas(w, h)
+			game.overlay_canvas = love.graphics.newCanvas(w, h)
+        end
+    end
+    
+    Font = {
+        HUD   = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.ceil(h/50)),
+        Menu  = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.ceil(h/32)),
+        Title = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.ceil(h/16)),
+    }
+    CanvasBG      = love.graphics.newCanvas()
+    CanvasBGprev  = love.graphics.newCanvas()
+    CanvasRainbow = love.graphics.newCanvas()
+    buffercanvas  = love.graphics.newCanvas()
+    
+    if not first then
+        TitleText :setFont(Font.Title)
+        ScoreText :setFont(Font.Title)
+        ScorePopup:setFont(Font.HUD)
+        for name, menu in pairs(Title) do
+            if name ~= "current" then menu:updateSelected() end
+        end
+        Pause:updateSelected()
+    end
+    if Config.dynamic_bg == "X" then PrerenderBG(currentbg) end
 end

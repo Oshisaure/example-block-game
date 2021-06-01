@@ -21,7 +21,7 @@ Title = {current = "main"}
 local change = function(menu) return function(button) button.parent.highlight = 1; SaveConfig(); Title.current = menu end end
 local open   = function(menu) return function(button)                              SaveConfig(); Title.current = menu end end
 
-Title.main = Menu.new(MenuFont, {
+Title.main = Menu.new("Menu", {
 	{x = 0, y = -0.2, label = "START GAME",      action_e = open("play")},
 	{x = 0, y =  0.0, label = "SETTINGS",        action_e = open("settings")},
 	--[[
@@ -87,9 +87,9 @@ for i, mode in ipairs(Levels) do
     end
 end
 table.insert(gamemodes, {x = 0, y =  0.7, label = "BACK", action_e = change("main")})
-Title.play = Menu.new(MenuFont, gamemodes)
+Title.play = Menu.new("Menu", gamemodes)
 
-Title.settings = Menu.new(MenuFont, {
+Title.settings = Menu.new("Menu", {
 	{x = 0, y = -0.5, label = ("< BGM VOLUME : %d%% >"):format(Config.bgm_volume),
 		action_e = function(button)
 			local n = (tonumber(Config.bgm_volume) + 5) % 105
@@ -157,10 +157,10 @@ end
 table.insert(keySettingsItems, {x = 0, y = -0.07+0.07*#Bindlist, label = ("DONE"), id = i, action_e = change("settings")})
 table.insert(padSettingsItems, {x = 0, y = -0.07+0.07*#Bindlist, label = ("DONE"), id = i, action_e = change("settings")})
 
-Title.keyconf = Menu.new(MenuFont, keySettingsItems)
-Title.padconf = Menu.new(MenuFont, padSettingsItems)
+Title.keyconf = Menu.new("Menu", keySettingsItems)
+Title.padconf = Menu.new("Menu", padSettingsItems)
 
-Title.graphics = Menu.new(MenuFont, {
+Title.graphics = Menu.new("Menu", {
 	{x = 0, y = -0.4,
 		label = ("MATRIX SWAY AMPLITUDE: <%s%s>"):format(("|"):rep(tonumber(Config.sway_amplitude)), ("."):rep(10 - tonumber(Config.sway_amplitude))),
 		action_e = function(button)
@@ -239,19 +239,19 @@ Title.graphics = Menu.new(MenuFont, {
 		action_e = function(button)
 			Config.vsync = (Config.vsync == "O" and "X" or "O")
 			button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            love.window.setVSync(Config.vsync == "O")
+            love.window.setVSync(BoolNumber(Config.vsync == "O"))
             SaveConfig()
 		end,
 		action_r = function(button)
 			Config.vsync = (Config.vsync == "O" and "X" or "O")
 			button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            love.window.setVSync(Config.vsync == "O")
+            love.window.setVSync(BoolNumber(Config.vsync == "O"))
             SaveConfig()
 		end,
 		action_l = function(button)
 			Config.vsync = (Config.vsync == "O" and "X" or "O")
 			button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            love.window.setVSync(Config.vsync == "O")
+            love.window.setVSync(BoolNumber(Config.vsync == "O"))
             SaveConfig()
 		end,
     },

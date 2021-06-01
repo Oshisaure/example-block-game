@@ -282,13 +282,14 @@ Board = {
 					local G = math.min(30, board.gravity)
 					local gv = math.max(1, G)
 					local vx, vy, vr = board.random:random()*150-75, (board.random:random()*5+5)*gv^0.5, (board.random:random()*150-75) * (board.spin and 50 or 1)
+                    local sc = board.size
 					table.insert(board.animate, {
 						object = board.block_mesh,
 						startt = board.time,
 						endt = board.time + 15,
 						func = function(t)
 							local t2 = 30*t
-							return {x-5.5+vx*t, 3*t2*t2*G - vy*t2 - y + 10.5, vr*t}
+							return sc*(x-5.5+vx*t), sc*(3*t2*t2*G - vy*t2 - y + 10.5), vr*t, sc 
 						end
 					})
                     board.grid[x][y] = nil
@@ -457,6 +458,26 @@ Board = {
         board.level = newlevel
         for k, v in pairs(board.speedcurve[newlevel]) do board[k] = v end
     end,
+    
+    putTheBlock = function(board, ...)
+        local x, y, r, sx, sy, ox, oy, kx, ky = ...
+        x  = x  or 0
+        y  = y  or 0
+        r  = r  or 0
+        sx = sx or 1
+        sy = sy or sx
+        ox = ox or 0
+        oy = oy or 0
+        kx = kx or 0
+        ky = ky or 0
+        
+        local sc = board.size
+        x = (x-5.5)*sc
+        y = (10.5-y)*sc
+        sx = sx * sc
+        sy = sy * sc
+		love.graphics.draw(board.block_mesh, x, y, r, sx, sy, ox, oy, kx, ky)
+    end,
 	
 	add_event = function(board, where, when, action)
 		-- where: on what function call should the event be called
@@ -510,14 +531,14 @@ Board = {
             local byte1 = 0
             for x = 1, 5 do
                 byte1 = byte1 * 2
-                byte1 = byte1 + nBool(board.grid[x][y])
+                byte1 = byte1 + BoolNumber(board.grid[x][y])
             end
             byte1 = byte1 + 0x80
             enc = enc..string.char(byte1)
             local byte2 = 0
             for x = 6,10 do
                 byte2 = byte2 * 2
-                byte2 = byte2 + nBool(board.grid[x][y])
+                byte2 = byte2 + BoolNumber(board.grid[x][y])
             end
             byte2 = byte2 + 0x80
             enc = enc..string.char(byte2)
@@ -735,7 +756,7 @@ Board = {
 			for x = 1, 10 do
 				if board.grid[x][y] then
 					-- love.graphics.rectangle("fill", (x-6)*sc, (10-y)*sc, sc, sc)
-					love.graphics.draw(board.block_mesh, (x-5.5)*sc, (10.5-y)*sc)
+					board:putTheBlock(x, y)
 				end
 			end
 		end
@@ -748,7 +769,7 @@ Board = {
                     local x, y = b[1] + pc.x, b[2] + pc.y
                     if not board.current_grounded then y = y - board.gravity_acc end
                     -- love.graphics.rectangle("fill", (x-6)*sc, (10-y)*sc, sc, sc)
-                    love.graphics.draw(board.block_mesh, (x-5.5)*sc, (10.5-y)*sc)
+                    board:putTheBlock(x, y)
                 else
                     local x1, y1 = unpack(b)
                     local rotate_anim_time = 0.1
@@ -759,7 +780,7 @@ Board = {
                     local x2, y2 = c*(x1-xr)-s*(y1-yr)+xr, s*(x1-xr)+c*(y1-yr)+yr
                     local x, y = x2 + pc.x, y2 + pc.y
                     if not board.current_grounded then y = y - board.gravity_acc end
-                    love.graphics.draw(board.block_mesh, (x-5.5)*sc, (10.5-y)*sc, -a)
+                    board:putTheBlock(x, y, -a)
                 end
 			end
 		end
@@ -807,8 +828,7 @@ Board = {
 			if board.time > endt then
 				table.remove(board.animate, n)
 			else
-				local x, y, r = unpack(Interpolate(i.func, board.time, startt, endt))
-				love.graphics.draw(i.object, x*sc, y*sc, r)
+				love.graphics.draw(i.object, Interpolate(i.func, board.time, startt, endt))
 				n = n+1
 			end
 			i = board.animate[n]
@@ -825,7 +845,7 @@ Board = {
 			for _, b in ipairs(piece.blocks[piece.orientation]) do
 				local x, y = b[1], b[2]
 				-- love.graphics.rectangle("fill", (x+8)*sc, (4*n-y-12)*sc, sc, sc)
-				love.graphics.draw(board.block_mesh, (x+8.5)*sc, (3.5*n-y-14.0)*sc)
+				board:putTheBlock(x+14, y+21-3.5*(n-1))
 			end
 		end
 		
@@ -837,7 +857,7 @@ Board = {
 			for _, b in ipairs(hold.blocks[hold.orientation]) do
 				local x, y = b[1], b[2]
 				-- love.graphics.rectangle("fill", (x-10)*sc, (-y-9)*sc, sc, sc)
-				love.graphics.draw(board.block_mesh, (x-9.5)*sc, (-y-10.5)*sc)
+				board:putTheBlock(x-4, y+21)
 			end
 		end
         
@@ -946,7 +966,7 @@ Board = {
         love.graphics.setCanvas()
 	end,
 	
-	new = function(curve, seed, blocksize, blocktexture, posx, posy)
+	new = function(curve, seed, blocksize, posx, posy)
 		local newboard = {
 			nexts = {},
 			next_count = curve.prev,
@@ -958,15 +978,15 @@ Board = {
             position_y = posy,
             edge_colour = curve.colour,
 			block_mesh = love.graphics.newMesh({
-				{-blocksize/2, -blocksize/2, 0, 0, 1.0,1.0,1.0, 1},
-				{ blocksize/2, -blocksize/2, 1, 0, 0.9,0.9,0.9, 1},
-				{ blocksize/2,  blocksize/2, 1, 1, 0.7,0.7,0.7, 1},
-				{-blocksize/2,  blocksize/2, 0, 1, 0.8,0.8,0.8, 1},
+				{-0.5, -0.5, 0, 0, 1.0,1.0,1.0, 1},
+				{ 0.5, -0.5, 1, 0, 0.9,0.9,0.9, 1},
+				{ 0.5,  0.5, 1, 1, 0.7,0.7,0.7, 1},
+				{-0.5,  0.5, 0, 1, 0.8,0.8,0.8, 1},
 			}, "fan", "static"),
 			trail_mesh = love.graphics.newMesh({
-				{-blocksize/2,  blocksize/2, 0, 0, 1,1,1,1},
-				{ blocksize/2,  blocksize/2, 0, 0, 1,1,1,1},
-				{ 0,           0,            0, 0, 1,1,1,0},
+				{-0.5,  0.5, 0, 0, 1,1,1,1},
+				{ 0.5,  0.5, 0, 0, 1,1,1,1},
+				{ 0,    0,   0, 0, 1,1,1,0},
 			}, "fan", "dynamic"),
 			random = love.math.newRandomGenerator(seed),
 			canvas = love.graphics.newCanvas(),
@@ -1002,6 +1022,7 @@ Board = {
 			add_draw_item = Board.add_draw_item,
 			do_draw_items = Board.do_draw_items,
             darken_glow = Board.darken_glow,
+            putTheBlock = Board.putTheBlock,
 		}
 		newboard.block_mesh:setTexture(blocktexture)
 		for i = 1, curve.prev do newboard.nexts[i] = 0 end

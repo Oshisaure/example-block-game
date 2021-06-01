@@ -24,6 +24,7 @@ Menu = {
 		elseif key == "right"  then r = self.items[self.highlight]:action_r()
 		elseif key == "left"   then r = self.items[self.highlight]:action_l()
 		end
+        self.text:setFont(Font[self.font])
 		self.text:set("")
 		for k, item in ipairs(self.items) do
 			self.text:addf({k == self.highlight and {1, 0.7, 0.5} or {1,1,1}, item.label}, Width, "center", math.floor(item.x*Width/2), math.floor(item.y*Height/2)+Height/2)
@@ -57,7 +58,7 @@ Menu = {
 		local menu = {
 			items = items,
             font = font,
-			text = love.graphics.newText(font),
+			text = love.graphics.newText(Font[font]),
 			highlight = 1,
 			updateSelected = Menu.updateSelected,
             reload = Menu.reload,
