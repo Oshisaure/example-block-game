@@ -113,11 +113,34 @@ Title.settings = Menu.new("Menu", {
             SaveConfig()
 		end,
     },
+	{x = 0, y = -0.3, label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume),
+		action_e = function(button)
+			local n = (tonumber(Config.sfx_volume) + 5) % 105
+			Config.sfx_volume = tostring(n)
+			button.label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume)
+            SetSFXVolume(n/100)
+            SaveConfig()
+		end,
+		action_r = function(button)
+			local n = math.min(tonumber(Config.sfx_volume) + 5, 100)
+			Config.sfx_volume = tostring(n)
+			button.label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume)
+            SetSFXVolume(n/100)
+            SaveConfig()
+		end,
+		action_l = function(button)
+			local n = math.max(tonumber(Config.sfx_volume) - 5, 0)
+			Config.sfx_volume = tostring(n)
+			button.label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume)
+            SetSFXVolume(n/100)
+            SaveConfig()
+		end,
+    },
     
-	{x = 0, y = -0.3, label = "KEYBOARD CONFIG", action_e = open("keyconf")},
-	{x = 0, y = -0.1, label = "GAMEPAD CONFIG",  action_e = open("padconf")},
-	{x = 0, y =  0.1, label = "GRAPHICS OPTIONS",  action_e = open("graphics")},
-	{x = 0, y =  0.3, label = "BACK",  action_e = change("main")},
+	{x = 0, y = -0.1, label = "KEYBOARD CONFIG", action_e = open("keyconf")},
+	{x = 0, y =  0.1, label = "GAMEPAD CONFIG",  action_e = open("padconf")},
+	{x = 0, y =  0.3, label = "GRAPHICS OPTIONS",  action_e = open("graphics")},
+	{x = 0, y =  0.7, label = "BACK",  action_e = change("main")},
 })
 
 local keySettingsItems = {}

@@ -86,7 +86,7 @@ Board = {
 	end,
 	
 	rotate_cw = function(board)
-        local kik, point = board.piece:rotateCW(board)
+        local kik = board.piece:rotateCW(board)
 		if kik then
             board.cur_rots = board.cur_rots + 1
             board.spin = board:check_spin()
@@ -95,6 +95,8 @@ Board = {
             board.last_rotate_time  = board.time
             board.last_rotate_dir   = -1
             board:update_ghost() -- update ghost on rotate
+			
+			PlaySFX("classic_rotate")
         end
 	end,
 	
@@ -108,18 +110,22 @@ Board = {
             board.last_rotate_time  = board.time
             board.last_rotate_dir   = 1
             board:update_ghost() -- update ghost on rotate
+			
+			PlaySFX("classic_rotate")
         end
 	end,
 
 	initial_rotate = function(board, input)
-		if input.cw1  and not (input.ccw1 or input.ccw2 or input.ccw3 or input.ccw4) then board.piece:rotateCW (board) end
-		if input.cw2  and not (input.ccw1 or input.ccw2 or input.ccw3 or input.ccw4) then board.piece:rotateCW (board) end
-		if input.cw3  and not (input.ccw1 or input.ccw2 or input.ccw3 or input.ccw4) then board.piece:rotateCW (board) end
-		if input.cw4  and not (input.ccw1 or input.ccw2 or input.ccw3 or input.ccw4) then board.piece:rotateCW (board) end
-		if input.ccw1 and not (input.cw1  or input.cw2  or input.cw3  or input.cw4 ) then board.piece:rotateCCW(board) end
-		if input.ccw2 and not (input.cw1  or input.cw2  or input.cw3  or input.cw4 ) then board.piece:rotateCCW(board) end
-		if input.ccw3 and not (input.cw1  or input.cw2  or input.cw3  or input.cw4 ) then board.piece:rotateCCW(board) end
-		if input.ccw4 and not (input.cw1  or input.cw2  or input.cw3  or input.cw4 ) then board.piece:rotateCCW(board) end
+		local s = false
+		if input.cw1  and not (input.ccw1 or input.ccw2 or input.ccw3 or input.ccw4) then s = board.piece:rotateCW (board) end
+		if input.cw2  and not (input.ccw1 or input.ccw2 or input.ccw3 or input.ccw4) then s = board.piece:rotateCW (board) end
+		if input.cw3  and not (input.ccw1 or input.ccw2 or input.ccw3 or input.ccw4) then s = board.piece:rotateCW (board) end
+		if input.cw4  and not (input.ccw1 or input.ccw2 or input.ccw3 or input.ccw4) then s = board.piece:rotateCW (board) end
+		if input.ccw1 and not (input.cw1  or input.cw2  or input.cw3  or input.cw4 ) then s = board.piece:rotateCCW(board) end
+		if input.ccw2 and not (input.cw1  or input.cw2  or input.cw3  or input.cw4 ) then s = board.piece:rotateCCW(board) end
+		if input.ccw3 and not (input.cw1  or input.cw2  or input.cw3  or input.cw4 ) then s = board.piece:rotateCCW(board) end
+		if input.ccw4 and not (input.cw1  or input.cw2  or input.cw3  or input.cw4 ) then s = board.piece:rotateCCW(board) end
+		if s then PlaySFX("classic_rotate") end
 	end,
 	
 	place = function(board)
@@ -209,17 +215,25 @@ Board = {
                     if board.animation_time <= 0 then
                         board:drop_lines()
                         board.spawn_timer = board.spawn_delay - board.spawn_delay_after_line
+						PlaySFX("classic_lock")
                         return true
                     end
                     return false
                 end)
-            elseif board.last_spin then
-                table.insert(board.recent_actions, 1, {
-                    time   = board.time,
-                    label  = board.piece.parent.."-SPIN",
-                    score  = board.last_score,
-                    colour = AvgArrays(board.piece.colour, {1,1,1,1}),
-                })
+				
+				if board.spin or ln >= 4 then PlaySFX("classic_bonus") end
+				PlaySFX("classic_clear")
+            else
+				if board.last_spin then
+					table.insert(board.recent_actions, 1, {
+						time   = board.time,
+						label  = board.piece.parent.."-SPIN",
+						score  = board.last_score,
+						colour = AvgArrays(board.piece.colour, {1,1,1,1}),
+					})
+				end
+				
+				PlaySFX("classic_lock")
             end
 
 			-- check level up
@@ -613,6 +627,7 @@ Board = {
 						board.piece.x = board.piece.x - board.AS_dir
                         board.AS_timer = board.AS_delay
                     else
+						if board.AS_dir ~= 0 then PlaySFX("classic_move") end
                         if board.AS_timer >= board.AS_delay then board.AS_timer = board.AS_timer - board.AS_repeat end
 					end
 					board:update_ghost() -- update ghost when the piece moves

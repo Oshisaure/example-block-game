@@ -105,7 +105,8 @@ ConfigDefaults = {
 	pad_hold      = "rightshoulder",
 	
 	pad_deadzone  = "70",
-	bgm_volume    = "100",
+	bgm_volume    = "50",
+	sfx_volume    = "50",
     
 	sway_bounciness = "5",
 	sway_amplitude  = "5",

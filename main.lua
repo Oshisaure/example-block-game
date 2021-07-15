@@ -58,6 +58,13 @@ function love.load()
         track:setLooping(true)
         track:setVolume(tostring(Config.bgm_volume)/100)
     end
+	SFX = {
+		classic_move   = love.audio.newSource("assets/sfx/classic_move.ogg"  , "stream"),
+		classic_rotate = love.audio.newSource("assets/sfx/classic_rotate.ogg", "stream"),
+		classic_clear  = love.audio.newSource("assets/sfx/classic_clear.ogg" , "stream"),
+		classic_bonus  = love.audio.newSource("assets/sfx/classic_bonus.ogg" , "stream"),
+		classic_lock   = love.audio.newSource("assets/sfx/classic_lock.ogg"  , "stream"),
+	}
 	BlockSize = Height/40
 	-- BlockCanvas = love.graphics.newCanvas(BlockSize,BlockSize)
 	-- love.graphics.setCanvas(BlockCanvas)

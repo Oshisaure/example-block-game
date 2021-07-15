@@ -156,6 +156,11 @@ function SetBGM(id)
     end
 end
 
+function PlaySFX(id)
+    SFX[id]:stop()
+    SFX[id]:play()
+end
+
 function SetBGMVolume(v)
     for k, t in pairs(BGM) do
         if k == 4 then
@@ -163,6 +168,12 @@ function SetBGMVolume(v)
         else
             t:setVolume(v)
         end
+    end
+end
+
+function SetSFXVolume(v)
+    for k, t in pairs(SFX) do
+        t:setVolume(v)
     end
 end
 
