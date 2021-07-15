@@ -51,3 +51,8 @@ function DrawPause()
     love.graphics.draw(Pause.text)
     DrawRainbow(CanvasRainbow)
 end
+
+function UpdatePauseMenuFonts()
+	pausetext:setFont(Font.Title)
+	Pause:updateSelected()
+end

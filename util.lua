@@ -323,7 +323,7 @@ function ProcessResize(w, h, first)
         for name, menu in pairs(Title) do
             if name ~= "current" then menu:updateSelected() end
         end
-        Pause:updateSelected()
+		UpdatePauseMenuFonts()
     end
     if Config.dynamic_bg == "X" then PrerenderBG(currentbg) end
 end
