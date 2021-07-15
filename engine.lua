@@ -1044,7 +1044,7 @@ Board = {
 		}
 		newboard.block_mesh:setTexture(blocktexture)
 		for i = 1, curve.prev do newboard.nexts[i] = 0 end
-		newboard:reset(seed)
+		newboard:reset(seed, 1)
 		
 		return newboard
 	end
