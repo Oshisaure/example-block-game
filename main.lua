@@ -90,6 +90,7 @@ function love.load()
         beginner  = love.graphics.newShader("shaders/bgbeginner.glsl"),
         original  = love.graphics.newShader("shaders/bg1.glsl"),
         master    = love.graphics.newShader("shaders/bg10.glsl"),
+        classic   = love.graphics.newShader("shaders/bgclassic.glsl"),
         menu      = love.graphics.newShader("shaders/bgmenu.glsl"),
     }
     ShaderBlur    = love.graphics.newShader("shaders/blur.glsl")
@@ -114,19 +115,23 @@ function love.load()
     --[[
     Width = 3840
     Height = 2160
+    CanvasBG    :release()
+    CanvasBGprev:release()
     CanvasBG      = love.graphics.newCanvas(Width, Height)
     CanvasBGprev  = love.graphics.newCanvas(Width, Height)
-    PrerenderBG("beginner")
+    PrerenderBG("classic")
     print("prerendered")
     local dat = Prerendered_frame:newImageData()
     print("imagedata")
-    dat:encode("png", "beginner_bg_4k.png")
+    dat:encode("png", "classic_bg_4k.png")
     print("encode")
     dat:release()
     print("release")
+	Width, Height = love.graphics.getDimensions()
     CanvasBG    :release()
     CanvasBGprev:release()
-	Width, Height = love.graphics.getDimensions()
+    CanvasBG      = love.graphics.newCanvas(Width, Height)
+    CanvasBGprev  = love.graphics.newCanvas(Width, Height)
     --]]
     
 	--[==[

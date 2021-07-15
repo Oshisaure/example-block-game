@@ -73,14 +73,20 @@ local gamemodes = {}
 for i, mode in ipairs(Levels) do
     if mode.name ~= "Death" then -- keep that for carnival?
         table.insert(gamemodes, 
-            {x = 0, y = -0.5+0.1*i, label = mode.name,
-                action_e = function()
+            {x = -0.5, y = -0.5+0.1*i, label = mode.name, id = i,
+                action_e = function(button)
                     Game = Games[i]
-                    Game:reset(os.time())
+                    Game:reset(os.time(), button.parent.startlv)
                     SetBGM(Game.BGM)
                     Game.display_score = 999999999 -- 999,999,999
                     if Config.dynamic_bg == "X" then PrerenderBG(Game.speedcurve.BG) end
                     STATE = "ingame"
+                end,
+                action_l = function(button)
+                    button.parent.startlv = math.max(button.parent.startlv - 1, 1)
+                end,
+                action_r = function(button)
+                    button.parent.startlv = math.min(button.parent.startlv + 1, mode.maxstart or #mode)
                 end,
             }
         )
@@ -88,6 +94,18 @@ for i, mode in ipairs(Levels) do
 end
 table.insert(gamemodes, {x = 0, y =  0.7, label = "BACK", action_e = change("main")})
 Title.play = Menu.new("Menu", gamemodes)
+Title.play.startlv = 1
+Title.play.updateSelected = function(self, key)
+	Menu.updateSelected(self, key)
+	if key == "up" or key == "down" then self.startlv = 1 end
+	local modeid = Title.play.items[Title.play.highlight].id
+
+	if modeid then
+		self.text:addf({{1,1,1}, Levels[modeid].description}, Width*0.4, "right", math.floor(Width*0.5), math.floor(Height*0.4))
+		self.text:addf({{1, 0.7, 0.5}, string.format("Start level: < %s >", Levels[modeid][Title.play.startlv].level_name)}, Width, "center", 0, math.floor(Height*0.7))
+	end
+end
+Title.play:updateSelected()
 
 Title.settings = Menu.new("Menu", {
 	{x = 0, y = -0.5, label = ("< BGM VOLUME : %d%% >"):format(Config.bgm_volume),

@@ -470,7 +470,9 @@ Board = {
     setLV = function(board, newlevel)
 		newlevel = math.min(newlevel, #board.speedcurve)
         board.level = newlevel
-        for k, v in pairs(board.speedcurve[newlevel]) do board[k] = v end
+        for k, v in pairs(board.speedcurve[newlevel]) do
+			board[k] = (type(v) == "function" and v(newlevel) or v)
+		end
     end,
     
     putTheBlock = function(board, ...)
@@ -893,7 +895,7 @@ Board = {
 		love.graphics.origin()
 	end,
 	
-	reset = function(board, seed, character)
+	reset = function(board, seed, level, character)
 		board.cur_lock = 0
 		board.lock_delay = Board.lock_delay
 		board.cur_rots = 0
@@ -906,7 +908,8 @@ Board = {
 		board.drop_points = 0
 		board.recent_actions = {}
         board.percentile = 0
-        board.level = 1
+        board.level = level or board.startlevel
+        board.startlevel = level or board.startlevel
         board.time = -2
 		board.gravity = Board.gravity
         board.gravity_acc = 0
@@ -974,7 +977,7 @@ Board = {
 			board.events[v].override = {}
 		end
 		board.ghost = nil
-        board:setLV(1)
+        board:setLV(board.level)
         
         love.graphics.setCanvas(board.glow_canvas)
         love.graphics.clear(0,0,0,1)

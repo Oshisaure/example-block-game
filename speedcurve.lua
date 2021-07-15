@@ -147,7 +147,7 @@ Levels = {
     },
     
     {name = "Classic", description = "\"Block game is easy with hold and lock delay\" -- clueless block game non-player",
-     LV = "10L", prev = 1, hold = false, colour = {0.60,0.95,0.85,1}, BG = "original",
+     LV = "10L", prev = 1, hold = false, colour = {0.60,0.95,0.85,1}, BG = "classic", maxstart = 30,
 		{level_name = "00", gravity = 01.25, lock_delay = 1/01.25, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
 		{level_name = "01", gravity = 01.48, lock_delay = 1/01.48, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
 		{level_name = "02", gravity = 01.75, lock_delay = 1/01.75, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},

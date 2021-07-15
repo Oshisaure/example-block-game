@@ -29,10 +29,9 @@ Pause = Menu.new("Menu", {
     end},
 	{x = 0, y =  0.2, label = "QUIT",    action_e = function(button)
         if Config.dynamic_bg == "X" then PrerenderBG() end
-		Game:reset(os.time())
-		Game:setLV(1)
 		STATE = "menu"
         SetBGM("menu")
+        button.parent.highlight = 1
     end},
 })
 
