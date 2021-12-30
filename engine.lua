@@ -128,123 +128,137 @@ Board = {
 		if s then PlaySFX("classic_rotate") end
 	end,
 	
+	place_raw = function(board)	
+		-- place each block in the grid
+		local o = board.piece.orientation
+		for b = 1, #board.piece.blocks[o] do
+			local x, y = board.piece.blocks[o][b][1], board.piece.blocks[o][b][2]
+			x, y = x + board.piece.x, y + board.piece.y
+			if y > board.max_y then board.max_y = y end
+			board.grid[x][y] = true
+		end
+
+		-- then check lines 
+		local ln = board:clear_lines()
+		if board.piece.parent then
+			local counts = board.stat[board.spin][board.piece.parent]
+			if counts then
+				if not counts[ln] then counts[ln] = 0 end
+				counts[ln] = counts[ln] + 1
+			end
+			board.last_clear = ln
+			board.last_spin = board.spin
+			board.last_id = board.piece.parent
+		end
+		
+		-- update score and line clear animation if necessary
+		board.last_score = board:getScore(ln)
+		board.score = board.score + board.last_score
+		board.drop_points = 0
+		if ln >= 1 then
+			table.insert(board.recent_actions, 1, {
+				time   = board.time,
+				label  = (board.last_spin and (board.piece.parent.."-SPIN ") or "") .. LineClearName(ln),
+				score  = board.last_score,
+				colour = AvgArrays(board.piece.colour, {1,1,1,1}),
+			})
+			if board:is_grid_empty() then
+				PlaySFX("perfectclear")
+				table.insert(board.recent_actions, 1, {
+					time   = board.time,
+					label  = "PERFECT CLEAR!!!",
+					score  = 1000000,
+					colour = nil,
+				})
+				board.all_clears = board.all_clears + 1
+				board.score = board.score + 1000000
+			end
+			board.animation_time = board.line_delay
+			--[[
+			local s = board.size
+			local w, h = board.canvas:getDimensions()
+			local x, y = board.piece.x, board.piece.y
+			local px, py = board.position_x*w, board.position_y*h
+			local start_x, start_y = (x-5.5)*s+px, (11.5-y)*s+py
+			local text = love.graphics.newText(MenuFont, "+"..CommaValue(board.last_score))
+			local starttime = board.time
+			board:add_draw_item("overlay", function(board)
+				local t = board.time - starttime
+				if t >= 1 then
+					text:release()
+					return true
+				end
+				
+				local xoff, yoff = start_x, start_y
+				-- if t < 0.5 then
+					-- xoff = px + math.cos(math.pi*t) * (start_x-px)
+					-- yoff = start_y + s*20 * (2*t) * (2*t-2)
+				-- elseif t < 0.75 then
+					-- local t2 = 2*t-1
+					-- xoff = px + (x>5 and -10 or 10) * s * math.sin(math.pi*t2)
+					-- yoff = h*0.85 + (h*0.85 - start_y + s*20) * (2*t) * (2*t-2)
+				-- else
+					-- local t2 = 2*t-1
+					-- xoff = px + 10*s - (x>5 and 20 or 0) * s * math.sin(math.pi*t2)
+					-- yoff = h*0.85 + (h*0.85 - start_y + s*20) * (2*t) * (2*t-2)
+				-- end
+				
+				love.graphics.setColor(HSVA(360*t, 0.5, 1))
+				love.graphics.draw(text, xoff, yoff, 0, 1, 1, text:getWidth()/2, text:getHeight()/2)
+			end)
+			--]]
+			board:add_event("update", "before", function(board)
+				if board.animation_time <= 0 then
+					board:drop_lines()
+					board.spawn_timer = board.spawn_delay - board.spawn_delay_after_line
+					PlaySFX("classic_lock")
+					return true
+				end
+				return false
+			end)
+			
+			if board.spin or ln >= 4 then PlaySFX("classic_bonus") end
+			PlaySFX("classic_clear")
+		else
+			if board.last_spin then
+				table.insert(board.recent_actions, 1, {
+					time   = board.time,
+					label  = board.piece.parent.."-SPIN",
+					score  = board.last_score,
+					colour = AvgArrays(board.piece.colour, {1,1,1,1}),
+				})
+			end
+			
+			PlaySFX("classic_lock")
+		end
+
+		-- check level up
+		board.percentile = board.percentile + ln
+		board.lines = board.lines + ln
+		if (board.level_type == "10L" and board.level * 10 <= board.lines) 
+		or (board.level_type == "SEC" and board.percentile >= 100)
+		then 
+			local oldlv = board.level
+			board:setLV(board.level + 1)
+			if oldlv == board.level then	
+				board.percentile = 99
+			else
+				board.percentile = board.percentile % 100
+				PlaySFX("classic_levelup")
+			end
+		end
+		
+		-- nil the current piece to signify spawn delay started
+		board.piece = nil
+	end,
+	
 	place = function(board)
 		board:call_events("place", "before")
 		-- print("called pre-place event")
 		local override = board:call_events("place", "override")
 		-- print("called place override event")
 		if not override then
-			-- place each block in the grid
-			local o = board.piece.orientation
-			for b = 1, #board.piece.blocks[o] do
-				local x, y = board.piece.blocks[o][b][1], board.piece.blocks[o][b][2]
-				x, y = x + board.piece.x, y + board.piece.y
-				if y > board.max_y then board.max_y = y end
-				board.grid[x][y] = true
-			end
-
-			-- then check lines 
-			local ln = board:clear_lines()
-			if board.piece.parent then
-                local counts = board.stat[board.spin][board.piece.parent]
-                if counts then
-                    if not counts[ln] then counts[ln] = 0 end
-                    counts[ln] = counts[ln] + 1
-                end
-				board.last_clear = ln
-				board.last_spin = board.spin
-				board.last_id = board.piece.parent
-			end
-			
-            -- update score and line clear animation if necessary
-            board.last_score = board:getScore(ln)
-			board.score = board.score + board.last_score
-			board.drop_points = 0
-            if ln >= 1 then
-                table.insert(board.recent_actions, 1, {
-                    time   = board.time,
-                    label  = (board.last_spin and (board.piece.parent.."-SPIN ") or "") .. LineClearName(ln),
-                    score  = board.last_score,
-                    colour = AvgArrays(board.piece.colour, {1,1,1,1}),
-                })
-                if board:is_grid_empty() then
-                    table.insert(board.recent_actions, 1, {
-                        time   = board.time,
-                        label  = "PERFECT CLEAR!!!",
-                        score  = 1000000,
-                        colour = nil,
-                    })
-                    board.all_clears = board.all_clears + 1
-                    board.score = board.score + 1000000
-                end
-                board.animation_time = board.line_delay
-                --[[
-                local s = board.size
-                local w, h = board.canvas:getDimensions()
-                local x, y = board.piece.x, board.piece.y
-                local px, py = board.position_x*w, board.position_y*h
-                local start_x, start_y = (x-5.5)*s+px, (11.5-y)*s+py
-                local text = love.graphics.newText(MenuFont, "+"..CommaValue(board.last_score))
-                local starttime = board.time
-                board:add_draw_item("overlay", function(board)
-                    local t = board.time - starttime
-                    if t >= 1 then
-                        text:release()
-                        return true
-                    end
-                    
-                    local xoff, yoff = start_x, start_y
-                    -- if t < 0.5 then
-                        -- xoff = px + math.cos(math.pi*t) * (start_x-px)
-                        -- yoff = start_y + s*20 * (2*t) * (2*t-2)
-                    -- elseif t < 0.75 then
-                        -- local t2 = 2*t-1
-                        -- xoff = px + (x>5 and -10 or 10) * s * math.sin(math.pi*t2)
-                        -- yoff = h*0.85 + (h*0.85 - start_y + s*20) * (2*t) * (2*t-2)
-                    -- else
-                        -- local t2 = 2*t-1
-                        -- xoff = px + 10*s - (x>5 and 20 or 0) * s * math.sin(math.pi*t2)
-                        -- yoff = h*0.85 + (h*0.85 - start_y + s*20) * (2*t) * (2*t-2)
-                    -- end
-                    
-                    love.graphics.setColor(HSVA(360*t, 0.5, 1))
-                    love.graphics.draw(text, xoff, yoff, 0, 1, 1, text:getWidth()/2, text:getHeight()/2)
-                end)
-                --]]
-                board:add_event("update", "before", function(board)
-                    if board.animation_time <= 0 then
-                        board:drop_lines()
-                        board.spawn_timer = board.spawn_delay - board.spawn_delay_after_line
-						PlaySFX("classic_lock")
-                        return true
-                    end
-                    return false
-                end)
-				
-				if board.spin or ln >= 4 then PlaySFX("classic_bonus") end
-				PlaySFX("classic_clear")
-            else
-				if board.last_spin then
-					table.insert(board.recent_actions, 1, {
-						time   = board.time,
-						label  = board.piece.parent.."-SPIN",
-						score  = board.last_score,
-						colour = AvgArrays(board.piece.colour, {1,1,1,1}),
-					})
-				end
-				
-				PlaySFX("classic_lock")
-            end
-
-			-- check level up
-			board.percentile = board.percentile + ln
-			board.lines = board.lines + ln
-			if     board.level_type == "10L" and board.level * 10 <= board.lines then board:setLV(board.level + 1)
-			elseif board.level_type == "SEC" and board.percentile >= 100         then board:setLV(board.level + 1); board.percentile = board.percentile % 100
-			end
-            
-            -- nil the current piece to signify spawn delay started
-			board.piece = nil
+			board:place_raw()
 		end
 		board:call_events("place", "after")
 		-- print("called post-place event")
@@ -725,6 +739,8 @@ Board = {
             if board.ghost then board.ghost.colour[4] = 0 end
 		end
 		
+		board:call_events("update", "after")
+		
 		local n = 1
 		local i = board.trails[n]
 		while i do
@@ -737,6 +753,7 @@ Board = {
 			end
 			i = board.trails[n]
 		end
+		
 		
 		board.prev = input
         board.time = board.time + dt
@@ -1021,6 +1038,7 @@ Board = {
 			update_ghost = Board.update_ghost,
 			create_ghost = Board.create_ghost,
 			add_trails = Board.add_trails,
+			place_raw = Board.place_raw,
 			place = Board.place,
 			clear_lines = Board.clear_lines,
             drop_lines = Board.drop_lines,

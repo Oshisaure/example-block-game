@@ -59,11 +59,13 @@ function love.load()
         track:setVolume(tostring(Config.bgm_volume)/100)
     end
 	SFX = {
-		classic_move   = love.audio.newSource("assets/sfx/classic_move.ogg"  , "stream"),
-		classic_rotate = love.audio.newSource("assets/sfx/classic_rotate.ogg", "stream"),
-		classic_clear  = love.audio.newSource("assets/sfx/classic_clear.ogg" , "stream"),
-		classic_bonus  = love.audio.newSource("assets/sfx/classic_bonus.ogg" , "stream"),
-		classic_lock   = love.audio.newSource("assets/sfx/classic_lock.ogg"  , "stream"),
+		classic_move    = love.audio.newSource("assets/sfx/classic_move.ogg"   , "stream"),
+		classic_rotate  = love.audio.newSource("assets/sfx/classic_rotate.ogg" , "stream"),
+		classic_clear   = love.audio.newSource("assets/sfx/classic_clear.ogg"  , "stream"),
+		classic_bonus   = love.audio.newSource("assets/sfx/classic_bonus.ogg"  , "stream"),
+		classic_lock    = love.audio.newSource("assets/sfx/classic_lock.ogg"   , "stream"),
+		classic_levelup = love.audio.newSource("assets/sfx/classic_levelup.ogg", "stream"),
+		perfectclear    = love.audio.newSource("assets/sfx/perfectclear3.ogg"  , "stream"),
 	}
 	BlockSize = Height/40
 	-- BlockCanvas = love.graphics.newCanvas(BlockSize,BlockSize)
@@ -83,11 +85,11 @@ function love.load()
     ScoreText  = love.graphics.newText(Font.Title)
     ScorePopup = love.graphics.newText(Font.HUD)
     
-    -- ShaderXD = love.graphics.newShader("shaders/chroma-misalign.glsl")
     ShaderBG = {
         practice  = love.graphics.newShader("shaders/bgpractice.glsl"),
         practice2 = love.graphics.newShader("shaders/bgpractice2.glsl"),
         beginner  = love.graphics.newShader("shaders/bgbeginner.glsl"),
+        standard  = love.graphics.newShader("shaders/bgstandard.glsl"),
         original  = love.graphics.newShader("shaders/bg1.glsl"),
         master    = love.graphics.newShader("shaders/bg10.glsl"),
         classic   = love.graphics.newShader("shaders/bgclassic.glsl"),
@@ -95,6 +97,7 @@ function love.load()
     }
     ShaderBlur    = love.graphics.newShader("shaders/blur.glsl")
     ShaderRainbow = love.graphics.newShader("shaders/rainbow.glsl")
+    ShaderShaking = love.graphics.newShader("shaders/chroma-misalign.glsl")
     
     local moontex = love.graphics.newImage("assets/texture/lroc_color_poles_2k.png")
     local moondis = love.graphics.newImage("assets/texture/ldem_4_uint.png")
@@ -158,6 +161,8 @@ function love.load()
 	}
 	love.graphics.setFont(Font.Menu)
 	
+	--ApplyZoneMod = require("zone_mod")
+	
 	bottomtext = ""
 	STATE = "splash"
     SetBGM()
@@ -190,7 +195,7 @@ function love.update(dt)
             SetBGM(Game.BGM)
             Game.display_score = Game.score - (Game.score - Game.display_score) * 0.001^dt
             ScoreText:set(CommaValue(math.floor(Game.display_score+0.5)))
-            
+            SendShaderUniform("level", Game.level)
 			-- bottomtext = "LV. "..(Game.level_type == "10L" and Game.level_name or Game.level*100+Game.percentile-100).."\nLines: "..Game.lines.."\n"..FormatTime(Game.time)
 			--[[
 			UpdateTime = UpdateTime + dt
@@ -358,8 +363,8 @@ function love.draw()
         love.graphics.draw(CanvasBG)
         --]]
         
-        --[[shader test
-        love.graphics.setShader(ShaderXD)
+        -- [[shader test
+        -- love.graphics.setShader(ShaderShaking)
         local shiftDamp = (Game.last_collision_down  or -math.huge) - Game.time
         local shiftLamp = (Game.last_collision_left  or -math.huge) - Game.time
         local shiftRamp = (Game.last_collision_right or -math.huge) - Game.time
@@ -367,8 +372,8 @@ function love.draw()
         local decay2 = 10
         local sh_scale = 0.0 -- 0.1
         local an_scale = 0.0 -- 0.1
-        local distortscaleX = 0.03
-        local distortscaleY = 0.04
+        local distortscaleX = -0.03
+        local distortscaleY = -0.04
         -- [==[
         local distort = {
             distortscaleX * (math.exp(shiftRamp*decay) - math.exp(shiftLamp*decay)),
@@ -385,24 +390,28 @@ function love.draw()
             angle[i] = (math.random() - 0.5) * an_scale * math.exp(shiftDamp*decay)
         end
         
-        --ShaderXD:send("shift", shift)
-        ShaderXD:send("shift", {0,0,0,0,0,0,0,0,0})
-        ShaderXD:send("angle", angle)
-        ShaderXD:send("distort", distort)
-        ShaderXD:send("time", os.clock())
+        --ShaderShaking:send("shift", shift)
+        ShaderShaking:send("shift", {0,0,0,0,0,0,0,0,0})
+        ShaderShaking:send("angle", angle)
+        ShaderShaking:send("distort", distort)
+        ShaderShaking:send("time", os.clock())
         --]]
         
         RenderBG(Game.speedcurve.BG)
         love.graphics.setCanvas(CanvasBG)
+		-- love.graphics.setShader(ShaderShaking)
         love.graphics.draw(Game.canvas)
+		love.graphics.setShader()
         love.graphics.setCanvas()
         local b = tonumber(Config.bg_brightness)/100
 		love.graphics.setColor(b, b, b)
         love.graphics.draw(CanvasBG)
         love.graphics.setColor(1,1,1)
         -- [===[ activate this block comment to render none of the HUD and only the BG
+		-- love.graphics.setShader(ShaderShaking)
         love.graphics.draw(Game.canvas)
-        -- love.graphics.draw(Game.overlay_canvas)
+		love.graphics.setShader()
+        love.graphics.draw(Game.overlay_canvas)
         
 		-- love.graphics.draw(Game.canvas, -Width*0.23, 0)
         -- love.graphics.setShader()

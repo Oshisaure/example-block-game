@@ -80,6 +80,7 @@ for i, mode in ipairs(Levels) do
                     SetBGM(Game.BGM)
                     Game.display_score = 999999999 -- 999,999,999
                     if Config.dynamic_bg == "X" then PrerenderBG(Game.speedcurve.BG) end
+					-- ApplyZoneMod(Game)
                     STATE = "ingame"
                 end,
                 action_l = function(button)

@@ -26,12 +26,18 @@ vec2 rotateAround(in vec2 uv, in vec2 centre, in float angle) {
 }
 
 vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
-    //vec4 pixel = Texel(image, uvs);
-    float pixelr = Texel(image, random2(time+0.+uvs.x+uvs.y)*distort + rotateAround(uvs, UV_CENTRE, angle.r)+shift[0].xy).r;
-    float pixelg = Texel(image, random2(time+2.+uvs.x+uvs.y)*distort + rotateAround(uvs, UV_CENTRE, angle.g)+shift[1].xy).g;
-    float pixelb = Texel(image, random2(time+4.+uvs.x+uvs.y)*distort + rotateAround(uvs, UV_CENTRE, angle.b)+shift[2].xy).b;
-    
-    return vec4(pixelr, pixelg, pixelb, color.a);
+    // vec4 pixel = Texel(image, uvs);
+	vec4 pixel = vec4(0.);
+	vec4 sampleR = Texel(image, random2(time+0.+uvs.x+uvs.y)*distort + rotateAround(uvs, UV_CENTRE, angle.r)+shift[0].xy);
+	vec4 sampleG = Texel(image, random2(time+2.+uvs.x+uvs.y)*distort + rotateAround(uvs, UV_CENTRE, angle.g)+shift[1].xy);
+	vec4 sampleB = Texel(image, random2(time+4.+uvs.x+uvs.y)*distort + rotateAround(uvs, UV_CENTRE, angle.b)+shift[2].xy);
+    pixel.ra += sampleR.r / sampleR.a;
+    pixel.ga += sampleG.g / sampleG.a;
+    pixel.ba += sampleB.b / sampleB.a;
+	pixel.a /= 3;
+	
+    // return vec4(pixelr, pixelg, pixelb, color.a);
+    return pixel;
 }
 #endif
 

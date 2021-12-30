@@ -1,5 +1,14 @@
 uniform float dt;
 uniform float time;
+uniform int level;
+const vec4 BG0 = vec4(.1, .1, .3, 1.);
+const vec4 BG1 = vec4(.2, .1, .3, 1.);
+const vec4 BG2 = vec4(.3, .0, .0, 1.);
+const vec4 BG3 = vec4(.0, .0, .0, 1.);
+const vec4 CLOUD0 = vec4(0.5, 1.5, 1.5, 0.0);
+const vec4 CLOUD1 = vec4(1.5, 0.5, 1.5, 0.0);
+const vec4 CLOUD2 = vec4(2.0, 0.5, 0.5, 0.0);
+const vec4 CLOUD3 = vec4(0.5, 0.5, 0.5, 0.0);
 
 // from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83 //
 float rand(vec2 n) { 
@@ -34,6 +43,20 @@ float line_distance(vec2 v, vec2 w, vec2 p) {
 }
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+vec4 getBGColor() {
+	if (level < 10) return mix(BG0, BG1, smoothstep(01., 10., float(level)));
+	if (level < 20) return mix(BG1, BG2, smoothstep(11., 20., float(level)));
+	if (level < 30) return mix(BG2, BG3, smoothstep(21., 30., float(level)));
+	return BG3;
+}
+
+vec4 getCloudColor() {
+	if (level < 10) return mix(CLOUD0, CLOUD1, smoothstep(01., 10., float(level)));
+	if (level < 20) return mix(CLOUD1, CLOUD2, smoothstep(11., 20., float(level)));
+	if (level < 30) return mix(CLOUD2, CLOUD3, smoothstep(21., 30., float(level)));
+	return CLOUD3;
+}
+
 float rand1(float s){
     return fract(sin(s)*100000.);
 }
@@ -44,7 +67,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
     vec4 oldpixel = Texel(image, (uvs-.5)*pow(1.2, dt)+.5);
     
     // background colour
-    vec4 newpixel = vec4(.1, .1, .3, 1.);
+    vec4 newpixel = getBGColor();
     // noise clouds
     float angle = .5*cos(time*.1);
     float c = cos(angle);
@@ -61,7 +84,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
     vec2 lightningsky = vec2(lightningabs.x/lightningabs.y,10.*time-1./lightningabs.y);
     float d = line_distance(lightningabs, vec2(lightningabs.x, 0.), uv2)*20.;
     
-    newpixel += vec4(.5, 1.5, 1.5, 0.)*uv2.y*noise(10.*skypoint)*(1+lightningintensity*3./distance(skypoint, lightningsky));
+    newpixel += getCloudColor()*uv2.y*noise(10.*skypoint)*(1+lightningintensity*3./distance(skypoint, lightningsky));
     newpixel += vec4(1.,1.,1.,0.)*lightningintensity/(1+d*d);
     
     

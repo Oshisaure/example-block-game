@@ -113,6 +113,7 @@ end
 function BoolNumber(b) return b and 1 or 0 end
 
 function AvgArrays(base, ...)
+	if not base then return nil end
 	local arg = {...}
 	local a = Deepcopy(base)
 	for n, arr in ipairs(arg) do
@@ -183,6 +184,12 @@ function UpdateShadersUniforms(dt)
     for _, v in pairs(ShaderBG) do
         pcall(function() v:send("time", time) end)
         pcall(function() v:send("dt", dt)     end)
+    end
+end
+
+function SendShaderUniform(name, value)
+    for _, v in pairs(ShaderBG) do
+        pcall(function() v:send(name, value) end)
     end
 end
 

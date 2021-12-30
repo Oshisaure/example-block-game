@@ -33,7 +33,7 @@ Levels = {
     },
     
     {name = "Standard", description = "A fairly balanced 20-level mode going from slow to fast gravity",
-     LV = "10L", prev = 6, hold = true, colour = {0.85,0.85,0.85,1}, BG = "original",
+     LV = "10L", prev = 6, hold = true, colour = {0.85,0.85,0.85,1}, BG = "standard",
 		{level_name = "01", gravity = 1.0, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 2},
 		{level_name = "02", gravity = 1.1, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 2},
 		{level_name = "03", gravity = 1.2, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 2},
