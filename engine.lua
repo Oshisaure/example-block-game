@@ -244,6 +244,8 @@ Board = {
 				board.percentile = 99
 			else
 				board.percentile = board.percentile % 100
+				board.level_time = board.time
+				board.last_level = oldlv
 				PlaySFX("classic_levelup")
 			end
 		end
@@ -927,6 +929,8 @@ Board = {
         board.percentile = 0
         board.level = level or board.startlevel
         board.startlevel = level or board.startlevel
+		board.last_level = 0
+		board.level_time = -2
         board.time = -2
 		board.gravity = Board.gravity
         board.gravity_acc = 0

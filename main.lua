@@ -110,10 +110,8 @@ function love.load()
     love.graphics.draw(moondis)
     love.graphics.setCanvas()
     love.graphics.setShader()
-    ShaderBG.practice :send("moontex", moontex)
-    ShaderBG.practice :send("moonnor", moonnor)
-    ShaderBG.practice2:send("moontex", moontex)
-    ShaderBG.practice2:send("moonnor", moonnor)
+    SendShaderUniform("moontex", moontex)
+    SendShaderUniform("moonnor", moonnor)
     
     --[[
     Width = 3840
@@ -196,6 +194,8 @@ function love.update(dt)
             Game.display_score = Game.score - (Game.score - Game.display_score) * 0.001^dt
             ScoreText:set(CommaValue(math.floor(Game.display_score+0.5)))
             SendShaderUniform("level", Game.level)
+            SendShaderUniform("levelprev", Game.last_level)
+            SendShaderUniform("leveltime", Game.time - Game.level_time)
 			-- bottomtext = "LV. "..(Game.level_type == "10L" and Game.level_name or Game.level*100+Game.percentile-100).."\nLines: "..Game.lines.."\n"..FormatTime(Game.time)
 			--[[
 			UpdateTime = UpdateTime + dt
