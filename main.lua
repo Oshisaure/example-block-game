@@ -135,6 +135,8 @@ function love.load()
     CanvasBGprev  = love.graphics.newCanvas(Width, Height)
     --]]
     
+	
+	if Config.dynamic_bg == "X" then PrerenderBG("menu") end
 	--[==[
 	ServerThreadUDP = love.thread.newThread([[
 		require("netserver")

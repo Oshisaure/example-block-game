@@ -756,10 +756,13 @@ Board = {
 			i = board.trails[n]
 		end
 		
-		
-		board.prev = input
-        board.time = board.time + dt
-        board.animation_time = board.animation_time - dt
+		if board.first_frame then
+			board.first_frame = false
+		else
+			board.prev = input
+			board.time = board.time + dt
+			board.animation_time = board.animation_time - dt
+		end
 	end,
 	
 	draw = function(board)
@@ -915,6 +918,7 @@ Board = {
 	end,
 	
 	reset = function(board, seed, level, character)
+		board.first_frame = true
 		board.cur_lock = 0
 		board.lock_delay = Board.lock_delay
 		board.cur_rots = 0
