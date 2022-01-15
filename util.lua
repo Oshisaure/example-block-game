@@ -334,3 +334,44 @@ function ProcessResize(w, h, first)
 		if Config.dynamic_bg == "X" then PrerenderBG(currentbg) end
     end
 end
+
+local arrow_buttons = {
+	up    = 0,
+	down  = 0,
+	left  = 0,
+	right = 0,
+}
+local autorepeat_delay = 0.5
+local tick_count, last_tick_time, last_key = 1, 0, nil
+function ProcessMenuAutorepeat(dt)
+	-- check for the key that has been held for the least amount of time
+	local recent_key, recent_time = nil, math.huge
+	for key, time_held in pairs(arrow_buttons) do
+		if love.keyboard.isDown(key) then
+			local newtime = time_held + dt
+			arrow_buttons[key] = newtime
+			if newtime < recent_time then
+				recent_key, recent_time = key, newtime
+			end
+		else
+			arrow_buttons[key] = 0
+		end
+	end
+	
+	-- if there is a change in keypresses then reset the autorepeat
+	if last_key ~= recent_key then
+		tick_count, last_tick_time, last_key = 1, 0, recent_key
+	end
+	
+	-- if there is a key being pressed and we need to tick forward
+	-- then update the counters and return the key press
+	-- we're using 1/tick_count as the delay to make it faster the longer you press
+	if last_key and recent_time > last_tick_time + autorepeat_delay / tick_count then
+		last_tick_time = recent_time
+		tick_count = tick_count + 1
+		return recent_key
+	end
+	
+	--either there is no key being pressed or we don't need to send a keypress yet
+	return nil
+end

@@ -175,6 +175,9 @@ function love.update(dt)
     UpdateShadersUniforms(dt)
 	if STATE == "splash" then
         UpdateSplashScreen(dt)
+	elseif STATE == "menu" then
+		key = ProcessMenuAutorepeat(dt)
+		if key then love.keypressed(key) end
 	elseif STATE == "ingame" then
 		if not Game.dead then
 			Game:update({
