@@ -103,7 +103,9 @@ Title.play.updateSelected = function(self, key)
 
 	if modeid then
 		self.text:addf({{1,1,1}, Levels[modeid].description}, Width*0.4, "right", math.floor(Width*0.5), math.floor(Height*0.4))
-		self.text:addf({{1, 0.7, 0.5}, string.format("Start level: < %s >", Levels[modeid][Title.play.startlv].level_name)}, Width, "center", 0, math.floor(Height*0.7))
+		local leveldisp = Levels[modeid][Title.play.startlv].level_name
+		if leveldisp == math.huge then leveldisp = "  " end
+		self.text:addf({{1, 0.7, 0.5}, string.format("Start level: < %s >", leveldisp)}, Width, "center", 0, math.floor(Height*0.7))
 	end
 end
 Title.play:updateSelected()

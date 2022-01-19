@@ -318,6 +318,9 @@ function ProcessResize(w, h, first)
         Menu  = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.ceil(h/32)),
         Title = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.ceil(h/16)),
     }
+	Font.HUD  :setFilter("linear", "linear")
+	Font.Menu :setFilter("linear", "linear")
+	Font.Title:setFilter("linear", "linear")
     CanvasBG      = love.graphics.newCanvas()
     CanvasBGprev  = love.graphics.newCanvas()
     CanvasRainbow = love.graphics.newCanvas()
@@ -374,4 +377,17 @@ function ProcessMenuAutorepeat(dt)
 	
 	--either there is no key being pressed or we don't need to send a keypress yet
 	return nil
+end
+
+InfinitySymbol = love.graphics.newCanvas(9, 5)
+function DrawInfinitySymbol(...)
+	local _s = love.graphics.getShader()
+	local _c = {love.graphics.getColor()}
+	love.graphics.setShader(ShaderInfinity)
+	ShaderInfinity:send("time", os.clock())
+	
+	love.graphics.draw(InfinitySymbol, ...)
+	
+	love.graphics.setShader(_s)
+	love.graphics.setColor(_c)
 end

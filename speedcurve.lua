@@ -18,7 +18,7 @@
 
 Levels = {
     {name = "Beginner", description = "An easier 10-level mode for people who are new to block games",
-     LV = "10L", prev = 7, hold = true, colour = {0.75,0.95,1.00,1}, BG = "beginner",
+     LV = "10L", prev = 7, hold = true, colour = {0.75,0.95,1.00,1}, BG = "beginner", maxstart = 10,
 		{level_name = "01", gravity = 0.15, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 1},
 		{level_name = "02", gravity = 0.25, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 1},
 		{level_name = "03", gravity = 0.40, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 1},
@@ -30,10 +30,12 @@ Levels = {
 		{level_name = "08", gravity = 1.45, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 2},
 		{level_name = "09", gravity = 1.75, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 2},
 		{level_name = "10", gravity = 2.00, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 2},
+		
+		{level_name = math.huge, gravity = 2.00, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.5, line_delay = 0.5, AS_delay = 0.3, BGM = 2},
     },
     
     {name = "Standard", description = "A fairly balanced 20-level mode going from slow to fast gravity",
-     LV = "10L", prev = 6, hold = true, colour = {0.85,0.85,0.85,1}, BG = "standard",
+     LV = "10L", prev = 6, hold = true, colour = {0.85,0.85,0.85,1}, BG = "standard", maxstart = 20,
 		{level_name = "01", gravity = 1.0, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 2},
 		{level_name = "02", gravity = 1.1, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 2},
 		{level_name = "03", gravity = 1.2, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 2},
@@ -57,11 +59,13 @@ Levels = {
 		{level_name = "18", gravity = 120, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 3},
 		{level_name = "19", gravity = 180, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 3},
 		{level_name = "20", gravity = 300, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 3},
+		
+		{level_name = math.huge, gravity = 300, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 3},
     },
     
 	-- Original build speed curve
 	{name = "Original", description = "A 36-level mode covering a wide range of speeds",
-     LV = "10L", prev = 5, hold = true, colour = {0.90,0.75,1.00,1}, BG = "original",
+     LV = "10L", prev = 5, hold = true, colour = {0.90,0.75,1.00,1}, BG = "original", maxstart = 36,
 		{level_name = "01", gravity = 1.0, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.5, AS_delay = 0.25, BGM = 2},
 		{level_name = "02", gravity = 1.1, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.5, AS_delay = 0.25, BGM = 2},
 		{level_name = "03", gravity = 1.2, lock_delay = 2, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.5, AS_delay = 0.25, BGM = 2},
@@ -105,10 +109,12 @@ Levels = {
 		{level_name = "AG", gravity = math.huge, lock_delay = 0.25, spawn_delay = 0.25, spawn_delay_after_line = 0.20, line_delay = 0.2, AS_delay = 0.1, BGM = 5},  --4.0PPS
 		
 		{level_name = "AU", gravity = math.huge, lock_delay = 0.20, spawn_delay = 0.25, spawn_delay_after_line = 0.20, line_delay = 0.1, AS_delay = 0.1, BGM = 5},  --5.0PPS
+		
+		{level_name = math.huge, gravity = math.huge, lock_delay = 0.20, spawn_delay = 0.25, spawn_delay_after_line = 0.20, line_delay = 0.1, AS_delay = 0.1, BGM = 5},
 	},
     
     {name = "Master", description = "A 30-level mode that starts on infinite gravity, yet keeps going faster",
-     LV = "10L", prev = 5, hold = true, colour = {0.35,0.10,0.15,1}, BG = "master",
+     LV = "10L", prev = 5, hold = true, colour = {0.35,0.10,0.15,1}, BG = "master", maxstart = 30,
 		{level_name = "M01", gravity = math.huge, lock_delay = 1.000, spawn_delay = 0.500, spawn_delay_after_line = 0.500, line_delay = 0.375, AS_delay = 0.150, BGM = 4},
 		{level_name = "M02", gravity = math.huge, lock_delay = 0.946, spawn_delay = 0.473, spawn_delay_after_line = 0.473, line_delay = 0.355, AS_delay = 0.150, BGM = 4},
 		{level_name = "M03", gravity = math.huge, lock_delay = 0.895, spawn_delay = 0.447, spawn_delay_after_line = 0.447, line_delay = 0.336, AS_delay = 0.150, BGM = 4},
@@ -144,6 +150,8 @@ Levels = {
 		{level_name = "M28", gravity = math.huge, lock_delay = 0.223, spawn_delay = 0.112, spawn_delay_after_line = 0.112, line_delay = 0.084, AS_delay = 0.084, BGM = 6},
 		{level_name = "M29", gravity = math.huge, lock_delay = 0.211, spawn_delay = 0.106, spawn_delay_after_line = 0.106, line_delay = 0.079, AS_delay = 0.079, BGM = 6},
 		{level_name = "M30", gravity = math.huge, lock_delay = 0.200, spawn_delay = 0.100, spawn_delay_after_line = 0.100, line_delay = 0.075, AS_delay = 0.075, BGM = 6},
+		
+		{level_name = -math.huge, gravity = math.huge, lock_delay = 0.200, spawn_delay = 0.100, spawn_delay_after_line = 0.100, line_delay = 0.075, AS_delay = 0.075, BGM = 6},
     },
     
     {name = "Classic", description = "\"Block game is easy with hold and lock delay\" -- clueless block game non-player",
@@ -183,33 +191,35 @@ Levels = {
 		{level_name = "27", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
 		{level_name = "28", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
 		{level_name = "29", gravity = 60.00, lock_delay = 1/60.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+		
+		{level_name = math.huge, gravity = 60.00, lock_delay = 1/60.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
     },
     
 	-- Practice level (low-g)
 	{name = "Zero-G Practice", description = "A practice mode with no gravity and infinite time to place your piece",
      LV = "10L", prev = 5, hold = true, colour = {0.65,0.75,0.80,1}, BG = "practice",
-		{level_name = "Practice", gravity = 0, lock_delay = math.huge, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 1},
+		{level_name = math.huge, gravity = 0, lock_delay = math.huge, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 1},
 	},
 	
 	-- Practice level (inf-g)
 	{name = "Max-G Practice", description = "A practice mode with infinite gravity but infinite time to place your piece",
      LV = "10L", prev = 5, hold = true, colour = {0.85,0.55,0.55,1}, BG = "practice2",
-		{level_name = "Practice", gravity = math.huge, lock_delay = math.huge, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 4},
+		{level_name = math.huge, gravity = math.huge, lock_delay = math.huge, spawn_delay = 0.5, spawn_delay_after_line = 0.25, line_delay = 0.25, AS_delay = 0.25, BGM = 4},
 	},
     
 	--TGM2 Death
 	{name = "Death", description = "",
-     LV = "SEC", prev = 1, hold = false, colour = {0.55,0.25,0.25,1}, BG = "original",
-		{level_name =   0, gravity = math.huge, lock_delay = 30/60, spawn_delay = 18/60, spawn_delay_after_line = 14/60, line_delay = 12/60, AS_delay = 12/60},
-		{level_name = 100, gravity = math.huge, lock_delay = 26/60, spawn_delay = 14/60, spawn_delay_after_line = 08/60, line_delay = 06/60, AS_delay = 12/60},
-		{level_name = 200, gravity = math.huge, lock_delay = 22/60, spawn_delay = 14/60, spawn_delay_after_line = 08/60, line_delay = 06/60, AS_delay = 11/60},
-		{level_name = 300, gravity = math.huge, lock_delay = 18/60, spawn_delay = 08/60, spawn_delay_after_line = 08/60, line_delay = 06/60, AS_delay = 10/60},
-		{level_name = 400, gravity = math.huge, lock_delay = 15/60, spawn_delay = 07/60, spawn_delay_after_line = 07/60, line_delay = 05/60, AS_delay = 08/60},
-		{level_name = 500, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60},
-		{level_name = 600, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60},
-		{level_name = 700, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60},
-		{level_name = 800, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60},
-		{level_name = 900, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60},
+     LV = "SEC", prev = 1, hold = false, colour = {0.55,0.25,0.25,1}, BG = "death",
+		{level_name =   0, gravity = math.huge, lock_delay = 30/60, spawn_delay = 18/60, spawn_delay_after_line = 14/60, line_delay = 12/60, AS_delay = 12/60, BGM = 4},
+		{level_name = 100, gravity = math.huge, lock_delay = 26/60, spawn_delay = 14/60, spawn_delay_after_line = 08/60, line_delay = 06/60, AS_delay = 12/60, BGM = 4},
+		{level_name = 200, gravity = math.huge, lock_delay = 22/60, spawn_delay = 14/60, spawn_delay_after_line = 08/60, line_delay = 06/60, AS_delay = 11/60, BGM = 4},
+		{level_name = 300, gravity = math.huge, lock_delay = 18/60, spawn_delay = 08/60, spawn_delay_after_line = 08/60, line_delay = 06/60, AS_delay = 10/60, BGM = 5},
+		{level_name = 400, gravity = math.huge, lock_delay = 15/60, spawn_delay = 07/60, spawn_delay_after_line = 07/60, line_delay = 05/60, AS_delay = 08/60, BGM = 5},
+		{level_name = 500, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60, BGM = 6},
+		{level_name = 600, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60, BGM = 6},
+		{level_name = 700, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60, BGM = 6},
+		{level_name = 800, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60, BGM = 6},
+		{level_name = 900, gravity = math.huge, lock_delay = 15/60, spawn_delay = 06/60, spawn_delay_after_line = 06/60, line_delay = 04/60, AS_delay = 08/60, BGM = 6},
 	},
 	--[[
 	-- Server spec, won't show in the list

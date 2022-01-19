@@ -93,11 +93,13 @@ function love.load()
         original  = love.graphics.newShader("shaders/bg1.glsl"),
         master    = love.graphics.newShader("shaders/bg10.glsl"),
         classic   = love.graphics.newShader("shaders/bgclassic.glsl"),
+        death     = love.graphics.newShader("shaders/bgdeath.glsl"),
         menu      = love.graphics.newShader("shaders/bgmenu.glsl"),
     }
-    ShaderBlur    = love.graphics.newShader("shaders/blur.glsl")
-    ShaderRainbow = love.graphics.newShader("shaders/rainbow.glsl")
-    ShaderShaking = love.graphics.newShader("shaders/chroma-misalign.glsl")
+    ShaderBlur     = love.graphics.newShader("shaders/blur.glsl")
+    ShaderRainbow  = love.graphics.newShader("shaders/rainbow.glsl")
+    ShaderShaking  = love.graphics.newShader("shaders/chroma-misalign.glsl")
+    ShaderInfinity = love.graphics.newShader("shaders/infinity.glsl")
     
     local moontex = love.graphics.newImage("assets/texture/lroc_color_poles_2k.png")
     local moondis = love.graphics.newImage("assets/texture/ldem_4_uint.png")
@@ -328,6 +330,14 @@ function love.draw()
         love.graphics.setCanvas(CanvasBG)
 		love.graphics.setColor(.5,.5,.5)
 		love.graphics.draw(Title[Title.current].text)
+		if Title.current == "play" then
+			local modeid = Title.play.items[Title.play.highlight].id
+			if modeid and Levels[modeid][Title.play.startlv].level_name == math.huge then
+				local scx, scy = Font.Menu:getWidth("AA"), Font.Menu:getHeight()
+				local posx = 0.5*Font.Menu:getWidth("Start level: <    >") - Font.Menu:getWidth(" >")
+				DrawInfinitySymbol(Width*0.5 + posx - scx/10, math.floor(Height*0.7), 0, -scx/10, scy/6)
+			end
+		end
         DrawRainbow(CanvasRainbow)
         love.graphics.setCanvas()
         local b = tonumber(Config.bg_brightness)/100
@@ -335,6 +345,14 @@ function love.draw()
         love.graphics.draw(CanvasBG)
 		love.graphics.setColor(1,1,1)
 		love.graphics.draw(Title[Title.current].text)
+		if Title.current == "play" then
+			local modeid = Title.play.items[Title.play.highlight].id
+			if modeid and Levels[modeid][Title.play.startlv].level_name == math.huge then
+				local scx, scy = Font.Menu:getWidth("AA"), Font.Menu:getHeight()
+				local posx = 0.5*Font.Menu:getWidth("Start level: <    >") - Font.Menu:getWidth(" >")
+				DrawInfinitySymbol(Width*0.5 + posx - scx/10, math.floor(Height*0.7), 0, -scx/10, scy/6)
+			end
+		end
         DrawRainbow(CanvasRainbow)
 	elseif STATE == "battle2P" then
 		Games.P1:draw()
@@ -482,7 +500,31 @@ function love.draw()
         love.graphics.setFont(Font.Menu)
         love.graphics.printf("SCORE", Width*0.75, Height*0.80, Width*0.2, "right")
         
-        love.graphics.printf(Game.level_name,        Width*0.75, Height*0.425, Width*0.2, "right")
+		local leveldisplay = Game.level_name
+		if Game.level_type == "SEC" then
+			leveldisplay = string.format("%03d/%03d", leveldisplay+Game.percentile, leveldisplay+100)
+		elseif leveldisplay == math.huge or leveldisplay == -math.huge then
+			local scx, scy = Font.Menu:getWidth("AA"), Font.Menu:getHeight()
+			if leveldisplay < 0 then
+				love.graphics.setShader(ShaderRainbow)
+				love.graphics.printf("M", Width*0.75-scx, Height*0.425, Width*0.2, "right")
+				love.graphics.setShader()
+			end
+			leveldisplay = ""
+			DrawInfinitySymbol(Width*0.95-scx/10, Height*0.425, 0, -scx/10, scy/6)
+			
+			love.graphics.setFont(Font.HUD)
+			love.graphics.printf("("..FormatTime(Game.level_time)..")",  Width*0.75, Height*0.625 + Font.Menu:getHeight(), Width*0.2, "right")
+			love.graphics.setFont(Font.Menu)
+		end
+		
+		if Game.startlevel ~= 1 then
+			love.graphics.setFont(Font.HUD)
+			love.graphics.printf("("..Game.speedcurve[Game.startlevel].level_name..")",  Width*0.75, Height*0.425 + Font.Menu:getHeight(), Width*0.2, "right")
+			love.graphics.setFont(Font.Menu)
+		end
+		
+		love.graphics.printf(leveldisplay,           Width*0.75, Height*0.425, Width*0.2, "right")
         love.graphics.printf(Game.lines,             Width*0.75, Height*0.525, Width*0.2, "right")
         love.graphics.printf(FormatTime(Game.time),  Width*0.75, Height*0.625, Width*0.2, "right")
         

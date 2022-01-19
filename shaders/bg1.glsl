@@ -37,7 +37,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
     uv2.x *= love_ScreenSize.x/love_ScreenSize.y;
     if (uvs.y > .5) {
         // ground: grid thing
-        newpixel += uv2.y*max(smoothstep(.1, .0, abs(mod(uv2.x/uv2.y, 1)-.5)), pow(mod(time-1/uv2.y, 1), 4))*0.6;
+        newpixel += uv2.y*max(smoothstep(.1, .0, abs(fract(uv2.x/uv2.y)-.5)), pow(fract(time-1/uv2.y), 4))*0.6;
     } else {
         // sky: noise clouds
         uv2.y *= -1;
