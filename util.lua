@@ -291,6 +291,15 @@ function RenderBG(id)
     love.graphics.setColor(r, g, b, a)
 end
 
+function GetAdjustedFontSize(size)
+	local s = math.ceil(size)
+	local r = s % 6
+	if s < 9 then return 6
+	elseif r == 4 then return s-1
+	elseif r == 5 then return s+1
+	end
+	return s
+end
 
 function ProcessResize(w, h, first)
 	Width, Height = w, h
@@ -313,14 +322,18 @@ function ProcessResize(w, h, first)
         end
     end
     
+	
+	
+	-- font = love.graphics.newImageFont( filename, glyphs, extraspacing )
+	
     Font = {
-        HUD   = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.ceil(h/50)),
-        Menu  = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.ceil(h/32)),
-        Title = love.graphics.newFont("assets/font/exampleblockgame.ttf", math.ceil(h/16)),
+        HUD   = love.graphics.newFont("assets/font/exampleblockgame.ttf", GetAdjustedFontSize(h/50)),
+        Menu  = love.graphics.newFont("assets/font/exampleblockgame.ttf", GetAdjustedFontSize(h/32)),
+        Title = love.graphics.newFont("assets/font/exampleblockgame.ttf", GetAdjustedFontSize(h/16)),
     }
-	Font.HUD  :setFilter("linear", "linear")
-	Font.Menu :setFilter("linear", "linear")
-	Font.Title:setFilter("linear", "linear")
+	Font.HUD  :setFilter("nearest", "nearest")
+	Font.Menu :setFilter("nearest", "nearest")
+	Font.Title:setFilter("nearest", "nearest")
     CanvasBG      = love.graphics.newCanvas()
     CanvasBGprev  = love.graphics.newCanvas()
     CanvasRainbow = love.graphics.newCanvas()
