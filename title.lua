@@ -24,6 +24,7 @@ local open   = function(menu) return function(button)                           
 Title.main = Menu.new("Menu", {
 	{x = 0, y = -0.2, label = "START GAME",      action_e = open("play")},
 	{x = 0, y =  0.0, label = "SETTINGS",        action_e = open("settings")},
+	{x = 0, y =  0.2, label = "HIGH SCORES",     action_e = open("highscores")}
 	--[[
 	{x = 0, y =  0.2, label = "Networking test",
 		action_e = function(button)
@@ -377,3 +378,66 @@ Title.graphics = Menu.new("Menu", {
 	},
 	{x = 0, y =  0.7, label = "BACK", action_e = change("settings")},
 })
+
+-- sets the default high score mode view to the first mode alphabetically
+local hs_keys = {}
+local mode_indices = {} -- to prevent unnecessary lookups
+for k,v in pairs(HighScores) do
+	if(k ~= "Death") then table.insert(hs_keys,k) end -- death is technically a secret mode
+	for i=1,#Levels do
+		if(Levels[i].name == k) then mode_indices[k] = i end
+	end
+end
+table.sort(hs_keys) -- alphabetical order
+if(#hs_keys == 0) then
+	error("No high score keys. Are you sure there's at least one mode?")
+end
+
+Title.highscores = Menu.new("Menu", {
+	{x = 0, y = -0.8, label = "< MODE: "..hs_keys[1].." >",
+		action_l = function(button)
+			Title.highscores.selection = (Title.highscores.selection+#Title.highscores.modeList-2)%(#Title.highscores.modeList)+1
+			button.label = "< MODE: "..hs_keys[Title.highscores.selection].." >"
+		end,
+		action_r = function(button)
+			Title.highscores.selection = (Title.highscores.selection)%(#Title.highscores.modeList)+1
+			button.label = "< MODE: "..hs_keys[Title.highscores.selection].." >"
+		end},
+	{x = 0, y = -0.7, label = "< SHOW CLEAR STATISTICS: X >",
+		action_l = function(button)
+			Title.highscores.showclear = not Title.highscores.showclear
+			button.label = "< SHOW CLEAR STATISTICS: " .. (Title.highscores.showclear and "O" or "X") .. " >"
+		end,
+		action_r = function(button)
+			Title.highscores.showclear = not Title.highscores.showclear
+			button.label = "< SHOW CLEAR STATISTICS: " .. (Title.highscores.showclear and "O" or "X") .. " >"
+		end},
+	{x = 0, y =  0.7, label = "BACK", action_e = function(button)
+		Title.highscores.resetCounter = 0
+		Title.highscores.items[4].label = "RESET HIGH SCORES"
+		change("main")(button)
+	end},
+	{x = 0, y =  0.8, label = "RESET HIGH SCORES", action_e = function(button)
+		Title.highscores.resetCounter = Title.highscores.resetCounter + 1
+		if(Title.highscores.resetCounter == 1) then
+			button.label = "ARE YOU SURE YOU WANT TO CLEAR RECORDS?"
+		elseif(Title.highscores.resetCounter == 2) then
+			button.label = "ARE YOU REALLY SURE?"
+		elseif(Title.highscores.resetCounter == 3) then
+			button.label = "LAST CHANCE! ARE YOU SURE YOU WANT TO?"
+		else
+			button.label = "RESET HIGH SCORES"
+			Title.highscores.resetCounter = 0
+			for _,mode in pairs(Levels) do
+				local name = mode.name
+				HighScores[name] = {}
+			end
+			SaveHighScores()
+		end
+	end}
+})
+Title.highscores.selection = 1
+Title.highscores.modeList = hs_keys
+Title.highscores.modeIndices = mode_indices
+Title.highscores.showclear = false
+Title.highscores.resetCounter = 0

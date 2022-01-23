@@ -132,7 +132,7 @@ function LoadConfig()
 	if love.filesystem.getInfo("keys.conf") then
 		for line in love.filesystem.lines("keys.conf") do
 			key, param = line:match("(.*)=(.+)")
-			print(key, param)
+			--print(key, param)
 			if key then
 				Config[key] = param
 				if key:sub(1, 4) == "key_" then KeyBindings[key:sub(5,-1)] = param end
