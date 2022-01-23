@@ -246,6 +246,7 @@ Board = {
 			else
 				board.percentile = board.percentile % 100
 				board.level_time = board.time
+				board.level_final_score = board.score
 				board.last_level = oldlv
 				PlaySFX("classic_levelup")
 			end
@@ -288,7 +289,10 @@ Board = {
 		board:initial_rotate(input)
 		
 		-- check death and make new ghost
-		if board:check_collision_with(board.piece) then board.dead = true end
+		if board:check_collision_with(board.piece) then
+			board.dead = true
+			board:saveScore()
+		end
 		board:create_ghost()
 		
 		-- set hold flag
@@ -727,7 +731,12 @@ Board = {
                     if input.hold and board.allow_hold then board:hold(input) end
                     
 					-- check death, if not dead make new ghost
-					if board:check_collision_with(board.piece) then board.dead = true else board:create_ghost() end
+					if board:check_collision_with(board.piece) then
+						board.dead = true
+						board:saveScore()
+					else
+						board:create_ghost()
+					end
 				end
 			end
 		else
@@ -1009,6 +1018,23 @@ Board = {
         love.graphics.clear(0,0,0,1)
         love.graphics.setCanvas()
 	end,
+
+	saveScore = function(board)
+		local isClear = (board.speedcurve[board.level].level_name == math.huge and board.level ~= board.startlevel)
+		print("score = " .. board.score .. ", clearscore = " .. (board.level_final_score or "nil"))
+		table.insert(HighScores[board.speedcurve.name],
+			{
+				score=board.score,
+				clearScore=isClear and (board.level_final_score or 0),
+				lines=board.lines,
+				startLevel=board.startlevel,
+				finalLevel=(board.level or board.startlevel),
+				time=board.time,
+				clearTime=isClear and board.level_time
+			}
+		)
+		SaveHighScores()
+	end,
 	
 	new = function(curve, seed, blocksize, posx, posy)
 		local newboard = {
@@ -1068,6 +1094,7 @@ Board = {
 			do_draw_items = Board.do_draw_items,
             darken_glow = Board.darken_glow,
             putTheBlock = Board.putTheBlock,
+			saveScore = Board.saveScore
 		}
 		newboard.block_mesh:setTexture(blocktexture)
 		for i = 1, curve.prev do newboard.nexts[i] = 0 end
