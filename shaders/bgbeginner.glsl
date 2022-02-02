@@ -1,22 +1,42 @@
 uniform float dt;
 uniform float time;
+uniform int   level;
+uniform int   levelprev;
+uniform float leveltime;
 #define PI            3.141592653589793238463
 #define TAU           6.283185307179586476925
 #define SCREENHEIGHT  .60
 #define SEALEVEL      20.
-#define SEAREFRACTION 1.3
+#define SEAREFRACTION 1.4
 #define SHAPETHICNESS 15.
 #define SHAPEGLOWNESS 20.
 #define SHAPESIZENESS 250.
+#define TRANSITIONLEN 3.
+#define STARSDENSITY  35.
 const vec3 SHAPEPOS = vec3(0., -200., 1000);
 const vec3 LIGHTDIR = vec3(0.,0.,1.);
 const vec2 DVEC     = vec2(.00, .01);
 // colours
-const vec4 sky   = vec4(.4, .6, .7, 1.);
-const vec4 light = vec4(.9, .9, .9, 1.);
-const vec4 water = vec4(.7, .5, .5, 1.);
-const vec4 watr2 = vec4(.9, .6, .7, 1.);
-const vec4 shape = vec4(.9, .6, .7, 1.);
+const vec4 sky0   = vec4(.4, .6, .7, 1.);
+const vec4 sky1   = vec4(.1, .2, .3, 1.);
+const vec4 light0 = vec4(.9, .9, .9, 1.);
+const vec4 light1 = vec4(.9, .4, .0, 1.);
+const vec4 water1 = vec4(.0, .0, .0, 1.);
+const vec4 water2 = vec4(.7, .9, .7, 1.);
+const vec4 shape  = vec4(.9, .6, .7, 1.);
+
+vec4 getSky(float lv) {
+	return mix(sky0, sky1, min(1., lv));
+}
+
+vec4 getLight(float lv) {
+	return mix(light0, light1, min(1., lv));
+}
+
+vec3 getLightdir(float lv) {
+	float a = min(1., lv)*PI*.5;
+	return vec3(0., sin(a), cos(a));
+}
 
 float distanceLineToSegment(vec3 lineOrigin, vec3 lineDir, vec3 segA, vec3 segB) {
     float distanceA = distance(dot(segA-lineOrigin, lineDir)*lineDir + lineOrigin, segA);
@@ -100,6 +120,11 @@ float fbm(vec3 x) {
 
 #ifdef PIXEL
 vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
+	float lv = mix(levelprev, level, smoothstep(0., TRANSITIONLEN, leveltime))*.1 - .1;
+	vec4 light    = getLight   (lv);
+	vec4 sky      = getSky     (lv);
+	vec3 lightdir = getLightdir(lv);
+	
     //scaling uvs
     vec2 uv2 = uvs - .5;
     uv2.x *= love_ScreenSize.x/love_ScreenSize.y;
@@ -109,7 +134,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
     vec3 uvdir = normalize(vec3(uv2, 1));
     
     vec3 startpoint = vec3(0.);
-    vec4 reflectioncolour = mix(sky, light, pow(dot(uvdir, LIGHTDIR), 5));
+    vec4 reflectioncolour = mix(sky, light, max(pow(dot(uvdir, lightdir), 5), 0.));
     vec4 refractioncolour = vec4(0.);
     float reflectionindex = 1.;
     if (uvdir.y > 0.) {
@@ -126,26 +151,45 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
             vec3 normal = cross(dz, dx);
             // reflected and refracted rays
             vec3 reflected = normalize(reflect(uvdir, normal));
-            vec3 refracted = normalize(refract(uvdir, normal, 1/SEAREFRACTION));
+            vec3 refracted = normalize(refract(uvdir, normal, 1./SEAREFRACTION));
             // Schlick's approximation for how much refraction
             float r = (1-SEAREFRACTION)/(1+SEAREFRACTION);
             r *= r;
             r += (1-r)*pow(1-dot(uvdir, normal), 5);
             // update values
-            refractioncolour = mix(watr2, water, dot(refracted, LIGHTDIR));
-            reflectioncolour = mix(sky  , light, max(pow(dot(reflected, LIGHTDIR), 5),0.));
+            refractioncolour = mix(water2, water1, (.5+.5*dot(refracted, lightdir)));
+            reflectioncolour = mix(sky  , light, max(pow(dot(reflected, lightdir), 5),0.));
             reflectionindex = clamp(0, 1, r + startpoint.z*.0025);
             uvdir = reflected;
         }
     }
+	
     vec2 uvb = uvdir.xy/uvdir.z;
+	// random stars
+	// lots of random but essentially, the screen is divided into square cells
+	// in which i place one star at a random spot towards the middle
+	vec2 cell = floor(uvb*STARSDENSITY);
+	// the randomness makes the stars off the grid
+	// and with enough of them it looks somewhat convincing i guess
+	float r = rand(cell);
+	vec2 starpos = .25+.5*vec2(r, rand(cell+r));
+	// shine of the stars changes with time so it's a bit sparkly
+	// not how stars behave but i think it looks good
+	float intensity = noise((starpos+cell)*5.+time)*max(0., lv);
+	reflectioncolour.xyz += vec3(1., 1., rand(cell*intensity)) * (1.-smoothstep(.0, .004*intensity, distance(uv2, (cell+starpos)/STARSDENSITY)))*intensity;
+	
+	// rainbow stripes
     vec4 blend = vec4(
-        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + 1.00)),
-        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + 1.05)),
-        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + 1.10)),
-        0.
+        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + 1.00)), // position of red ray
+        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + 1.05)), // position of green ray
+        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + 1.10)), // position of blue ray
+        0. // don't touch alpha
     );
-    reflectioncolour = mix(reflectioncolour, vec4(1., 1., 1., 1.), blend);
+	// each ray gets mixed with its own component
+    reflectioncolour = mix(reflectioncolour, vec4(1.), blend);
+	
+	// octahedron
+	// calculate rotation with 3 linearly changing angles for yaw/pitch/roll
     float a = time*0.8, b = time*0.4, c = time*.2;
     float ca = cos(a), sa = sin(a), cb = cos(b), sb = sin(b), cc = cos(c), sc = sin(c);
     mat3 spin = mat3(sc, cc,  0,
@@ -157,10 +201,13 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
               * mat3(ca,  0, sa,
                       0,  1,  0,
                     -sa,  0, ca);
+	// the resulting matrix contains the results of the transformation of +x, +y and +z
     vec3 spinX = spin[0], spinY = spin[1], spinZ = spin[2];
+	// the points of a octahedron are +x, -x, +y, -y, +z, -z
     vec3 Xpos = SHAPEPOS + SHAPESIZENESS*spinX, Xneg = SHAPEPOS - SHAPESIZENESS*spinX;
     vec3 Ypos = SHAPEPOS + SHAPESIZENESS*spinY, Yneg = SHAPEPOS - SHAPESIZENESS*spinY;
     vec3 Zpos = SHAPEPOS + SHAPESIZENESS*spinZ, Zneg = SHAPEPOS - SHAPESIZENESS*spinZ;
+	// see what edge we're closest to
     float d =  distanceLineToSegment(startpoint, uvdir, Xpos, Ypos);
     d = min(d, distanceLineToSegment(startpoint, uvdir, Xpos, Yneg));
     d = min(d, distanceLineToSegment(startpoint, uvdir, Xpos, Zpos));
@@ -174,8 +221,10 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
     d = min(d, distanceLineToSegment(startpoint, uvdir, Yneg, Zpos));
     d = min(d, distanceLineToSegment(startpoint, uvdir, Yneg, Zneg));
     if (d < SHAPETHICNESS) {
+		// we're hitting the shape: make the shape colour
         reflectioncolour = shape;
     } else {
+		// we're not hitting the shape: make the shape glow
         reflectioncolour = mix(reflectioncolour, shape, 1/(1+d/SHAPEGLOWNESS));
     }
     
