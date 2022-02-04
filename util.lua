@@ -301,9 +301,10 @@ function GetAdjustedFontSize(size)
 	return s
 end
 
-function ProcessResize(w, h, first)
+local first_resize = true
+function ProcessResize(w, h)
 	Width, Height = w, h
-    if not first then
+    if not first_resize then
         for _, font in pairs(Font) do font:release() end
         CanvasBG     :release()
         CanvasBGprev :release()
@@ -339,7 +340,7 @@ function ProcessResize(w, h, first)
     CanvasRainbow = love.graphics.newCanvas()
     buffercanvas  = love.graphics.newCanvas()
     
-    if not first then
+    if not first_resize then
         TitleText :setFont(Font.Title)
         ScoreText :setFont(Font.Title)
         ScorePopup:setFont(Font.HUD)
@@ -349,6 +350,8 @@ function ProcessResize(w, h, first)
 		UpdatePauseMenuFonts()
 		if Config.dynamic_bg == "X" then PrerenderBG(currentbg) end
     end
+	
+	first_resize = false
 end
 
 local arrow_buttons = {
@@ -403,4 +406,26 @@ function DrawInfinitySymbol(...)
 	
 	love.graphics.setShader(_s)
 	love.graphics.setColor(_c)
+end
+
+
+FullScreenModes = {}
+for i = 1, love.window.getDisplayCount() do
+	local modes = love.window.getFullscreenModes(i)
+	for _, mode in ipairs(modes) do
+		mode.display = i
+		table.insert(FullScreenModes, mode)
+	end
+end
+table.sort(FullScreenModes, function(a, b)
+		if a.height ~= b.height then return a.height  < b.height
+	elseif a.width  ~= b.width  then return a.width   < b.width
+	else                             return a.display < b.display
+	end
+end)
+-- for _, mode in ipairs(FullScreenModes) do print(string.format("%4dx%4d (%d)", mode.width, mode.height, mode.display)) end
+
+function SetDisplayMode(width, height, display, fs, vsync)
+	love.window.updateMode(width, height, {display = display, fullscreen = fs, vsync = vsync, fullscreentype = "exclusive"})
+	ProcessResize(width, height)
 end

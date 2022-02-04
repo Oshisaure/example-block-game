@@ -112,7 +112,7 @@ end
 Title.play:updateSelected()
 
 Title.settings = Menu.new("Menu", {
-	{x = 0, y = -0.5, label = ("< BGM VOLUME : %d%% >"):format(Config.bgm_volume),
+	{x = 0, y = -0.3, label = ("< BGM VOLUME : %d%% >"):format(Config.bgm_volume),
 		action_e = function(button)
 			local n = (tonumber(Config.bgm_volume) + 5) % 105
 			Config.bgm_volume = tostring(n)
@@ -135,7 +135,7 @@ Title.settings = Menu.new("Menu", {
             SaveConfig()
 		end,
     },
-	{x = 0, y = -0.3, label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume),
+	{x = 0, y = -0.2, label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume),
 		action_e = function(button)
 			local n = (tonumber(Config.sfx_volume) + 5) % 105
 			Config.sfx_volume = tostring(n)
@@ -159,10 +159,11 @@ Title.settings = Menu.new("Menu", {
 		end,
     },
     
-	{x = 0, y = -0.1, label = "KEYBOARD CONFIG", action_e = open("keyconf")},
-	{x = 0, y =  0.1, label = "GAMEPAD CONFIG",  action_e = open("padconf")},
-	{x = 0, y =  0.3, label = "GRAPHICS OPTIONS",  action_e = open("graphics")},
-	{x = 0, y =  0.7, label = "BACK",  action_e = change("main")},
+	{x = 0, y =  0.0, label = "KEYBOARD CONFIG",  action_e = open("keyconf")},
+	{x = 0, y =  0.1, label = "GAMEPAD CONFIG",   action_e = open("padconf")},
+	{x = 0, y =  0.3, label = "GRAPHICS OPTIONS", action_e = open("graphics")},
+	{x = 0, y =  0.4, label = "WINDOW OPTIONS",   action_e = open("window")},
+	{x = 0, y =  0.7, label = "BACK",             action_e = change("main")},
 })
 
 local keySettingsItems = {}
@@ -280,27 +281,7 @@ Title.graphics = Menu.new("Menu", {
             -- SaveConfig()
 		-- end,
     -- },
-	{x = 0, y =  0.1, label = ("< VSYNC : %s >"):format(Config.vsync),
-		action_e = function(button)
-			Config.vsync = (Config.vsync == "O" and "X" or "O")
-			button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            love.window.setVSync(BoolNumber(Config.vsync == "O"))
-            SaveConfig()
-		end,
-		action_r = function(button)
-			Config.vsync = (Config.vsync == "O" and "X" or "O")
-			button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            love.window.setVSync(BoolNumber(Config.vsync == "O"))
-            SaveConfig()
-		end,
-		action_l = function(button)
-			Config.vsync = (Config.vsync == "O" and "X" or "O")
-			button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            love.window.setVSync(BoolNumber(Config.vsync == "O"))
-            SaveConfig()
-		end,
-    },
-	{x = 0, y =  0.2, label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg),
+	{x = 0, y =  0.1, label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg),
 		action_e = function(button)
 			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
 			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
@@ -320,7 +301,7 @@ Title.graphics = Menu.new("Menu", {
             SaveConfig()
 		end,
     },
-	{x = 0, y =  0.3, label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness),
+	{x = 0, y =  0.2, label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness),
 		action_e = function(button)
 			local n = (tonumber(Config.bg_brightness) + 5) % 105
 			Config.bg_brightness = tostring(n)
@@ -340,7 +321,7 @@ Title.graphics = Menu.new("Menu", {
             SaveConfig()
 		end,
     },
-	{x = 0, y =  0.4,
+	{x = 0, y =  0.3,
 		label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(tonumber(Config.blur_spread)), ("."):rep(10 - tonumber(Config.blur_spread))),
 		action_e = function(button)
 			local n = (tonumber(Config.blur_spread) % 10)
@@ -358,7 +339,7 @@ Title.graphics = Menu.new("Menu", {
 			Config.blur_spread = tostring(n)
 		end,
 	},
-	{x = 0, y =  0.5,
+	{x = 0, y =  0.4,
 		label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(tonumber(Config.trail_duration)), ("."):rep(10 - tonumber(Config.trail_duration))),
 		action_e = function(button)
 			local n = (tonumber(Config.trail_duration) % 10)
@@ -378,6 +359,76 @@ Title.graphics = Menu.new("Menu", {
 	},
 	{x = 0, y =  0.7, label = "BACK", action_e = change("settings")},
 })
+
+Title.window = Menu.new("Menu", {
+	{x = 0, y = -0.2,
+	label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(FullScreenModes[1].width, FullScreenModes[1].height, FullScreenModes[1].display),
+	param = 1,
+		action_e = function(button)
+			button.param = (button.param % #FullScreenModes) + 1
+			local mode = FullScreenModes[button.param]
+			button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, mode.display)
+		end,
+		action_r = function(button)
+			button.param = (button.param % #FullScreenModes) + 1
+			local mode = FullScreenModes[button.param]
+			button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, mode.display)
+		end,
+		action_l = function(button)
+			button.param = ((button.param - 2) % #FullScreenModes) + 1
+			local mode = FullScreenModes[button.param]
+			button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, mode.display)
+		end,
+    },
+	{x = 0, y =  0.1, label = ("< FULLSCREEN : %s >"):format(Config.fullscreen), param = Config.fullscreen,
+		action_e = function(button)
+			button.param = (button.param == "O" and "X" or "O")
+			button.label = ("< FULLSCREEN : %s >"):format(button.param)
+		end,
+		action_r = function(button)
+			button.param = (button.param == "O" and "X" or "O")
+			button.label = ("< FULLSCREEN : %s >"):format(button.param)
+		end,
+		action_l = function(button)
+			button.param = (button.param == "O" and "X" or "O")
+			button.label = ("< FULLSCREEN : %s >"):format(button.param)
+		end,
+    },
+	{x = 0, y =  0.2, label = ("< VSYNC : %s >"):format(Config.vsync), param = Config.vsync,
+		action_e = function(button)
+			button.param = (button.param == "O" and "X" or "O")
+			button.label = ("< VSYNC : %s >"):format(button.param)
+		end,
+		action_r = function(button)
+			button.param = (button.param == "O" and "X" or "O")
+			button.label = ("< VSYNC : %s >"):format(button.param)
+		end,
+		action_l = function(button)
+			button.param = (button.param == "O" and "X" or "O")
+			button.label = ("< VSYNC : %s >"):format(button.param)
+		end,
+    },
+	
+	{x = 0, y =  0.5, label = "APPLY",
+		action_e = function(button)
+			local width, height, display, vsync, fs
+			local buttons = button.parent.items
+			local mode = FullScreenModes[buttons[1].param]
+			width, height, display = mode.width, mode.height, mode.display
+			fs    = buttons[2].param
+			vsync = buttons[3].param
+			SetDisplayMode(width, height, display, fs == "O", vsync == "O")
+			Config.window_width   = tostring(width  )
+			Config.window_height  = tostring(height )
+			Config.window_display = tostring(display)
+			Config.fullscreen = fs
+			Config.vsync      = vsync
+		end
+	},
+	{x = 0, y =  0.7, label = "BACK",  action_e = change("settings")},
+})
+
+
 
 -- sets the default high score mode view to the first mode alphabetically
 local hs_keys = {}

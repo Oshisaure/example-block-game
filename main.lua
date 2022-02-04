@@ -17,10 +17,17 @@
 ]==]
 
 function love.load()
-	Width, Height = love.graphics.getDimensions()
+	-- Width, Height = love.graphics.getDimensions()
 	require("util")
 	require("config")
-    ProcessResize(Width, Height, true)
+	
+	SetDisplayMode(
+		tonumber(Config.window_width),
+		tonumber(Config.window_height),
+		tonumber(Config.window_display),
+		Config.fullscreen == "O",
+		Config.vsync == "O"
+	)
     
 	require("piece")
 	require("engine")
@@ -35,7 +42,7 @@ function love.load()
 	require("pause")
 	require("splash")
     
-    love.window.setVSync(BoolNumber(Config.vsync == "O"))
+    -- love.window.setVSync(BoolNumber(Config.vsync == "O"))
     
     --[[
     BGMSD = love.sound.newSoundData("assets/bounce.mp3")
@@ -138,7 +145,6 @@ function love.load()
     CanvasBG      = love.graphics.newCanvas(Width, Height)
     CanvasBGprev  = love.graphics.newCanvas(Width, Height)
     --]]
-    
 	
 	if Config.dynamic_bg == "X" then PrerenderBG("menu") end
 	--[==[
