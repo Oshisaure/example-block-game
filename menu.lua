@@ -18,36 +18,50 @@
 Menu = {
 	updateSelected = function(self, key)
 		local r
-		    if key == "up"     then self.highlight = (self.highlight - 2) % #self.items + 1
-		elseif key == "down"   then self.highlight = (self.highlight - 0) % #self.items + 1
-		elseif key == "return" then r = self.items[self.highlight]:action_e()
-		elseif key == "right"  then r = self.items[self.highlight]:action_r()
-		elseif key == "left"   then r = self.items[self.highlight]:action_l()
-		end
-        self.text:setFont(Font[self.font])
-		self.text:set("")
-		for k, item in ipairs(self.items) do
-			self.text:addf({k == self.highlight and {1, 0.7, 0.5} or {1,1,1}, item.label}, Width, "center", math.floor(item.x*Width/2), math.floor(item.y*Height/2)+Height/2)
-		end
+            if key == "up"     then self.highlight = (self.highlight - 2) % #self.items + 1
+        elseif key == "down"   then self.highlight = (self.highlight - 0) % #self.items + 1
+        elseif key == "return" then r = self.items[self.highlight]:action_e()
+        elseif key == "right"  then r = self.items[self.highlight]:action_r()
+        elseif key == "left"   then r = self.items[self.highlight]:action_l()
+        else for _, item in ipairs(self.items) do item:update() end
+        end
+
+        self:updateItem(self.highlight)
+
 		return r
 	end,
-    
-    reload = function(menu)
-        -- local fontsize = menu.font
+
+    reload = function(self)
+        -- local fontsize = self.font
         -- local font
             -- if fontsize == "big"   then font = HUDFontBig
         -- elseif fontsize == "small" then font = HUDFontSmall
         -- else font = HUDFont
         -- end
-        -- menu.text:setFont(font)
-        menu:updateSelected("kek")
+        -- self.text:setFont(font)
+        self:updateSelected("kek")
     end,
-	
-	new = function(font, items)
-		for k = 1, #items do
-			if not items[k].action_e then items[k].action_e = NADA end
-			if not items[k].action_l then items[k].action_l = NADA end
-			if not items[k].action_r then items[k].action_r = NADA end
+
+    updateItem = function(self, index)
+        self.items[index]:update()
+
+        self.text:setFont(Font[self.font])
+		self.text:set("")
+		for k, item in ipairs(self.items) do
+			self.text:addf({k == index and {1, 0.7, 0.5} or {1,1,1}, item.label},
+                            Width, "center",
+                            math.floor(item.x*Width/2),
+                            math.floor(item.y*Height/2)+Height/2)
+		end
+	end,
+
+    new = function(font, items)
+        for k = 1, #items do
+            if not items[k].action_e 	then items[k].action_e  = NADA end
+            if not items[k].action_l 	then items[k].action_l  = NADA end
+            if not items[k].action_r 	then items[k].action_r  = NADA end
+            if not items[k].update 	    then items[k].update    = NADA end
+            items[k].index = k
 		end
 		--[[
         local font
@@ -56,12 +70,13 @@ Menu = {
         else font = HUDFont
         end]]
 		local menu = {
-			items = items,
-            font = font,
-			text = love.graphics.newText(Font[font]),
-			highlight = 1,
-			updateSelected = Menu.updateSelected,
-            reload = Menu.reload,
+			items           = items,
+            font            = font,
+			text            = love.graphics.newText(Font[font]),
+			highlight       = 1,
+			updateItem      = Menu.updateItem,
+			updateSelected  = Menu.updateSelected,
+            reload          = Menu.reload,
 		}
 		for k = 1, #menu.items do menu.items[k].parent = menu end
 		menu:updateSelected("kek")

@@ -261,26 +261,6 @@ Title.graphics = Menu.new("Menu", {
 			Config.sway_bounciness = tostring(n)
 		end,
 	},
-	-- {x = 0, y =  0.0, label = ("< FULLSCREEN : %s >"):format(Config.vsync),
-		-- action_e = function(button)
-			-- Config.vsync = (Config.vsync == "O" and "X" or "O")
-			-- button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            -- love.window.setVSync(Config.vsync == "O")
-            -- SaveConfig()
-		-- end,
-		-- action_r = function(button)
-			-- Config.vsync = (Config.vsync == "O" and "X" or "O")
-			-- button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            -- love.window.setVSync(Config.vsync == "O")
-            -- SaveConfig()
-		-- end,
-		-- action_l = function(button)
-			-- Config.vsync = (Config.vsync == "O" and "X" or "O")
-			-- button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            -- love.window.setVSync(Config.vsync == "O")
-            -- SaveConfig()
-		-- end,
-    -- },
 	{x = 0, y =  0.1, label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg),
 		action_e = function(button)
 			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
@@ -361,70 +341,94 @@ Title.graphics = Menu.new("Menu", {
 })
 
 Title.window = Menu.new("Menu", {
-	{x = 0, y = -0.2,
-	label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(FullScreenModes[1].width, FullScreenModes[1].height, FullScreenModes[1].display),
-	param = 1,
+	{x = 0, y =  -0.4, param = CurrentScreen, prev_screen = CurrentScreen,
 		action_e = function(button)
-			button.param = (button.param % #FullScreenModes) + 1
-			local mode = FullScreenModes[button.param]
-			button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, mode.display)
+            button.prev_screen = CurrentScreen
+			CurrentScreen = (CurrentScreen % #FullScreenModes) + 1
 		end,
 		action_r = function(button)
-			button.param = (button.param % #FullScreenModes) + 1
-			local mode = FullScreenModes[button.param]
-			button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, mode.display)
+			button.prev_screen = CurrentScreen
+            CurrentScreen = (CurrentScreen % #FullScreenModes) + 1
 		end,
 		action_l = function(button)
-			button.param = ((button.param - 2) % #FullScreenModes) + 1
-			local mode = FullScreenModes[button.param]
-			button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, mode.display)
+			button.prev_screen = CurrentScreen
+            CurrentScreen = ((CurrentScreen - 2) % #FullScreenModes) + 1
 		end,
+        update = function(button)
+            button.label = ("< SCREEN : %s >"):format(CurrentScreen)
+
+            local cur_res_param     = button.parent.items[button.index+1].param
+            local aprox_switch_res  = math.floor((cur_res_param/#FullScreenModes[button.prev_screen])*#FullScreenModes[CurrentScreen])
+            button.parent.items[button.index+1].param = math.clamp(aprox_switch_res, 1, #FullScreenModes[CurrentScreen])
+
+            button.parent:updateItem(button.index+1) -- Updates `RESOLUTION` item to match a selected screen's resolutions.
+        end
     },
-	{x = 0, y =  0.1, label = ("< FULLSCREEN : %s >"):format(Config.fullscreen), param = Config.fullscreen,
+
+	{x = 0, y = -0.2, param = 1,
 		action_e = function(button)
-			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< FULLSCREEN : %s >"):format(button.param)
+			button.param = (button.param % #FullScreenModes[CurrentScreen]) + 1
 		end,
 		action_r = function(button)
-			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< FULLSCREEN : %s >"):format(button.param)
+			button.param = (button.param % #FullScreenModes[CurrentScreen]) + 1
 		end,
 		action_l = function(button)
-			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< FULLSCREEN : %s >"):format(button.param)
+			button.param = ((button.param - 2) % #FullScreenModes[CurrentScreen]) + 1
 		end,
+		update = function(button)
+			local mode = FullScreenModes[CurrentScreen][button.param]
+			--button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, CurrentScreen) -- Debuge
+			button.label = ("< RESOLUTION : %4dx%4d >"):format(mode.width, mode.height)
+		end
     },
-	{x = 0, y =  0.2, label = ("< VSYNC : %s >"):format(Config.vsync), param = Config.vsync,
+
+	{x = 0, y = 0.1, param = Config.fullscreen,
 		action_e = function(button)
 			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< VSYNC : %s >"):format(button.param)
 		end,
 		action_r = function(button)
 			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< VSYNC : %s >"):format(button.param)
 		end,
 		action_l = function(button)
 			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< VSYNC : %s >"):format(button.param)
 		end,
+        update = function(button)
+            button.label = ("< FULLSCREEN : %s >"):format(button.param)
+        end
+    },
+
+	{x = 0, y = 0.2, param = Config.vsync,
+		action_e = function(button)
+			button.param = (button.param == "O" and "X" or "O")
+		end,
+		action_r = function(button)
+			button.param = (button.param == "O" and "X" or "O")
+		end,
+		action_l = function(button)
+			button.param = (button.param == "O" and "X" or "O")
+		end,
+        update = function(button)
+            button.label = ("< VSYNC : %s >"):format(button.param)
+        end
     },
 	
-	{x = 0, y =  0.5, label = "APPLY",
+	{x = 0, y = 0.5, label = "APPLY",
 		action_e = function(button)
-			local width, height, display, vsync, fs
-			local buttons = button.parent.items
-			local mode = FullScreenModes[buttons[1].param]
-			width, height, display = mode.width, mode.height, mode.display
-			fs    = buttons[2].param
-			vsync = buttons[3].param
-			SetDisplayMode(width, height, display, fs == "O", vsync == "O")
-			Config.window_width   = tostring(width  )
-			Config.window_height  = tostring(height )
-			Config.window_display = tostring(display)
-			Config.fullscreen = fs
-			Config.vsync      = vsync
+			local buttons   = button.parent.items
+			local mode      = FullScreenModes[CurrentScreen][buttons[2].param]
+
+			local width, height, display    = mode.width, mode.height, CurrentScreen
+			local fs, vsync                 = buttons[3].param, buttons[4].param
+
+            SetDisplayMode(width, height, display, fs == "O", vsync == "O")
+			Config.window_width     = tostring(width  )
+			Config.window_height    = tostring(height )
+			Config.window_display   = tostring(display)
+			Config.fullscreen       = fs
+			Config.vsync            = vsync
 		end
 	},
+
 	{x = 0, y =  0.7, label = "BACK",  action_e = change("settings")},
 })
 
@@ -433,7 +437,7 @@ Title.window = Menu.new("Menu", {
 -- sets the default high score mode view to the first mode alphabetically
 local hs_keys = {}
 local mode_indices = {} -- to prevent unnecessary lookups
-for k,v in pairs(HighScores) do
+for k, _ in pairs(HighScores) do
 	if(k ~= "Death") then table.insert(hs_keys,k) end -- death is technically a secret mode
 	for i=1,#Levels do
 		if(Levels[i].name == k) then mode_indices[k] = i end
