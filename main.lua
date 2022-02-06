@@ -550,7 +550,7 @@ function love.draw()
         until (not lastentry) or lastentry.time + 3 > Game.time
         table.insert(Game.recent_actions, lastentry)
         local yscoff = 0
-        for i, entry in ipairs(Game.recent_actions) do
+        for _, entry in ipairs(Game.recent_actions) do
             local t = (Game.time - entry.time)/3
             local ysc, xsc = 1-(1-t)^15, 1-t^10
             yscoff = yscoff + ysc

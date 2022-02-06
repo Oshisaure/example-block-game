@@ -18,10 +18,12 @@
 
 function NADA() end
 
-math.clamp = function(val, min, max)
+function Clamp(val, min, max)
     if min > max then min, max = max, min end
     return math.max(math.min(val, max), min)
 end
+
+function Mod1(x, base) return ((x - 1) % base) + 1 end
 
 function Deepcopy(orig)
     local orig_type = type(orig)
@@ -84,7 +86,7 @@ function CheckPadInput(pad, input)
 end
 
 function FormatTime(s)
-    local sec, cen, min = math.modf(math.max(0,s)), 0
+    local sec, cen, min = math.modf(math.max(0,s))
     sec, min = sec % 60, math.floor(sec/60)
     return string.format("%02d\'%02d\"%02d", min, sec, math.floor(cen*100))
 end
@@ -416,22 +418,25 @@ end
 
 -- Get all available screens and their supported resolutions.
 FullScreenModes = {}
-CurrentScreen = 1
 for i = 1, love.window.getDisplayCount() do
 	local modes = love.window.getFullscreenModes(i)
     local screen = {}
 	for _, mode in ipairs(modes) do
 		table.insert(screen, mode)
 	end
-    table.insert(FullScreenModes, screen)
-end
--- Sort the resolutions
-for _, screen in pairs(FullScreenModes) do
-    table.sort(screen, function(a, b)
-            if a.height ~= b.height then return a.height  < b.height
-        elseif a.width  ~= b.width  then return a.width   < b.width
+    table.sort(screen, function(a, b) -- Sort the resolutions
+            if a.height ~= b.height then return a.height < b.height
+        elseif a.width  ~= b.width  then return a.width  < b.width
         end
     end)
+    table.insert(FullScreenModes, screen)
+end
+
+for _, screen in pairs(FullScreenModes) do
+    for i, mode in pairs(screen) do
+        print(i, mode.width, mode.height)
+    end
+    --break
 end
 
 function SetDisplayMode(width, height, display, fs, vsync)
