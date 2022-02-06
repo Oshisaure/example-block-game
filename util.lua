@@ -432,12 +432,12 @@ for i = 1, love.window.getDisplayCount() do
     table.insert(FullScreenModes, screen)
 end
 
-for _, screen in pairs(FullScreenModes) do
-    for i, mode in pairs(screen) do
-        print(i, mode.width, mode.height)
-    end
-    --break
-end
+--for _, screen in pairs(FullScreenModes) do
+--    for i, mode in pairs(screen) do
+--        print(i, mode.width, mode.height)
+--    end
+--    --break
+--end
 
 function SetDisplayMode(width, height, display, fs, vsync)
 	love.window.updateMode(width, height, {display = display, fullscreen = fs, vsync = vsync, fullscreentype = "exclusive"})

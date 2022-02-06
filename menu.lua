@@ -19,9 +19,9 @@ Menu = {
 	updateSelected = function(self, key)
             if key == "up"     then self.highlight = (self.highlight - 2) % #self.items + 1
         elseif key == "down"   then self.highlight = (self.highlight - 0) % #self.items + 1
-        elseif key == "return" then r = self.items[self.highlight]:action_e(); self.items[self.highlight]:update()
-        elseif key == "right"  then r = self.items[self.highlight]:action_r(); self.items[self.highlight]:update()
-        elseif key == "left"   then r = self.items[self.highlight]:action_l(); self.items[self.highlight]:update()
+        elseif key == "return" then self.items[self.highlight]:action_e(); self.items[self.highlight]:update()
+        elseif key == "right"  then self.items[self.highlight]:action_r(); self.items[self.highlight]:update()
+        elseif key == "left"   then self.items[self.highlight]:action_l(); self.items[self.highlight]:update()
         end
 
         self.text:setFont(Font[self.font])
