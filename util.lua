@@ -25,6 +25,11 @@ end
 
 function Mod1(x, base) return ((x - 1) % base) + 1 end
 
+function DrawBar(rep, size)
+	local _rep = tonumber(rep)
+	return ("%s%s"):format(("|"):rep(_rep), ("."):rep(size - _rep))
+end
+
 function Deepcopy(orig)
     local orig_type = type(orig)
     local copy

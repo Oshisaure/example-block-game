@@ -1024,13 +1024,13 @@ Board = {
 		print("score = " .. board.score .. ", clearscore = " .. (board.level_final_score or "nil"))
 		table.insert(HighScores[board.speedcurve.name],
 			{
-				score=board.score,
-				clearScore=isClear and (board.level_final_score or 0),
-				lines=board.lines,
-				startLevel=board.startlevel,
-				finalLevel=(board.level or board.startlevel),
-				time=board.time,
-				clearTime=isClear and board.level_time
+				score 		= board.score,
+				clearScore	= isClear and (board.level_final_score or 0),
+				lines		= board.lines,
+				startLevel	= board.startlevel,
+				finalLevel	= board.level or board.startlevel,
+				time		= board.time,
+				clearTime   = isClear and board.level_time
 			}
 		)
 		SaveHighScores()

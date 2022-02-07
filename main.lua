@@ -361,6 +361,7 @@ function love.draw()
 				DrawInfinitySymbol(Width*0.5 + posx - scx/10, math.floor(Height*0.7), 0, -scx/10, scy/6)
 			end
 		end
+		--TODO: Refactor this place
 		if Title.current == "highscores" then
 			local mode = Title.highscores.modeList[Title.highscores.selection]
 			local current_scores = HighScores[mode]
@@ -374,17 +375,17 @@ function love.draw()
 				if(Title.highscores.showclear) then
 					local textw = charw*40
 					leftx = Width*0.5-textw/2
-					love.graphics.printf("CLEAR SCORE",math.floor(leftx+charw*6),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("START LV",      math.floor(leftx+charw*19),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("LEVEL",         math.floor(leftx+charw*26),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("CLEAR TIME", math.floor(leftx+charw*32),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+					love.graphics.printf("CLEAR SCORE", math.floor(leftx+charw*6),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+					love.graphics.printf("START LV",    math.floor(leftx+charw*19),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+					love.graphics.printf("LEVEL",       math.floor(leftx+charw*26),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+					love.graphics.printf("CLEAR TIME",  math.floor(leftx+charw*32),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
 				else
 					local textw = charw*41
 					leftx = Width*0.5-textw/2
-					love.graphics.printf("SCORE",math.floor(leftx+charw*6),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("LINES",math.floor(leftx+charw*20),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("LEVEL",math.floor(leftx+charw*27),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("TIME", math.floor(leftx+charw*33),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+					love.graphics.printf("SCORE", math.floor(leftx+charw*6),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+					love.graphics.printf("LINES", math.floor(leftx+charw*20),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+					love.graphics.printf("LEVEL", math.floor(leftx+charw*27),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+					love.graphics.printf("TIME",  math.floor(leftx+charw*33),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
 				end
 				love.graphics.setFont(Font.Menu)
 				local curve = Levels[Title.highscores.modeIndices[mode]]
