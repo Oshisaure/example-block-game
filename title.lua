@@ -286,7 +286,7 @@ Title.graphics = Menu.new("Menu", {
 })
 
 Title.window = Menu.new("Menu", {
-	{x = 0, y =  -0.4, param = 1, prev_screen = 1, label = ("< SCREEN : %s >"):format(1),
+	{x = 0, y =  -0.3, param = 1, prev_screen = 1, label = ("< SCREEN : %s >"):format(1),
 		action_e = function(button)
             button.prev_screen = button.param
 			button.param = (button.param % #FullScreenModes) + 1

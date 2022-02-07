@@ -26,7 +26,7 @@ local splashcanvas = love.graphics.newCanvas(1600, 900)
 function ResetSplashScreen(t) splashtime = t or 0 end -- idk maybe itll be useful
 
 function UpdateSplashScreen(dt)
-    if splashtime < 4 then
+    if not love.keyboard.isDown("return") and splashtime < 4 then
         splashtime = splashtime + dt
     else
         love.graphics.setCanvas(CanvasBG)
