@@ -16,6 +16,47 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ]==]
 
+-- classic mode speedcurve is in the form a*b^lv+c
+-- with speed(lv=0) = 1; speed(lv=20) = 30; speed(lv=30) = 60
+-- a*b^0+c = 1 => c = 1-a
+-- a*b^20+(1-a) = a*(b^20-1) + 1 = 30 => a = 29/(b^20-1)
+-- then idk solve 1+29*(b^30-1)/(b^20-1) = 60 in wolfram alpha or something
+local b = ((1095^0.5+15)/29)^0.1
+local a = 29/(b^20 - 1)
+local function classic_gravity  (level) return 1 + a * (b^(level-1) - 1)  end
+local function classic_lockdelay(level) return 1 / classic_gravity(level) end
+
+local tensdigits = [=[0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ#]=]
+local possibledigits = #tensdigits
+local function classic_levelname(level)
+    local lv = level - 1
+    local tens = math.floor(lv/10)+1
+    if tens > possibledigits then tens = possibledigits end
+    return tensdigits:sub(tens, tens)..(lv%10)
+end
+local parameters = {
+    "level_name",
+    "gravity",
+    "lock_delay",
+    "spawn_delay",
+    "spawn_delay_after_line",
+    "line_delay",
+    "BGM",
+}
+
+local procedural_mt = {
+    __index = function(self, i)
+        -- print(self, i)
+        if type(i) ~= "number" then return nil end
+        local entry = {}
+        for _, param in ipairs(parameters) do
+            -- print(param, self[param])
+            entry[param] = self[param](i)
+        end
+        return entry
+    end,
+}
+
 Levels = {
     {name = "Beginner", description = "An easier 10-level mode for people who are new to block games",
      LV = "10L", prev = 7, hold = true, colour = {0.75,0.95,1.00,1}, BG = "beginner", maxstart = 10,
@@ -155,44 +196,14 @@ Levels = {
     },
     
     {name = "Classic", description = "\"Block game is easy with hold and lock delay\" -- clueless block game non-player",
-     LV = "10L", prev = 1, hold = false, colour = {0.60,0.95,0.85,1}, BG = "classic", maxstart = 30,
-		{level_name = "00", gravity = 01.25, lock_delay = 1/01.25, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "01", gravity = 01.48, lock_delay = 1/01.48, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "02", gravity = 01.75, lock_delay = 1/01.75, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "03", gravity = 02.06, lock_delay = 1/02.06, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "04", gravity = 02.44, lock_delay = 1/02.44, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-
-		{level_name = "05", gravity = 02.88, lock_delay = 1/02.88, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "06", gravity = 03.41, lock_delay = 1/03.41, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "07", gravity = 04.03, lock_delay = 1/04.03, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "08", gravity = 04.76, lock_delay = 1/04.76, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "09", gravity = 05.63, lock_delay = 1/05.63, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-
-		{level_name = "10", gravity = 06.66, lock_delay = 1/06.66, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "11", gravity = 07.87, lock_delay = 1/07.87, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "12", gravity = 09.30, lock_delay = 1/09.30, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "13", gravity = 11.00, lock_delay = 1/11.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "14", gravity = 13.00, lock_delay = 1/13.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-
-		{level_name = "15", gravity = 15.37, lock_delay = 1/15.37, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "16", gravity = 18.16, lock_delay = 1/18.16, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "17", gravity = 21.47, lock_delay = 1/21.47, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "18", gravity = 25.37, lock_delay = 1/25.37, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "19", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-
-		{level_name = "20", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "21", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "22", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "23", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "24", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-
-		{level_name = "25", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "26", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "27", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "28", gravity = 30.00, lock_delay = 1/30.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		{level_name = "29", gravity = 60.00, lock_delay = 1/60.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
-		
-		{level_name = math.huge, gravity = 60.00, lock_delay = 1/60.00, spawn_delay = 16/60, spawn_delay_after_line = 16/60, line_delay = 20/60, AS_delay = 16/60, BGM = 4},
+     LV = "10L", prev = 1, hold = false, colour = {0.60,0.95,0.85,1}, BG = "classic", maxstart = 30, procedural = true, no_harddrop = true,
+        level_name             = classic_levelname,
+        gravity                = classic_gravity,
+        lock_delay             = classic_lockdelay,
+        spawn_delay            = function() return 16/60 end,
+        spawn_delay_after_line = function() return 16/60 end,
+        line_delay             = function() return 20/60 end,
+        BGM                    = function() return 4 end
     },
     
 	-- Practice level (low-g)
@@ -250,3 +261,8 @@ Levels = {
 	},
     ]]
 }
+
+for _, curve in ipairs(Levels) do
+    if curve.procedural then setmetatable(curve, procedural_mt) end
+    if not curve.maxlevel then curve.maxlevel = curve.procedural and math.huge or #curve end
+end

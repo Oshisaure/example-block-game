@@ -88,7 +88,7 @@ for i, mode in ipairs(Levels) do
                     button.parent.startlv = math.max(button.parent.startlv - 1, 1)
                 end,
                 action_r = function(button)
-                    button.parent.startlv = math.min(button.parent.startlv + 1, mode.maxstart or #mode)
+                    button.parent.startlv = math.min(button.parent.startlv + 1, mode.maxstart or mode.maxlevel)
                 end,
             }
         )
