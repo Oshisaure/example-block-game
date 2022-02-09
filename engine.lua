@@ -17,17 +17,17 @@
 ]==]
 
 Board = {
-	lock_delay = 2,
-	maxrots = 99,--15,
-    gravity = 1,
-    AS_delay = 0.25, --15f@60fps
-	AS_repeat = 1/60, --1f@60fps
+	lock_delay  = 2,
+	maxrots     = 99,--15,
+    gravity     = 1,
+    AS_delay    = 0.25, --15f@60fps
+	AS_repeat   = 1/60, --1f@60fps
 	spawn_delay = 0.5,
 	--startbag = {"I", "T", "L", "J", "O"}, -- 7-bag with no SZ
 	-- startbag = {"I", "T", "L", "J", "O", "S", "Z"}, -- re-introduction of SZ in starting bag after 2-history addition
-	mainbag = {'I', 'I', 'L', 'L', 'J', 'J', 'S', 'S', 'Z', 'Z', 'T', 'T', 'O', 'O'}, -- changed again to 14-bag strict 3-history
+	--mainbag      = {'I', 'I', 'L', 'L', 'J', 'J', 'S', 'S', 'Z', 'Z', 'T', 'T', 'O', 'O'}, -- changed again to 14-bag strict 3-history
     starthistory = {'S', 'Z', 'O'},                                                   -- with no starting bag since history starts at SZO
-	-- mainbag = {'test'},
+    mainbag = {'test'},
 	-- mainbag = {'I'},
 	-- mainbag = {'I', 'L', 'J', 'S', 'Z', 'T', 'O', 'F5l', 'F5r', 'I5', 'L5l', 'L5r', 'N5l', 'N5r', 'P5l', 'P5r', 'T5', 'U5', 'V5', 'W5', 'X5', 'Y5l', 'Y5r', 'Z5l', 'Z5r' },
 	-- mainbag = {'I', 'L', 'J', 'S', 'Z', 'T', 'O', 'F5l', 'F5r', 'I5', 'L5l', 'L5r', 'N5l', 'N5r', 'P5l', 'P5r', 'T5', 'U5', 'V5', 'W5', 'X5', 'Y5l', 'Y5r', 'Z5l', 'Z5r', 'w6' },
@@ -208,10 +208,10 @@ Board = {
 				love.graphics.draw(text, xoff, yoff, 0, 1, 1, text:getWidth()/2, text:getHeight()/2)
 			end)
 			--]]
-			board:add_event("update", "before", function(board)
-				if board.animation_time <= 0 then
-					board:drop_lines()
-					board.spawn_timer = board.spawn_delay - board.spawn_delay_after_line
+			board:add_event("update", "before", function(self)
+				if self.animation_time <= 0 then
+					self:drop_lines()
+					self.spawn_timer = self.spawn_delay - self.spawn_delay_after_line
 					PlaySFX("classic_lock")
 					return true
 				end
@@ -600,7 +600,7 @@ Board = {
 			-- [[
             local fieldbytes = {s:byte(5,-1)}
             local x, y = 1, 1
-            for n, b in ipairs(fieldbytes) do
+            for _, b in ipairs(fieldbytes) do
                 b = b - 0x80
                 for i = 0,4 do
                     if b%2 == 1 then board.grid[x+4-i][y] = true; b = b-1 end
@@ -792,7 +792,7 @@ Board = {
 		end
 		
 		
-		for n, trail in ipairs(board.trails) do
+		for _, trail in ipairs(board.trails) do
 			love.graphics.setColor(unpack(trail.c))
 			local x, y, h = trail.x, trail.y, trail.h
 			board.trail_mesh:setVertex(3, 0, (0.5-h)*sc, 0,0, 1,1,1,0)
@@ -813,14 +813,14 @@ Board = {
 		local pc = board.piece
 		if pc then
 			love.graphics.setColor(pc.colour)
-			for _, b in ipairs(pc.blocks[pc.orientation]) do
+			for _, bl in ipairs(pc.blocks[pc.orientation]) do
                 if not board.last_rotate_point then
-                    local x, y = b[1] + pc.x, b[2] + pc.y
+                    local x, y = bl[1] + pc.x, bl[2] + pc.y
                     if not board.current_grounded then y = y - board.gravity_acc end
                     -- love.graphics.rectangle("fill", (x-6)*sc, (10-y)*sc, sc, sc)
                     board:putTheBlock(x, y)
                 else
-                    local x1, y1 = unpack(b)
+                    local x1, y1 = unpack(bl)
                     local rotate_anim_time = 0.1
                     local t = math.min((board.time - board.last_rotate_time)/rotate_anim_time, 1)-1
                     local a = t*board.last_rotate_dir*math.pi/2
@@ -836,18 +836,18 @@ Board = {
 		
 		local gh = board.ghost
 		if gh and board.animation_time <= 0 and not board.dead then
-			local r, g, b, a = unpack(gh.colour)
-			local t = board.spawn_timer/board.spawn_delay
+			local gh_r, gh_g, gh_b, a = unpack(gh.colour)
+			local t                   = board.spawn_timer/board.spawn_delay
 			love.graphics.setLineWidth(sc/8)
 			for _, bl in ipairs(gh.blocks[gh.orientation]) do
 				local x, y = bl[1] + gh.x, bl[2] + gh.y
 				if t == 0 then
-					love.graphics.setColor(r,g,b,a)
+					love.graphics.setColor(gh_r, gh_g, gh_b, a)
 					love.graphics.rectangle("line", (x-5.9375)*sc, (10.0625-y)*sc, sc*0.875, sc*0.875)
 					love.graphics.line((x-5.9375)*sc, (10.0625-y)*sc, (x-5.0625)*sc, (10.9375-y)*sc)
 				else
-					love.graphics.setColor(1,1,1,t <= 0.1 and a or 0)
-					love.graphics.rectangle("fill", (x-6)*sc, (10-y )*sc, sc, sc)
+					love.graphics.setColor(1, 1, 1, t <= 0.1 and a or 0)
+					love.graphics.rectangle("fill", (x-6)*sc, (10-y)*sc, sc, sc)
 				end
 			end
 		end
@@ -870,17 +870,17 @@ Board = {
         board:do_draw_items("back")
 		
 		love.graphics.setColor(0.5,0.5,0.5)
-		local n = 1
-		local i = board.animate[n]
-		while i do
-			local startt, endt = i.startt, i.endt
+		local anim_index = 1
+		local anim_item  = board.animate[anim_index]
+		while anim_item do
+			local startt, endt = anim_item.startt, anim_item.endt
 			if board.time > endt then
-				table.remove(board.animate, n)
+				table.remove(board.animate, anim_index)
 			else
-				love.graphics.draw(i.object, Interpolate(i.func, board.time, startt, endt))
-				n = n+1
+				love.graphics.draw(anim_item.object, Interpolate(anim_item.func, board.time, startt, endt))
+				anim_index = anim_index +1
 			end
-			i = board.animate[n]
+			anim_item = board.animate[anim_index]
 		end
 		
 		love.graphics.setColor(1,1,1,1)
@@ -891,8 +891,8 @@ Board = {
 		for n = 1, #board.nexts do
 			local piece = board.nexts[n]
 			love.graphics.setColor(unpack(piece.colour))
-			for _, b in ipairs(piece.blocks[piece.orientation]) do
-				local x, y = b[1], b[2]
+			for _, bl in ipairs(piece.blocks[piece.orientation]) do
+				local x, y = bl[1], bl[2]
 				-- love.graphics.rectangle("fill", (x+8)*sc, (4*n-y-12)*sc, sc, sc)
 				board:putTheBlock(x+14, y+21-3.5*(n-1))
 			end
@@ -900,11 +900,11 @@ Board = {
 		
 		local hold = board.hold_piece
 		if hold then
-			local r, g, b, a = unpack(hold.colour)
-			if board.held then r, g, b, a = r/4+0.25, g/4+0.25, b/4+0.25, a end
-			love.graphics.setColor(r, g, b, a)
-			for _, b in ipairs(hold.blocks[hold.orientation]) do
-				local x, y = b[1], b[2]
+			local h_r, h_g, h_b, a = unpack(hold.colour)
+			if board.held then h_r, h_g, h_b, a = h_r /4+0.25, h_g /4+0.25, h_b /4+0.25, a end
+			love.graphics.setColor(h_r, h_g, h_b, a)
+			for _, bl in ipairs(hold.blocks[hold.orientation]) do
+				local x, y = bl[1], bl[2]
 				-- love.graphics.rectangle("fill", (x-10)*sc, (-y-9)*sc, sc, sc)
 				board:putTheBlock(x-4, y+21)
 			end
@@ -929,67 +929,67 @@ Board = {
 	
 	reset = function(board, seed, level, character)
 		board.first_frame = true
-		board.cur_lock = 0
-		board.lock_delay = Board.lock_delay
-		board.cur_rots = 0
-		board.max_y = 0
-		board.pieces = 0
-		board.lines = 0
-        board.all_clears = 0
-		board.score = 0
-		board.last_score = 0
+		board.cur_lock    = 0
+		board.lock_delay  = Board.lock_delay
+		board.cur_rots    = 0
+		board.max_y       = 0
+		board.pieces      = 0
+		board.lines       = 0
+        board.all_clears  = 0
+		board.score       = 0
+		board.last_score  = 0
 		board.drop_points = 0
-		board.recent_actions = {}
-        board.percentile = 0
-        board.level = level or board.startlevel
-        board.startlevel = level or board.startlevel
-		board.last_level = 0
-		board.level_time = -2
-        board.time = -2
-		board.gravity = Board.gravity
+        board.percentile  = 0
+        board.level       = level or board.startlevel
+        board.startlevel  = level or board.startlevel
+		board.last_level  = 0
+		board.level_time  = -2
+        board.time        = -2
+		board.gravity     = Board.gravity
         board.gravity_acc = 0
-        board.AS_acc = 0
-        board.AS_dir = 0
-        board.AS_timer = 0
-		board.AS_repeat = Board.AS_repeat
-		board.AS_delay = Board.AS_delay
+        board.AS_acc      = 0
+        board.AS_dir      = 0
+        board.AS_timer    = 0
+		board.AS_repeat   = Board.AS_repeat
+		board.AS_delay    = Board.AS_delay
 		board.spawn_timer = 0
 		board.spawn_delay = Board.spawn_delay
-		board.held = false
-		board.spin = false
-		board.dead = false
-		board.hold_piece = nil
-		board.character = character
+		board.held        = false
+		board.spin        = false
+		board.dead        = false
+		board.hold_piece  = nil
+		board.character   = character
         board.edge_colour = character and Characters[character].colour or board.speedcurve.colour
-        board.animation_time = 0
-        board.scale_x = 1
-        board.scale_y = 1
+        board.scale_x     = 1
+        board.scale_y     = 1
 		-- board.ignore_next_event = false
-		board.trails = {}
-		board.last_clear = 0
-		board.last_spin = false
-		board.last_id = nil
-        board.last_lines = {}
-		board.prev = {}
-		board.stat = {[false] = {}, [true] = {}}
-		board.grid = {{},{},{},{},{},{},{},{},{},{}}
+		board.trails      = {}
+		board.last_clear  = 0
+		board.last_spin   = false
+		board.last_id     = nil
+        board.last_lines  = {}
+		board.prev        = {}
+		board.stat        = {[false] = {}, [true] = {}}
+		board.grid        = {{},{},{},{},{},{},{},{},{},{}}
 		-- board.bag = Deepcopy(Board.startbag)
-		board.bag = Deepcopy(Board.mainbag)
-		board.history = Deepcopy(Board.starthistory)
-		board.rep_queue = {}
-		board.animate = {}
-		board.events = {}
-        board.draw_items = {back = {}, front = {}, overlay = {}}
+		board.bag         = Deepcopy(Board.mainbag)
+		board.history     = Deepcopy(Board.starthistory)
+		board.rep_queue   = {}
+		board.animate     = {}
+		board.events      = {}
+        board.draw_items  = {back = {}, front = {}, overlay = {}}
+        board.recent_actions = {}
+        board.animation_time = 0
         -- board.anim_sprites = {}
-        board.current_grounded = false
+        board.current_grounded     = false
 		board.last_collision_down  = nil
 		board.last_collision_left  = nil
 		board.last_collision_right = nil
 		board.last_collision_cw    = nil
 		board.last_collision_ccw   = nil
-        board.last_rotate_point = nil
-        board.last_rotate_time  = nil
-        board.last_rotate_dir   = 0
+        board.last_rotate_point    = nil
+        board.last_rotate_time     = nil
+        board.last_rotate_dir      = 0
 		
 		board.random:setSeed(seed)
 		-- board:shuffle_bag()
@@ -1005,8 +1005,8 @@ Board = {
 				board.stat[false][id][n] = 0
 			end
 		end
-		for k, v in pairs(Board.events) do
-			board.events[v] = {}
+		for _, v in pairs(Board.events) do
+			board.events[v]          = {}
 			board.events[v].before   = {}
 			board.events[v].after    = {}
 			board.events[v].override = {}
@@ -1021,16 +1021,15 @@ Board = {
 
 	saveScore = function(board)
 		local isClear = (board.speedcurve[board.level].level_name == math.huge and board.level ~= board.startlevel)
-		print("score = " .. board.score .. ", clearscore = " .. (board.level_final_score or "nil"))
 		table.insert(HighScores[board.speedcurve.name],
 			{
 				score 		= board.score,
-				clearScore	= isClear and (board.level_final_score or 0),
+				clear_score	= isClear and (board.level_final_score or 0),
 				lines		= board.lines,
-				startLevel	= board.startlevel,
-				finalLevel	= board.level or board.startlevel,
+				start_level	= board.startlevel,
+				final_level	= board.level or board.startlevel,
 				time		= board.time,
-				clearTime   = isClear and board.level_time
+				clear_time  = isClear and board.level_time
 			}
 		)
 		SaveHighScores()
@@ -1038,16 +1037,16 @@ Board = {
 	
 	new = function(curve, seed, blocksize, posx, posy)
 		local newboard = {
-			nexts = {},
-			next_count = curve.prev,
-            allow_hold = curve.hold,
-            level_type = curve.LV,
-            speedcurve = curve,
-			size = blocksize,
-            position_x = posx,
-            position_y = posy,
+			nexts       = {},
+			next_count  = curve.prev,
+            allow_hold  = curve.hold,
+            level_type  = curve.LV,
+            speedcurve  = curve,
+			size        = blocksize,
+            position_x  = posx,
+            position_y  = posy,
             edge_colour = curve.colour,
-			block_mesh = love.graphics.newMesh({
+			block_mesh  = love.graphics.newMesh({
 				{-0.5, -0.5, 0, 0, 1.0,1.0,1.0, 1},
 				{ 0.5, -0.5, 1, 0, 0.9,0.9,0.9, 1},
 				{ 0.5,  0.5, 1, 1, 0.7,0.7,0.7, 1},
@@ -1058,43 +1057,43 @@ Board = {
 				{ 0.5,  0.5, 0, 0, 1,1,1,1},
 				{ 0,    0,   0, 0, 1,1,1,0},
 			}, "fan", "dynamic"),
-			random = love.math.newRandomGenerator(seed),
-			canvas = love.graphics.newCanvas(),
-			field_canvas = love.graphics.newCanvas(),
-			glow_canvas = love.graphics.newCanvas(),
+			random         = love.math.newRandomGenerator(seed),
+			canvas         = love.graphics.newCanvas(),
+			field_canvas   = love.graphics.newCanvas(),
+			glow_canvas    = love.graphics.newCanvas(),
 			overlay_canvas = love.graphics.newCanvas(),
-			getScore = Board.getScore,
-			check_cell = Board.check_cell,
+			getScore       = Board.getScore,
+			check_cell     = Board.check_cell,
 			check_collision_with = Board.check_collision_with,
-			rotate_cw = Board.rotate_cw,
-			rotate_ccw = Board.rotate_ccw,
+			rotate_cw      = Board.rotate_cw,
+			rotate_ccw     = Board.rotate_ccw,
 			initial_rotate = Board.initial_rotate,
-			check_spin = Board.check_spin,
-			update_ghost = Board.update_ghost,
-			create_ghost = Board.create_ghost,
-			add_trails = Board.add_trails,
-			place_raw = Board.place_raw,
-			place = Board.place,
-			clear_lines = Board.clear_lines,
-            drop_lines = Board.drop_lines,
-            is_grid_empty = Board.is_grid_empty,
-			shuffle_bag = Board.shuffle_bag,
-			pull_next = Board.pull_next,
-			get_piece = Board.get_piece,
-			update = Board.update,
-			draw = Board.draw,
-			reset = Board.reset,
-			hold = Board.hold,
-            setLV = Board.setLV,
-            encodeBoard = Board.encodeBoard,
-            decodeBoard = Board.decodeBoard,
-			add_event = Board.add_event,
-			call_events = Board.call_events,
-			add_draw_item = Board.add_draw_item,
-			do_draw_items = Board.do_draw_items,
-            darken_glow = Board.darken_glow,
-            putTheBlock = Board.putTheBlock,
-			saveScore = Board.saveScore
+			check_spin     = Board.check_spin,
+			update_ghost   = Board.update_ghost,
+			create_ghost   = Board.create_ghost,
+			add_trails     = Board.add_trails,
+			place_raw      = Board.place_raw,
+			place          = Board.place,
+			clear_lines    = Board.clear_lines,
+            drop_lines     = Board.drop_lines,
+            is_grid_empty  = Board.is_grid_empty,
+			shuffle_bag    = Board.shuffle_bag,
+			pull_next      = Board.pull_next,
+			get_piece      = Board.get_piece,
+			update         = Board.update,
+			draw           = Board.draw,
+			reset          = Board.reset,
+			hold           = Board.hold,
+            setLV          = Board.setLV,
+            encodeBoard    = Board.encodeBoard,
+            decodeBoard    = Board.decodeBoard,
+			add_event      = Board.add_event,
+			call_events    = Board.call_events,
+			add_draw_item  = Board.add_draw_item,
+			do_draw_items  = Board.do_draw_items,
+            darken_glow    = Board.darken_glow,
+            putTheBlock    = Board.putTheBlock,
+			saveScore      = Board.saveScore
 		}
 		newboard.block_mesh:setTexture(blocktexture)
 		for i = 1, curve.prev do newboard.nexts[i] = 0 end

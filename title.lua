@@ -285,7 +285,7 @@ Title.graphics = Menu.new("Menu", {
 
 	{x = 0, y =  0.4, label = ("TRAIL FADEOUT DURATION: <%s>"):format(DrawBar(Config.trail_duration, 10)),
 		action_e = function(button)
-			Config.trail_duration = tostring(Mod1(tonumber(Config.trail_duration)+1, 10))
+			Config.trail_duration = tostring((tonumber(Config.trail_duration) + 1) % 11)
 		end,
 		action_r = function(button)
 			button.param = 1
@@ -404,22 +404,17 @@ Title.window = Menu.new("Menu", {
 -- sets the default high score mode view to the first mode alphabetically
 --TODO: Proper Sorting
 --TODO: Unlocking Secret Modes
-local modeList = {}
+local mode_list = {}
 local mode_indices = {} -- to prevent unnecessary lookups
 for k, _ in pairs(HighScores) do
-	if k ~= "Death" then table.insert(modeList, k) end -- death is technically a secret mode
-    for i=1,#Levels do
-		if(Levels[i].name == k) then mode_indices[k] = i end
+	if k ~= "Death" then table.insert(mode_list, k) end -- death is technically a secret mode
+    for i = 1, #Levels do
+		if Levels[i].name == k then mode_indices[k] = i end
 	end
-end
-if #modeList == 0 then
-	error("No high score keys. Are you sure there's at least one mode?")
-else
-    table.sort(modeList) -- alphabetical order
 end
 
 Title.highscores = Menu.new("Menu", {
-	{x = 0, y = -0.8, param = 0, label = ("MODE: < %s >"):format(modeList[1]),
+	{x = 0, y = -0.8, param = 0, label = ("MODE: < %s >"):format(mode_list[1]),
 		action_r = function(button)
 			button.param = 1
 		end,
@@ -427,22 +422,22 @@ Title.highscores = Menu.new("Menu", {
 			button.param = -1
 		end,
         update = function(button)
-            Title.highscores.selection = Mod1(Title.highscores.selection + button.param, #button.parent.modeList)
+            Title.highscores.selection = Mod1(Title.highscores.selection + button.param, #button.parent.mode_list)
             button.param = 0
-            button.label = ("MODE: < %s >"):format(Title.highscores.modeList[Title.highscores.selection])
+            button.label = ("MODE: < %s >"):format(Title.highscores.mode_list[Title.highscores.selection])
         end
 	},
 
 	{x = 0, y = -0.7, label = "SHOW CLEAR STATISTICS: < X >",
 		update = function(button)
-			button.parent.showclear = not button.parent.showclear
-			button.label = ("SHOW CLEAR STATISTICS: < %s >"):format(button.parent.showclear and "O" or "X")
+			button.parent.show_clear = not button.parent.show_clear
+			button.label = ("SHOW CLEAR STATISTICS: < %s >"):format(button.parent.show_clear and "O" or "X")
 		end
 	},
 
 	{x = 0, y =  0.7, label = "BACK",
 	 	action_e = function(button)
-			button.parent.resetCounter = 1
+			button.parent.reset_counter = 1
 			button.parent.items[4]:update()
 			change("main")(button)
 		end
@@ -454,21 +449,21 @@ Title.highscores = Menu.new("Menu", {
                   "ARE YOU REALLY SURE?",
                   "LAST CHANCE! ARE YOU SURE YOU WANT TO?"},
 	 	action_e = function(button)
-            button.parent.resetCounter = button.parent.resetCounter + 1
+            button.parent.reset_counter = button.parent.reset_counter + 1
         end,
 	 	update = function(button)
-			if button.parent.resetCounter > #button.labels then
-				button.parent.resetCounter = 1
+			if button.parent.reset_counter > #button.labels then
+				button.parent.reset_counter = 1
 				for _, mode in pairs(Levels) do HighScores[mode.name] = {} end
 				SaveHighScores()
 			end
-            button.label = button.labels[button.parent.resetCounter]
+            button.label = button.labels[button.parent.reset_counter]
 		end
 	}
 })
 --TODO: Apply general styling to this
-Title.highscores.selection    = 1
-Title.highscores.modeList     = modeList
-Title.highscores.modeIndices  = mode_indices
-Title.highscores.showclear    = false
-Title.highscores.resetCounter = 1
+Title.highscores.selection     = 1
+Title.highscores.mode_list     = mode_list
+Title.highscores.mode_indices  = mode_indices
+Title.highscores.show_clear    = false
+Title.highscores.reset_counter = 1
