@@ -164,7 +164,7 @@ function SaveConfig()
 	for key, param in pairs(Config) do
 		str = str..key.."="..param.."\n"
 	end
-	success, message = love.filesystem.write("keys.conf", str:sub(1,-2))
+	local success, message = love.filesystem.write("keys.conf", str:sub(1,-2))
 	ConfigBroke = false
 end
 
