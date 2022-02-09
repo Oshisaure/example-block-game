@@ -323,7 +323,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
 	
 	// piece position / angle
 	vec3 piece_pos = vec3(170, -70+10*sin(.5*time), 500);
-	mat3 rotation = yaw(cos(.5*time))*pitch(.3*time)*roll(.11*time);
+	mat3 rotation = yaw(cos(.5*time))*pitch(.33*time)*roll(.11*time);
 	
 	// get 2 pieces and interpolate block positions for
 	// an animation of the piece morphing from one to the other

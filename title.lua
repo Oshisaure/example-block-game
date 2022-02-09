@@ -72,7 +72,7 @@ Title.play = Menu.new(MenuFont, {
 --]]
 local gamemodes = {}
 for i, mode in ipairs(Levels) do
-    if mode.name ~= "Death" then -- keep that for carnival?
+    -- if mode.name ~= "Death" then -- keep that for carnival?
         table.insert(gamemodes, 
             {x = -0.5, y = -0.5+0.1*i, label = mode.name, id = i,
                 action_e = function(button)
@@ -80,7 +80,11 @@ for i, mode in ipairs(Levels) do
                     Game:reset(os.time(), button.parent.startlv)
                     SetBGM(Game.BGM)
                     Game.display_score = 999999999 -- 999,999,999
-                    if Config.dynamic_bg == "X" then PrerenderBG(Game.speedcurve.BG) end
+                    if Config.dynamic_bg == "X" then
+                        SendShaderUniform("level",     Game.level)
+                        SendShaderUniform("levelprev", Game.level)
+                        PrerenderBG(Game.speedcurve.BG)
+                    end
 					-- ApplyZoneMod(Game)
                     STATE = "ingame"
                 end,
@@ -92,7 +96,7 @@ for i, mode in ipairs(Levels) do
                 end,
             }
         )
-    end
+    -- end
 end
 table.insert(gamemodes, {x = 0, y =  0.7, label = "BACK", action_e = change("main")})
 Title.play = Menu.new("Menu", gamemodes)

@@ -127,7 +127,8 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
 	
     //scaling uvs
     vec2 uv2 = uvs - .5;
-    uv2.x *= love_ScreenSize.x/love_ScreenSize.y;
+    float aspectratio = love_ScreenSize.x/love_ScreenSize.y;
+    uv2.x *= aspectratio;
     uv2 *= 2*SCREENHEIGHT;
 
     // direction of camera pixel
@@ -180,9 +181,9 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
 	
 	// rainbow stripes
     vec4 blend = vec4(
-        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + 1.00)), // position of red ray
-        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + 1.05)), // position of green ray
-        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + 1.10)), // position of blue ray
+        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + aspectratio*.5+.40)), // position of red ray
+        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + aspectratio*.5+.45)), // position of green ray
+        1.-smoothstep(0,0.15,abs(uvb.y-2*abs(uvb.x) + aspectratio*.5+.50)), // position of blue ray
         0. // don't touch alpha
     );
 	// each ray gets mixed with its own component
