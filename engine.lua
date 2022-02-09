@@ -489,7 +489,7 @@ Board = {
     end,
 	
     setLV = function(board, newlevel)
-		newlevel = math.min(newlevel, #board.speedcurve)
+		newlevel = math.min(newlevel, board.speedcurve.maxlevel)
         board.level = newlevel
         for k, v in pairs(board.speedcurve[newlevel]) do
 			board[k] = (type(v) == "function" and v(newlevel) or v)
@@ -677,7 +677,7 @@ Board = {
 					local old_height = board.piece.y + 1 - board.gravity_acc
 					board.gravity_acc = board.gravity_acc + dt * board.gravity + (input.softdrop and 60*dt or 0)
                     local fall_force = board.gravity + (input.softdrop and 60 or 0)
-					if input.harddrop then
+					if input.harddrop and not board.speedcurve.no_harddrop then
                         board.gravity_acc = math.huge
                         fall_force = math.huge
                     end
@@ -954,14 +954,15 @@ Board = {
 		board.AS_delay    = Board.AS_delay
 		board.spawn_timer = 0
 		board.spawn_delay = Board.spawn_delay
-		board.held        = false
-		board.spin        = false
-		board.dead        = false
-		board.hold_piece  = nil
-		board.character   = character
-        board.edge_colour = character and Characters[character].colour or board.speedcurve.colour
-        board.scale_x     = 1
-        board.scale_y     = 1
+		board.held = false
+		board.spin = false
+		board.dead = false
+		board.hold_piece = nil
+		-- board.character = character
+        -- board.edge_colour = character and Characters[character].colour or board.speedcurve.colour
+        board.edge_colour = board.speedcurve.colour
+        board.scale_x = 1
+        board.scale_y = 1
 		-- board.ignore_next_event = false
 		board.trails      = {}
 		board.last_clear  = 0

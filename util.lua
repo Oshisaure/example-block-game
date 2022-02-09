@@ -241,14 +241,14 @@ function DrawRainbow(drawable, ...)
     love.graphics.setShader()
 end
 
-Prerendered_frame = nil
+PrerenderedFrame = nil
 local currentbg = "menu"
 function PrerenderBG(id)
     id = id or "menu"
     currentbg = id
     -- for k, v in pairs(ShaderBG) do
-        if Prerendered_frame then Prerendered_frame:release() end
-        Prerendered_frame = love.graphics.newCanvas(Width, Height)
+        if PrerenderedFrame then PrerenderedFrame:release() end
+        PrerenderedFrame = love.graphics.newCanvas(Width, Height)
         love.graphics.setCanvas(CanvasBG)
         love.graphics.clear(0,0,0,1)
         local tmin, tmax, dt = 998.5, 1001.5, 0.02
@@ -257,7 +257,7 @@ function PrerenderBG(id)
             pcall(function() ShaderBG[id]:send("dt", dt)   end)
             RenderBGShader(id)
         end
-        love.graphics.setCanvas(Prerendered_frame)
+        love.graphics.setCanvas(PrerenderedFrame)
         love.graphics.draw(CanvasBG)
     -- end
     
@@ -296,7 +296,7 @@ function RenderBG(id)
     love.graphics.origin()
     love.graphics.setCanvas(CanvasBG)
     
-    love.graphics.draw(Prerendered_frame)
+    love.graphics.draw(PrerenderedFrame)
     
     love.graphics.pop()
     love.graphics.setCanvas(_c)
@@ -311,6 +311,42 @@ function GetAdjustedFontSize(size)
 	elseif r == 5 then return s-2
 	end
 	return s
+end
+
+function LoadShaders()
+    ShaderBG = {
+        practice  = love.graphics.newShader("shaders/bgpractice.glsl"),
+        practice2 = love.graphics.newShader("shaders/bgpractice2.glsl"),
+        beginner  = love.graphics.newShader("shaders/bgbeginner.glsl"),
+        standard  = love.graphics.newShader("shaders/bgstandard.glsl"),
+        original  = love.graphics.newShader("shaders/bg1.glsl"),
+        master    = love.graphics.newShader("shaders/bg10.glsl"),
+        classic   = love.graphics.newShader("shaders/bgclassic.glsl"),
+        death     = love.graphics.newShader("shaders/bgdeath.glsl"),
+        menu      = love.graphics.newShader("shaders/bgmenu.glsl"),
+    }
+    ShaderBlur     = love.graphics.newShader("shaders/blur.glsl")
+    ShaderRainbow  = love.graphics.newShader("shaders/rainbow.glsl")
+    ShaderShaking  = love.graphics.newShader("shaders/chroma-misalign.glsl")
+    ShaderInfinity = love.graphics.newShader("shaders/infinity.glsl")
+    
+    local moontex = love.graphics.newImage("assets/texture/lroc_color_poles_2k.png")
+    local moondis = love.graphics.newImage("assets/texture/ldem_4_uint.png")
+    local moondw, moondh = moondis:getDimensions()
+    local moonnor = love.graphics.newCanvas(moondw, moondh)
+    local normalshader = love.graphics.newShader("shaders/displacementnormals.glsl")
+    normalshader:send("off", {1/moondw, 1/moondh, 0})
+    love.graphics.setCanvas(moonnor)
+    love.graphics.setShader(normalshader)
+    love.graphics.draw(moondis)
+    love.graphics.setCanvas()
+    love.graphics.setShader()
+    SendShaderUniform("moontex", moontex)
+    SendShaderUniform("moonnor", moonnor)
+    moontex:release()
+    moondis:release()
+    moonnor:release()
+    -- normalshader:release()
 end
 
 local first_resize = true
@@ -364,6 +400,7 @@ function ProcessResize(w, h)
     end
 	
 	first_resize = false
+    LoadShaders()
 end
 
 local arrow_buttons = {

@@ -67,6 +67,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
 	
     // background colour, prep for 3d funnies
 	int bgindex = int(mod(level-1, 10));
+    if (level > 30) bgindex += 10;
     vec4 newpixel = BG_COLOUR_ARRAY[bgindex];
 	vec4 linecolour = FG_COLOUR_ARRAY[bgindex];
 	vec2 uv2 = pxcoord - .5;

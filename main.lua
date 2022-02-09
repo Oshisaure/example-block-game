@@ -94,35 +94,7 @@ function love.load()
     ScoreText  = love.graphics.newText(Font.Title)
     ScorePopup = love.graphics.newText(Font.HUD)
     
-    ShaderBG = {
-        practice  = love.graphics.newShader("shaders/bgpractice.glsl"),
-        practice2 = love.graphics.newShader("shaders/bgpractice2.glsl"),
-        beginner  = love.graphics.newShader("shaders/bgbeginner.glsl"),
-        standard  = love.graphics.newShader("shaders/bgstandard.glsl"),
-        original  = love.graphics.newShader("shaders/bg1.glsl"),
-        master    = love.graphics.newShader("shaders/bg10.glsl"),
-        classic   = love.graphics.newShader("shaders/bgclassic.glsl"),
-        death     = love.graphics.newShader("shaders/bgdeath.glsl"),
-        menu      = love.graphics.newShader("shaders/bgmenu.glsl"),
-    }
-    ShaderBlur     = love.graphics.newShader("shaders/blur.glsl")
-    ShaderRainbow  = love.graphics.newShader("shaders/rainbow.glsl")
-    ShaderShaking  = love.graphics.newShader("shaders/chroma-misalign.glsl")
-    ShaderInfinity = love.graphics.newShader("shaders/infinity.glsl")
-    
-    local moontex = love.graphics.newImage("assets/texture/lroc_color_poles_2k.png")
-    local moondis = love.graphics.newImage("assets/texture/ldem_4_uint.png")
-    local moondw, moondh = moondis:getDimensions()
-    local moonnor = love.graphics.newCanvas(moondw, moondh)
-    local normalshader = love.graphics.newShader("shaders/displacementnormals.glsl")
-    normalshader:send("off", {1/moondw, 1/moondh, 0})
-    love.graphics.setCanvas(moonnor)
-    love.graphics.setShader(normalshader)
-    love.graphics.draw(moondis)
-    love.graphics.setCanvas()
-    love.graphics.setShader()
-    SendShaderUniform("moontex", moontex)
-    SendShaderUniform("moonnor", moonnor)
+    LoadShaders()
     
     --[[
     Width = 3840
@@ -133,7 +105,7 @@ function love.load()
     CanvasBGprev  = love.graphics.newCanvas(Width, Height)
     PrerenderBG("classic")
     print("prerendered")
-    local dat = Prerendered_frame:newImageData()
+    local dat = PrerenderedFrame:newImageData()
     print("imagedata")
     dat:encode("png", "classic_bg_4k.png")
     print("encode")
@@ -617,6 +589,14 @@ function love.draw()
 end
 
 function love.keypressed(key)
+    if key == "f5" then
+        for _, v in pairs(ShaderBG) do v:release() end
+        ShaderBlur    :release()
+        ShaderRainbow :release()
+        ShaderShaking :release()
+        ShaderInfinity:release()
+        LoadShaders()
+    end
 	if STATE == "ingame" and (key == "return" or key == KeyBindings.pause) and Game.dead then
 		Game:reset(os.time())
 		Game:setLV(1)

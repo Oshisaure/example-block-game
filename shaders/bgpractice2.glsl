@@ -8,7 +8,8 @@ uniform float time;
 uniform Image moontex;
 uniform Image moonnor;
 
-const vec3 LIGHTDIR = normalize(vec3( -20.,  -40.,  -50.));
+const vec4 BG_COLOUR = vec4(.01, .02, .02, 1.);
+const vec3 LIGHT_DIR = normalize(vec3( 0.,  -1.,  10.));
 const vec3 amigapos  = vec3(0., 52., 10.);
 const vec3 amigaaxis = vec3(1., 0., 0.);
 const vec3 amigaback = vec3(0., 0., 1.);
@@ -17,6 +18,15 @@ const vec3 amigaleft = vec3(0., 1., 0.);
 #define AMIGACOLS 100.
 
 #define STARSDENSITY 35.
+
+const vec3 FLARE_COLOUR = vec3(1., 2., 4.);
+const vec2 FLARE_POS    = vec2(.0, -.2);
+#define FLAREPOW     0.7
+#define FLARESPREAD  2.8
+#define FLAREBRIGHT  0.04
+
+const vec3 GRID_COLOUR = vec3(1., 0., 1.);
+
 
 struct ballpoint {
     bool valid;
@@ -61,7 +71,24 @@ ballpoint pointOnBall(vec3 uvdir, vec3 ballpos, float ballsize, vec3 ballaxis, v
     return ballpoint(false, 0., 0., vec3(0.), mat3(0.));
 }
 
+// from http://lolengine.net/blog/2013/07/27/rgb-to-hsv-in-glsl //
+const vec4 K = vec4(1., 2. / 3., 1. / 3., 3.);
+vec3 hsv2rgb(vec3 c) {
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6. - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0., 1.), c.y);
+}
+
 //from https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83 //
+float rand(float n) {
+    return fract(sin(n) * 43758.5453123);
+}
+
+float noise(float p){
+    float fl = floor(p);
+    float fc = fract(p);
+	return mix(rand(fl), rand(fl + 1.0), fc);
+}
+
 float rand(vec2 n) { 
 	return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
 }
@@ -102,7 +129,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
     uv2 *= 2*SCREENHEIGHT;
 
     // background colour
-    vec4 newpixel = vec4(.1, .0, .3, 1.);
+    vec4 newpixel = BG_COLOUR;
     // direction of camera pixel
     vec3 uvdir = normalize(vec3(uv2, 1));
     
@@ -114,7 +141,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
         // amiga ball
         // checkerboard on longitude and latitude
         float red = mod(floor(amigapoint.longitude/PI*AMIGAROWS) + floor(amigapoint.latitude/TAU*AMIGACOLS), 2);
-        newpixel.xyz = vec3(1.,red,red) * dot(amigapoint.normal, LIGHTDIR) * 2.;
+        newpixel.rgb = vec3(1.,red,red) * (4.*dot(amigapoint.normal, LIGHT_DIR));
         
     } else {
         // floating moon
@@ -135,12 +162,13 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
             newpixel = Texel(moontex, vec2(moonpoint.latitude/TAU, moonpoint.longitude/PI +.5));
             // adjusting normal with normalmap
             vec3 mapnormal = Texel(moonnor, vec2(moonpoint.latitude/TAU, moonpoint.longitude/PI +.5)).xyz * 2. - 1.;
-            newpixel.xyz *= dot(moonpoint.normaltransform * mapnormal, LIGHTDIR);
+            newpixel.rgb *= .5+.5*dot(moonpoint.normaltransform * mapnormal, LIGHT_DIR);
         } else {
-            // space clouds background
-            newpixel.xyz += vec3(.7, .1, .3) * sqrt(fbm(15*uv2+time*vec2(.2, .1)) * fbm(10*uv2.yx+time*vec2(.1,-.2)))*2;
-            // random stars
+            // lens flare
+            vec2 flareuv = uv2 - FLARE_POS;
+            newpixel.rgb += FLARE_COLOUR * (FLAREBRIGHT * (1.+.05*noise(time*4))) / (pow(abs(flareuv.x/FLARESPREAD), FLAREPOW) + pow(abs(flareuv.y), FLAREPOW));
             
+            // random stars
             // lots of random but essentially, the screen is divided into square cells
             // in which i place one star at a random spot towards the middle
             vec2 cell = floor(uv2*STARSDENSITY);
@@ -151,7 +179,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
             // shine of the stars changes with time so it's a bit sparkly
             // not how stars behave but i think it looks good
             float intensity = noise((starpos+cell)*5.+time);
-            newpixel.xyz += vec3(1., 1., rand(cell*intensity)) * (1.-smoothstep(.0, .002*intensity, distance(uv2, (cell+starpos)/STARSDENSITY)))*intensity;
+            newpixel.rgb += vec3(1., 1., rand(cell*intensity)) * (1.-smoothstep(.0, .002*intensity, distance(uv2, (cell+starpos)/STARSDENSITY)))*intensity;
         }
     }
     return newpixel;
