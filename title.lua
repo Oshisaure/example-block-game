@@ -22,9 +22,9 @@ local change = function(menu) return function(button) button.parent.highlight = 
 local open   = function(menu) return function(button)                              SaveConfig(); Title.current = menu end end
 
 Title.main = Menu.new("Menu", {
-	{x = 0, y = -0.2, label = "START GAME",      action_e = open("play")},
-	{x = 0, y =  0.0, label = "SETTINGS",        action_e = open("settings")},
-	{x = 0, y =  0.2, label = "HIGH SCORES",     action_e = open("highscores")}
+	{x = 0, y = -0.2, label = "START GAME",  action_e = open("play")},
+	{x = 0, y =  0.0, label = "SETTINGS",    action_e = open("settings")},
+	{x = 0, y =  0.2, label = "HIGH SCORES", action_e = open("highscores")}
 	--[[
 	{x = 0, y =  0.2, label = "Networking test",
 		action_e = function(button)
@@ -112,53 +112,37 @@ end
 Title.play:updateSelected()
 
 Title.settings = Menu.new("Menu", {
-	{x = 0, y = -0.3, label = ("< BGM VOLUME : %d%% >"):format(Config.bgm_volume),
+    {x = 0, y = -0.3, label = ("BGM VOLUME : < %d%% >"):format(Config.bgm_volume),
 		action_e = function(button)
-			local n = (tonumber(Config.bgm_volume) + 5) % 105
-			Config.bgm_volume = tostring(n)
-			button.label = ("< BGM VOLUME : %d%% >"):format(Config.bgm_volume)
-            SetBGMVolume(n/100)
-            SaveConfig()
+			Config.bgm_volume = tostring((tonumber(Config.bgm_volume) + 5) % 105)
 		end,
 		action_r = function(button)
-			local n = math.min(tonumber(Config.bgm_volume) + 5, 100)
-			Config.bgm_volume = tostring(n)
-			button.label = ("< BGM VOLUME : %d%% >"):format(Config.bgm_volume)
-            SetBGMVolume(n/100)
-            SaveConfig()
+			Config.bgm_volume = tostring(math.min(tonumber(Config.bgm_volume) + 5, 100))
 		end,
 		action_l = function(button)
-			local n = math.max(tonumber(Config.bgm_volume) - 5, 0)
-			Config.bgm_volume = tostring(n)
-			button.label = ("< BGM VOLUME : %d%% >"):format(Config.bgm_volume)
-            SetBGMVolume(n/100)
-            SaveConfig()
+			Config.bgm_volume = tostring(math.max(tonumber(Config.bgm_volume) - 5, 0))
 		end,
+        update = function(button)
+            button.label = ("BGM VOLUME : < %d%% >"):format(Config.bgm_volume)
+            SetBGMVolume(tonumber(Config.bgm_volume)/100)
+        end
     },
-	{x = 0, y = -0.2, label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume),
+	{x = 0, y = -0.2, label = ("SFX VOLUME : < %d%% >"):format(Config.sfx_volume),
 		action_e = function(button)
-			local n = (tonumber(Config.sfx_volume) + 5) % 105
-			Config.sfx_volume = tostring(n)
-			button.label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume)
-            SetSFXVolume(n/100)
-            SaveConfig()
+			Config.sfx_volume = tostring((tonumber(Config.sfx_volume) + 5) % 105)
 		end,
 		action_r = function(button)
-			local n = math.min(tonumber(Config.sfx_volume) + 5, 100)
-			Config.sfx_volume = tostring(n)
-			button.label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume)
-            SetSFXVolume(n/100)
-            SaveConfig()
+			Config.sfx_volume = tostring(math.min(tonumber(Config.sfx_volume) + 5, 100))
 		end,
 		action_l = function(button)
-			local n = math.max(tonumber(Config.sfx_volume) - 5, 0)
-			Config.sfx_volume = tostring(n)
-			button.label = ("< SFX VOLUME : %d%% >"):format(Config.sfx_volume)
-            SetSFXVolume(n/100)
-            SaveConfig()
+			Config.sfx_volume = tostring(math.max(tonumber(Config.sfx_volume) - 5, 0))
 		end,
+        update = function(button)
+			button.label = ("SFX VOLUME : < %d%% >"):format(Config.sfx_volume)
+            SetSFXVolume(tonumber(Config.sfx_volume)/100)
+        end
     },
-    
+
 	{x = 0, y =  0.0, label = "KEYBOARD CONFIG",  action_e = open("keyconf")},
 	{x = 0, y =  0.1, label = "GAMEPAD CONFIG",   action_e = open("padconf")},
 	{x = 0, y =  0.3, label = "GRAPHICS OPTIONS", action_e = open("graphics")},
@@ -168,22 +152,19 @@ Title.settings = Menu.new("Menu", {
 
 local keySettingsItems = {}
 local padSettingsItems = {
-	{x = 0, y = -0.4, label = ("< AXIS DEADZONE : %d%% >"):format(Config.pad_deadzone),
+	{x = 0, y = -0.4, label = ("AXIS DEADZONE : < %d%% >"):format(Config.pad_deadzone),
 		action_e = function(button)
-			local n = (tonumber(Config.pad_deadzone) + 5) % 105
-			Config.pad_deadzone = tostring(n)
-			button.label = ("< AXIS DEADZONE : %d%% >"):format(Config.pad_deadzone)
+			Config.pad_deadzone = tostring((tonumber(Config.pad_deadzone) + 5) % 105)
 		end,
 		action_r = function(button)
-			local n = math.min(tonumber(Config.pad_deadzone) + 5, 100)
-			Config.pad_deadzone = tostring(n)
-			button.label = ("< AXIS DEADZONE : %d%% >"):format(Config.pad_deadzone)
+			Config.pad_deadzone = tostring(math.min(tonumber(Config.pad_deadzone) + 5, 100))
 		end,
 		action_l = function(button)
-			local n = math.max(tonumber(Config.pad_deadzone) - 5, 0)
-			Config.pad_deadzone = tostring(n)
-			button.label = ("< AXIS DEADZONE : %d%% >"):format(Config.pad_deadzone)
+			Config.pad_deadzone = tostring(math.max(tonumber(Config.pad_deadzone) - 5, 0))
 		end,
+        update = function(button)
+            button.label = ("AXIS DEADZONE : < %d%% >"):format(Config.pad_deadzone)
+        end
 	},
 }
 for i = 1, #Bindlist do
@@ -207,288 +188,282 @@ Title.keyconf = Menu.new("Menu", keySettingsItems)
 Title.padconf = Menu.new("Menu", padSettingsItems)
 
 Title.graphics = Menu.new("Menu", {
-	{x = 0, y = -0.4,
-		label = ("MATRIX SWAY AMPLITUDE: <%s%s>"):format(("|"):rep(tonumber(Config.sway_amplitude)), ("."):rep(10 - tonumber(Config.sway_amplitude))),
+	{x = 0, y = -0.4, param = 0,
+		label = ("MATRIX SWAY AMPLITUDE: <%s>"):format(DrawBar(Config.sway_amplitude, 10)),
 		action_e = function(button)
-			local n = (tonumber(Config.sway_amplitude) + 1) % 10
-			button.label = ("MATRIX SWAY AMPLITUDE: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.sway_amplitude = tostring(n)
+			Config.sway_amplitude = tostring((tonumber(Config.sway_amplitude) + 1) % 11)
 		end,
 		action_r = function(button)
-			local n = math.min(10, tonumber(Config.sway_amplitude) + 1)
-			button.label = ("MATRIX SWAY AMPLITUDE: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.sway_amplitude = tostring(n)
+			button.param = 1
 		end,
 		action_l = function(button)
-			local n = math.max(0, tonumber(Config.sway_amplitude) - 1)
-			button.label = ("MATRIX SWAY AMPLITUDE: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.sway_amplitude = tostring(n)
+			button.param = -1
 		end,
+        update = function(button)
+			Config.sway_amplitude = tostring(Clamp(tonumber(Config.sway_amplitude) + button.param, 0, 10))
+			button.param = 0
+            button.label = ("MATRIX SWAY AMPLITUDE: <%s>"):format(DrawBar(Config.sway_amplitude, 10))
+        end
 	},
+
 	{x = 0, y = -0.3,
-		label = ("MATRIX SWAY SPEED: <%s%s>"):format(("|"):rep(tonumber(Config.sway_speed)), ("."):rep(10 - tonumber(Config.sway_speed))),
+		label = ("MATRIX SWAY SPEED: <%s>"):format(DrawBar(Config.sway_speed, 10)),
 		action_e = function(button)
-			local n = (tonumber(Config.sway_speed) % 10) + 1
-			button.label = ("MATRIX SWAY SPEED: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.sway_speed = tostring(n)
+			Config.sway_speed = tostring(Mod1(tonumber(Config.sway_speed) + 1, 10))
 		end,
 		action_r = function(button)
-			local n = math.min(10, tonumber(Config.sway_speed) + 1)
-			button.label = ("MATRIX SWAY SPEED: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.sway_speed = tostring(n)
+			button.param = 1
 		end,
 		action_l = function(button)
-			local n = math.max(1, tonumber(Config.sway_speed) - 1)
-			button.label = ("MATRIX SWAY SPEED: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.sway_speed = tostring(n)
+			button.param = -1
 		end,
+        update = function(button)
+			Config.sway_speed = tostring(Clamp(tonumber(Config.sway_speed) + button.param, 1, 10))
+			button.param = 0
+            button.label = ("MATRIX SWAY SPEED: <%s>"):format(DrawBar(Config.sway_speed, 10))
+        end
 	},
-	{x = 0, y = -0.2,
-		label = ("MATRIX SWAY BOUNCINESS: <%s%s>"):format(("|"):rep(tonumber(Config.sway_bounciness)), ("."):rep(10 - tonumber(Config.sway_bounciness))),
+
+	{x = 0, y = -0.2, param = 0, label = ("MATRIX SWAY BOUNCINESS: <%s>"):format(DrawBar(Config.sway_bounciness, 10)),
 		action_e = function(button)
-			local n = (tonumber(Config.sway_bounciness) % 10) + 1
-			button.label = ("MATRIX SWAY BOUNCINESS: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.sway_bounciness = tostring(n)
+			Config.sway_bounciness = tostring(Mod1(tonumber(Config.sway_bounciness) + 1, 10))
 		end,
 		action_r = function(button)
-			local n = math.min(10, tonumber(Config.sway_bounciness) + 1)
-			button.label = ("MATRIX SWAY BOUNCINESS: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.sway_bounciness = tostring(n)
+			button.param = 1
 		end,
 		action_l = function(button)
-			local n = math.max(1, tonumber(Config.sway_bounciness) - 1)
-			button.label = ("MATRIX SWAY BOUNCINESS: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.sway_bounciness = tostring(n)
+			button.param = -1
 		end,
+        update = function(button)
+			Config.sway_bounciness = tostring(Clamp(tonumber(Config.sway_bounciness) + button.param, 1, 10))
+			button.param = 0
+            button.label = ("MATRIX SWAY BOUNCINESS: <%s>"):format(DrawBar(Config.sway_bounciness, 10))
+        end
 	},
-	-- {x = 0, y =  0.0, label = ("< FULLSCREEN : %s >"):format(Config.vsync),
-		-- action_e = function(button)
-			-- Config.vsync = (Config.vsync == "O" and "X" or "O")
-			-- button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            -- love.window.setVSync(Config.vsync == "O")
-            -- SaveConfig()
-		-- end,
-		-- action_r = function(button)
-			-- Config.vsync = (Config.vsync == "O" and "X" or "O")
-			-- button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            -- love.window.setVSync(Config.vsync == "O")
-            -- SaveConfig()
-		-- end,
-		-- action_l = function(button)
-			-- Config.vsync = (Config.vsync == "O" and "X" or "O")
-			-- button.label = ("< VSYNC : %s >"):format(Config.vsync)
-            -- love.window.setVSync(Config.vsync == "O")
-            -- SaveConfig()
-		-- end,
-    -- },
-	{x = 0, y =  0.1, label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg),
-		action_e = function(button)
-			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
-			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
+
+	{x = 0, y =  0.1, label = ("DYNAMIC BACKGROUNDS : < %s >"):format(Config.dynamic_bg),
+        update = function(button)
+            Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
+            button.label = ("DYNAMIC BACKGROUNDS : < %s >"):format(Config.dynamic_bg)
             if Config.dynamic_bg == "X" then PrerenderBG() end
-            SaveConfig()
-		end,
-		action_r = function(button)
-			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
-			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
-            if Config.dynamic_bg == "X" then PrerenderBG() end
-            SaveConfig()
-		end,
-		action_l = function(button)
-			Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
-			button.label = ("< DYNAMIC BACKGROUNDS : %s >"):format(Config.dynamic_bg)
-            if Config.dynamic_bg == "X" then PrerenderBG() end
-            SaveConfig()
-		end,
+        end
     },
-	{x = 0, y =  0.2, label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness),
+
+	{x = 0, y =  0.2, param = 0, label = ("BACKGROUND BRIGHTNESS : < %d%% >"):format(Config.bg_brightness),
 		action_e = function(button)
-			local n = (tonumber(Config.bg_brightness) + 5) % 105
-			Config.bg_brightness = tostring(n)
-			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
-            SaveConfig()
+			Config.bg_brightness = tostring((tonumber(Config.bg_brightness) + 5) % 105)
 		end,
 		action_r = function(button)
-			local n = math.min(tonumber(Config.bg_brightness) + 5, 100)
-			Config.bg_brightness = tostring(n)
-			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
-            SaveConfig()
+			button.param = 1
 		end,
 		action_l = function(button)
-			local n = math.max(tonumber(Config.bg_brightness) - 5, 0)
-			Config.bg_brightness = tostring(n)
-			button.label = ("< BACKGROUND BRIGHTNESS : %d%% >"):format(Config.bg_brightness)
-            SaveConfig()
+			button.param = -1
 		end,
+        update = function(button)
+			Config.bg_brightness = tostring(Clamp(tonumber(Config.bg_brightness) + 5 * button.param, 0, 100))
+			button.param = 0
+            button.label = ("BACKGROUND BRIGHTNESS : < %d%% >"):format(Config.bg_brightness)
+        end
     },
-	{x = 0, y =  0.3,
-		label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(tonumber(Config.blur_spread)), ("."):rep(10 - tonumber(Config.blur_spread))),
+
+	{x = 0, y =  0.3, param = 0, label = ("BLUR SPREAD: <%s>"):format(DrawBar(Config.blur_spread, 10)),
 		action_e = function(button)
-			local n = (tonumber(Config.blur_spread) % 10)
-			button.label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.blur_spread = tostring(n)
+			Config.blur_spread = tostring((tonumber(Config.blur_spread) + 1) % 11)
 		end,
 		action_r = function(button)
-			local n = math.min(10, tonumber(Config.blur_spread) + 1)
-			button.label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.blur_spread = tostring(n)
+			button.param = 1
 		end,
 		action_l = function(button)
-			local n = math.max(0, tonumber(Config.blur_spread) - 1)
-			button.label = ("BLUR SPREAD: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.blur_spread = tostring(n)
+			button.param = -1
 		end,
+        update = function(button)
+            Config.blur_spread = tostring(Clamp(tonumber(Config.blur_spread) + button.param, 0, 10))
+			button.param = 0
+			button.label = ("BLUR SPREAD: <%s>"):format(DrawBar(Config.blur_spread, 10))
+        end
 	},
-	{x = 0, y =  0.4,
-		label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(tonumber(Config.trail_duration)), ("."):rep(10 - tonumber(Config.trail_duration))),
+
+	{x = 0, y =  0.4, label = ("TRAIL FADEOUT DURATION: <%s>"):format(DrawBar(Config.trail_duration, 10)),
 		action_e = function(button)
-			local n = (tonumber(Config.trail_duration) % 10)
-			button.label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.trail_duration = tostring(n)
+			Config.trail_duration = tostring((tonumber(Config.trail_duration) + 1) % 11)
 		end,
 		action_r = function(button)
-			local n = math.min(10, tonumber(Config.trail_duration) + 1)
-			button.label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.trail_duration = tostring(n)
+			button.param = 1
 		end,
 		action_l = function(button)
-			local n = math.max(0, tonumber(Config.trail_duration) - 1)
-			button.label = ("TRAIL FADEOUT DURATION: <%s%s>"):format(("|"):rep(n), ("."):rep(10 - n))
-			Config.trail_duration = tostring(n)
+			button.param = -1
 		end,
+        update = function(button)
+			Config.trail_duration = tostring(Clamp(tonumber(Config.trail_duration) + button.param, 0, 10))
+			button.param = 0
+            button.label = ("TRAIL FADEOUT DURATION: <%s>"):format(DrawBar(Config.trail_duration, 10))
+        end
 	},
+
 	{x = 0, y =  0.7, label = "BACK", action_e = change("settings")},
 })
 
 Title.window = Menu.new("Menu", {
-	{x = 0, y = -0.2,
-	label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(FullScreenModes[1].width, FullScreenModes[1].height, FullScreenModes[1].display),
-	param = 1,
+	{x = 0, y =  -0.3, param = 1, prev_screen = 1, label = ("SCREEN : < %s >"):format(1),
 		action_e = function(button)
-			button.param = (button.param % #FullScreenModes) + 1
-			local mode = FullScreenModes[button.param]
-			button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, mode.display)
+            button.prev_screen = button.param
+			button.param = Mod1(button.param + 1, #FullScreenModes)
 		end,
 		action_r = function(button)
-			button.param = (button.param % #FullScreenModes) + 1
-			local mode = FullScreenModes[button.param]
-			button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, mode.display)
+			button.prev_screen = button.param
+            button.param = Mod1(button.param + 1, #FullScreenModes)
 		end,
 		action_l = function(button)
-			button.param = ((button.param - 2) % #FullScreenModes) + 1
-			local mode = FullScreenModes[button.param]
-			button.label = ("< RESOLUTION : %4dx%4d >\n(SCREEN #%d)"):format(mode.width, mode.height, mode.display)
+			button.prev_screen = button.param
+            button.param = Mod1(button.param - 1, #FullScreenModes)
 		end,
+        update = function(button)
+            button.label = ("SCREEN : < %s >"):format(button.param)
+
+			local prev_resolution_id = button.parent.items[2].param
+            local prev_resolutions   = FullScreenModes[button.prev_screen]
+            local cur_resolutions    = FullScreenModes[button.param]
+            local prev_mode          = prev_resolutions[prev_resolution_id]
+
+            local res_id_found
+            for i, mode in pairs(cur_resolutions) do
+                if mode.width == prev_mode.width and mode.height == prev_mode.height then
+                    res_id_found = i
+                    break
+                elseif (mode.width > prev_mode.width and mode.height == prev_mode.height) or
+                        mode.height > prev_mode.height then
+                    res_id_found = i-1
+                    break
+                end
+            end
+            if not res_id_found then res_id_found = #cur_resolutions end
+
+            -- Updates `RESOLUTION` item to match a selected screen's resolutions.
+            button.parent.items[2].param = res_id_found
+            button.parent.items[2]:update(2)
+        end
     },
-	{x = 0, y =  0.1, label = ("< FULLSCREEN : %s >"):format(Config.fullscreen), param = Config.fullscreen,
+
+	{x = 0, y = -0.2, param = 1, label = ("RESOLUTION : < %4dx%4d >"):format("640", "480"),
 		action_e = function(button)
-			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< FULLSCREEN : %s >"):format(button.param)
+			local cur_screen = button.parent.items[1].param
+			button.param = Mod1(button.param + 1, #FullScreenModes[cur_screen])
 		end,
 		action_r = function(button)
-			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< FULLSCREEN : %s >"):format(button.param)
+			local cur_screen = button.parent.items[1].param
+			button.param = Mod1(button.param + 1, #FullScreenModes[cur_screen])
 		end,
 		action_l = function(button)
-			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< FULLSCREEN : %s >"):format(button.param)
+			local cur_screen = button.parent.items[1].param
+			button.param = Mod1(button.param - 1, #FullScreenModes[cur_screen])
 		end,
+		update = function(button)
+			local cur_screen = button.parent.items[1].param
+			local mode = FullScreenModes[cur_screen][button.param]
+			button.label = ("RESOLUTION : < %4dx%4d >"):format(mode.width, mode.height)
+		end
     },
-	{x = 0, y =  0.2, label = ("< VSYNC : %s >"):format(Config.vsync), param = Config.vsync,
-		action_e = function(button)
-			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< VSYNC : %s >"):format(button.param)
-		end,
-		action_r = function(button)
-			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< VSYNC : %s >"):format(button.param)
-		end,
-		action_l = function(button)
-			button.param = (button.param == "O" and "X" or "O")
-			button.label = ("< VSYNC : %s >"):format(button.param)
-		end,
+
+	{x = 0, y = 0.1, param = Config.fullscreen, label = ("FULLSCREEN : < %s >"):format(Config.fullscreen),
+        update = function(button)
+            button.param = (button.param == "O" and "X" or "O")
+            button.label = ("FULLSCREEN : < %s >"):format(button.param)
+        end
+    },
+
+	{x = 0, y = 0.2, param = Config.vsync, label = ("VSYNC : < %s >"):format(Config.vsync),
+        update = function(button)
+            button.param = (button.param == "O" and "X" or "O")
+            button.label = ("VSYNC : < %s >"):format(button.param)
+        end
     },
 	
-	{x = 0, y =  0.5, label = "APPLY",
+	{x = 0, y = 0.5, label = "APPLY",
 		action_e = function(button)
-			local width, height, display, vsync, fs
 			local buttons = button.parent.items
-			local mode = FullScreenModes[buttons[1].param]
-			width, height, display = mode.width, mode.height, mode.display
-			fs    = buttons[2].param
-			vsync = buttons[3].param
-			SetDisplayMode(width, height, display, fs == "O", vsync == "O")
+			local display = buttons[1].param
+			local mode    = FullScreenModes[display][buttons[2].param]
+
+			local width, height = mode.width, mode.height
+			local fs, vsync     = buttons[3].param, buttons[4].param
+
+            SetDisplayMode(width, height, display, fs == "O", vsync == "O")
 			Config.window_width   = tostring(width  )
 			Config.window_height  = tostring(height )
 			Config.window_display = tostring(display)
-			Config.fullscreen = fs
-			Config.vsync      = vsync
+			Config.fullscreen     = fs
+			Config.vsync          = vsync
 		end
 	},
+
 	{x = 0, y =  0.7, label = "BACK",  action_e = change("settings")},
 })
 
 
-
+-- [[ === === === [ HIGHSCORES ] === === === ]] --
 -- sets the default high score mode view to the first mode alphabetically
-local hs_keys = {}
+--TODO: Proper Sorting
+--TODO: Unlocking Secret Modes
+local mode_list = {}
 local mode_indices = {} -- to prevent unnecessary lookups
-for k,v in pairs(HighScores) do
-	if(k ~= "Death") then table.insert(hs_keys,k) end -- death is technically a secret mode
-	for i=1,#Levels do
-		if(Levels[i].name == k) then mode_indices[k] = i end
+for k, _ in pairs(HighScores) do
+	if k ~= "Death" then table.insert(mode_list, k) end -- death is technically a secret mode
+    for i = 1, #Levels do
+		if Levels[i].name == k then mode_indices[k] = i end
 	end
-end
-table.sort(hs_keys) -- alphabetical order
-if(#hs_keys == 0) then
-	error("No high score keys. Are you sure there's at least one mode?")
 end
 
 Title.highscores = Menu.new("Menu", {
-	{x = 0, y = -0.8, label = "< MODE: "..hs_keys[1].." >",
-		action_l = function(button)
-			Title.highscores.selection = (Title.highscores.selection+#Title.highscores.modeList-2)%(#Title.highscores.modeList)+1
-			button.label = "< MODE: "..hs_keys[Title.highscores.selection].." >"
-		end,
+	{x = 0, y = -0.8, param = 0, label = ("MODE: < %s >"):format(mode_list[1]),
 		action_r = function(button)
-			Title.highscores.selection = (Title.highscores.selection)%(#Title.highscores.modeList)+1
-			button.label = "< MODE: "..hs_keys[Title.highscores.selection].." >"
-		end},
-	{x = 0, y = -0.7, label = "< SHOW CLEAR STATISTICS: X >",
-		action_l = function(button)
-			Title.highscores.showclear = not Title.highscores.showclear
-			button.label = "< SHOW CLEAR STATISTICS: " .. (Title.highscores.showclear and "O" or "X") .. " >"
+			button.param = 1
 		end,
-		action_r = function(button)
-			Title.highscores.showclear = not Title.highscores.showclear
-			button.label = "< SHOW CLEAR STATISTICS: " .. (Title.highscores.showclear and "O" or "X") .. " >"
-		end},
-	{x = 0, y =  0.7, label = "BACK", action_e = function(button)
-		Title.highscores.resetCounter = 0
-		Title.highscores.items[4].label = "RESET HIGH SCORES"
-		change("main")(button)
-	end},
-	{x = 0, y =  0.8, label = "RESET HIGH SCORES", action_e = function(button)
-		Title.highscores.resetCounter = Title.highscores.resetCounter + 1
-		if(Title.highscores.resetCounter == 1) then
-			button.label = "ARE YOU SURE YOU WANT TO CLEAR RECORDS?"
-		elseif(Title.highscores.resetCounter == 2) then
-			button.label = "ARE YOU REALLY SURE?"
-		elseif(Title.highscores.resetCounter == 3) then
-			button.label = "LAST CHANCE! ARE YOU SURE YOU WANT TO?"
-		else
-			button.label = "RESET HIGH SCORES"
-			Title.highscores.resetCounter = 0
-			for _,mode in pairs(Levels) do
-				local name = mode.name
-				HighScores[name] = {}
-			end
-			SaveHighScores()
+		action_l = function(button)
+			button.param = -1
+		end,
+        update = function(button)
+            Title.highscores.selection = Mod1(Title.highscores.selection + button.param, #button.parent.mode_list)
+            button.param = 0
+            button.label = ("MODE: < %s >"):format(Title.highscores.mode_list[Title.highscores.selection])
+        end
+	},
+
+	{x = 0, y = -0.7, label = "SHOW CLEAR STATISTICS: < X >",
+		update = function(button)
+			button.parent.show_clear = not button.parent.show_clear
+			button.label = ("SHOW CLEAR STATISTICS: < %s >"):format(button.parent.show_clear and "O" or "X")
 		end
-	end}
+	},
+
+	{x = 0, y =  0.7, label = "BACK",
+	 	action_e = function(button)
+			button.parent.reset_counter = 1
+			button.parent.items[4]:update()
+			change("main")(button)
+		end
+	},
+
+	{x = 0, y =  0.8, label = "RESET HIGH SCORES",
+        labels = {"RESET HIGH SCORES",
+                  "ARE YOU SURE YOU WANT TO CLEAR RECORDS?",
+                  "ARE YOU REALLY SURE?",
+                  "LAST CHANCE! ARE YOU SURE YOU WANT TO?"},
+	 	action_e = function(button)
+            button.parent.reset_counter = button.parent.reset_counter + 1
+        end,
+	 	update = function(button)
+			if button.parent.reset_counter > #button.labels then
+				button.parent.reset_counter = 1
+				for _, mode in pairs(Levels) do HighScores[mode.name] = {} end
+				SaveHighScores()
+			end
+            button.label = button.labels[button.parent.reset_counter]
+		end
+	}
 })
-Title.highscores.selection = 1
-Title.highscores.modeList = hs_keys
-Title.highscores.modeIndices = mode_indices
-Title.highscores.showclear = false
-Title.highscores.resetCounter = 0
+--TODO: Apply general styling to this
+Title.highscores.selection     = 1
+Title.highscores.mode_list     = mode_list
+Title.highscores.mode_indices  = mode_indices
+Title.highscores.show_clear    = false
+Title.highscores.reset_counter = 1

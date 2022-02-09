@@ -325,7 +325,8 @@ function love.draw()
         love.graphics.draw(CanvasBG)
 		love.graphics.setColor(1,1,1)
 		love.graphics.draw(Title[Title.current].text)
-		if Title.current == "play" then
+
+        if Title.current == "play" then
 			local modeid = Title.play.items[Title.play.highlight].id
 			if modeid and Levels[modeid][Title.play.startlv].level_name == math.huge then
 				local scx, scy = Font.Menu:getWidth("AA"), Font.Menu:getHeight()
@@ -333,66 +334,67 @@ function love.draw()
 				DrawInfinitySymbol(Width*0.5 + posx - scx/10, math.floor(Height*0.7), 0, -scx/10, scy/6)
 			end
 		end
+
 		if Title.current == "highscores" then
-			local mode = Title.highscores.modeList[Title.highscores.selection]
+			local mode = Title.highscores.mode_list[Title.highscores.selection]
 			local current_scores = HighScores[mode]
 			if(#current_scores == 0) then
 				love.graphics.printf("[ NO HIGH SCORES TO DISPLAY ]",0,Height*0.3,Width,"center")
 			else
 				-- title bar
 				love.graphics.setFont(Font.HUD)
-				local charw = Font.Menu:getWidth("A")
-				local leftx -- for use later
-				if(Title.highscores.showclear) then
-					local textw = charw*40
-					leftx = Width*0.5-textw/2
-					love.graphics.printf("CLEAR SCORE",math.floor(leftx+charw*6),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("START LV",      math.floor(leftx+charw*19),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("LEVEL",         math.floor(leftx+charw*26),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("CLEAR TIME", math.floor(leftx+charw*32),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+				local char_width = Font.Menu:getWidth("A")
+				local left_x -- for use later
+				if(Title.highscores.show_clear) then
+					local text_width = char_width *40
+					left_x  = Width*0.5- text_width /2
+					love.graphics.printf("CLEAR SCORE", math.floor(left_x + char_width *6),  Height*0.3-Font.HUD:getHeight()*1.1, Width*0.5, "left")
+					love.graphics.printf("START LV",    math.floor(left_x + char_width *19), Height*0.3-Font.HUD:getHeight()*1.1, Width*0.5, "left")
+					love.graphics.printf("LEVEL",       math.floor(left_x + char_width *26), Height*0.3-Font.HUD:getHeight()*1.1, Width*0.5, "left")
+					love.graphics.printf("CLEAR TIME",  math.floor(left_x + char_width *32), Height*0.3-Font.HUD:getHeight()*1.1, Width*0.5, "left")
 				else
-					local textw = charw*41
-					leftx = Width*0.5-textw/2
-					love.graphics.printf("SCORE",math.floor(leftx+charw*6),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("LINES",math.floor(leftx+charw*20),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("LEVEL",math.floor(leftx+charw*27),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
-					love.graphics.printf("TIME", math.floor(leftx+charw*33),Height*0.3-Font.HUD:getHeight()*1.1,Width*0.5,"left")
+					local textw = char_width *41
+					left_x = Width*0.5-textw/2
+					love.graphics.printf("SCORE", math.floor(left_x + char_width *6),  Height*0.3-Font.HUD:getHeight()*1.1, Width*0.5, "left")
+					love.graphics.printf("LINES", math.floor(left_x + char_width *20), Height*0.3-Font.HUD:getHeight()*1.1, Width*0.5, "left")
+					love.graphics.printf("LEVEL", math.floor(left_x + char_width *27), Height*0.3-Font.HUD:getHeight()*1.1, Width*0.5, "left")
+					love.graphics.printf("TIME",  math.floor(left_x + char_width *33), Height*0.3-Font.HUD:getHeight()*1.1, Width*0.5, "left")
 				end
 				love.graphics.setFont(Font.Menu)
-				local curve = Levels[Title.highscores.modeIndices[mode]]
+				local curve = Levels[Title.highscores.mode_indices[mode]]
 				local function levelStr(l)
 					-- Removes the level text if it's Lv. Inf so it can draw the infinity symbol instead
-					return (l ~= math.huge and l or "")
+					return l ~= math.huge and l or ""
 				end
-				for i=1,math.min(#current_scores,10) do
+				for i = 1, math.min(#current_scores, 10) do
 					local score = current_scores[i]
 					local st = ""
-					if(Title.highscores.showclear) then
+					if(Title.highscores.show_clear) then
 						st = string.format("#%2s -%12s - %3s - %3s -%9s",
 											i,
-											score.clearScore and CommaValue(score.clearScore) or "NO CLEAR",
-											levelStr(curve[score.startLevel].level_name),
-											levelStr(curve[score.finalLevel].level_name),
-											score.clearTime and FormatTime(score.clearTime) or "XX\'XX\"XX")
-						if(curve[score.startLevel].level_name == math.huge) then
-							DrawInfinitySymbol(leftx+charw*(22+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(charw*2)/10, Font.Menu:getHeight()/6)
+											score.clear_score and CommaValue(score.clear_score) or "NO CLEAR",
+											levelStr(curve[score.start_level].level_name),
+											levelStr(curve[score.final_level].level_name),
+											score.clear_time and FormatTime(score.clear_time) or "XX\'XX\"XX")
+						if(curve[score.start_level].level_name == math.huge) then
+							DrawInfinitySymbol(left_x + char_width *(22+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(char_width *2)/10, Font.Menu:getHeight()/6)
 						end
-						if(curve[score.finalLevel].level_name == math.huge) then
-							DrawInfinitySymbol(leftx+charw*(28+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(charw*2)/10, Font.Menu:getHeight()/6)
+						if(curve[score.final_level].level_name == math.huge) then
+							DrawInfinitySymbol(left_x + char_width *(28+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(char_width *2)/10, Font.Menu:getHeight()/6)
 						end
 					else
 						st = string.format("#%2s -%12s -%5d - %3s -%9s",
-											i,
-											tonumber(score.score) >= 1000000000 and score.score or CommaValue(score.score),
-											score.lines,
-											levelStr(curve[score.finalLevel].level_name),
-											FormatTime(score.time))
-						if(curve[score.finalLevel].level_name == math.huge) then
-							DrawInfinitySymbol(leftx+charw*(29+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(charw*2)/10, Font.Menu:getHeight()/6)
+                                            i,
+                                            tonumber(score.score) >= 1000000000 and score.score or CommaValue(score.score),
+                                            score.lines,
+                                            levelStr(curve[score.final_level].level_name),
+                                            FormatTime(score.time))
+						if(curve[score.final_level].level_name == math.huge) then
+							DrawInfinitySymbol(left_x + char_width *(29+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(char_width *2)/10, Font.Menu:getHeight()/6)
 						end
 					end
 							
-					love.graphics.printf(st,0,Height*0.3+(i-1)*Font.Menu:getHeight(),Width,"center")
+					love.graphics.printf(st, 0, Height*0.3+(i-1)*Font.Menu:getHeight(), Width, "center")
 				end
 			end
 		end
@@ -522,7 +524,7 @@ function love.draw()
         until (not lastentry) or lastentry.time + 3 > Game.time
         table.insert(Game.recent_actions, lastentry)
         local yscoff = 0
-        for i, entry in ipairs(Game.recent_actions) do
+        for _, entry in ipairs(Game.recent_actions) do
             local t = (Game.time - entry.time)/3
             local ysc, xsc = 1-(1-t)^15, 1-t^10
             yscoff = yscoff + ysc

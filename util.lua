@@ -18,6 +18,18 @@
 
 function NADA() end
 
+function Clamp(val, min, max)
+    if min > max then min, max = max, min end
+    return math.max(math.min(val, max), min)
+end
+
+function Mod1(x, base) return ((x - 1) % base) + 1 end
+
+function DrawBar(rep, size)
+	local _rep = tonumber(rep)
+	return ("%s%s"):format(("|"):rep(_rep), ("."):rep(size - _rep))
+end
+
 function Deepcopy(orig)
     local orig_type = type(orig)
     local copy
@@ -79,8 +91,8 @@ function CheckPadInput(pad, input)
 end
 
 function FormatTime(s)
-    local sec, cen = math.modf(math.max(0,s))
-    local sec, min = sec % 60, math.floor(sec/60)
+    local sec, cen, min = math.modf(math.max(0,s))
+    sec, min = sec % 60, math.floor(sec/60)
     return string.format("%02d\'%02d\"%02d", min, sec, math.floor(cen*100))
 end
 
@@ -116,7 +128,7 @@ function AvgArrays(base, ...)
 	if not base then return nil end
 	local arg = {...}
 	local a = Deepcopy(base)
-	for n, arr in ipairs(arg) do
+	for _, arr in ipairs(arg) do
 		for k, v in pairs(arr) do
 			a[k] = a[k] + v
 		end
@@ -173,7 +185,7 @@ function SetBGMVolume(v)
 end
 
 function SetSFXVolume(v)
-    for k, t in pairs(SFX) do
+    for _, t in pairs(SFX) do
         t:setVolume(v)
     end
 end
@@ -446,21 +458,28 @@ function DrawInfinitySymbol(...)
 end
 
 
+-- Get all available screens and their supported resolutions.
 FullScreenModes = {}
 for i = 1, love.window.getDisplayCount() do
 	local modes = love.window.getFullscreenModes(i)
+    local screen = {}
 	for _, mode in ipairs(modes) do
-		mode.display = i
-		table.insert(FullScreenModes, mode)
+		table.insert(screen, mode)
 	end
+    table.sort(screen, function(a, b) -- Sort the resolutions
+            if a.height ~= b.height then return a.height < b.height
+        elseif a.width  ~= b.width  then return a.width  < b.width
+        end
+    end)
+    table.insert(FullScreenModes, screen)
 end
-table.sort(FullScreenModes, function(a, b)
-		if a.height ~= b.height then return a.height  < b.height
-	elseif a.width  ~= b.width  then return a.width   < b.width
-	else                             return a.display < b.display
-	end
-end)
--- for _, mode in ipairs(FullScreenModes) do print(string.format("%4dx%4d (%d)", mode.width, mode.height, mode.display)) end
+
+--for _, screen in pairs(FullScreenModes) do
+--    for i, mode in pairs(screen) do
+--        print(i, mode.width, mode.height)
+--    end
+--    --break
+--end
 
 function SetDisplayMode(width, height, display, fs, vsync)
 	love.window.updateMode(width, height, {display = display, fullscreen = fs, vsync = vsync, fullscreentype = "exclusive"})
