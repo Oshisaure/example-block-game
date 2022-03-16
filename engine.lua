@@ -39,6 +39,11 @@ Board = {
         return base * board.level * 1000
     end,
 	
+	addScore = function(board, points)
+		board.score = board.score + points
+		board.level_scores[board.level] = (board.level_scores[board.level] or 0) + points
+	end,
+	
 	check_cell = function(board, x, y)
 		-- returns true if cell is blocked/oob
 		if x > 10 or x < 1 or y <= 0 or board.grid[x][y] then return true end
@@ -154,7 +159,7 @@ Board = {
 		
 		-- update score and line clear animation if necessary
 		board.last_score = board:getScore(ln)
-		board.score = board.score + board.last_score
+		board:addScore(board.last_score)
 		board.drop_points = 0
 		if ln >= 1 then
 			table.insert(board.recent_actions, 1, {
@@ -172,7 +177,7 @@ Board = {
 					colour = nil,
 				})
 				board.all_clears = board.all_clears + 1
-				board.score = board.score + 1000000
+				board:addScore(1000000)
 			end
 			board.animation_time = board.line_delay
 			--[[
@@ -245,7 +250,7 @@ Board = {
 				board.percentile = 99
 			else
 				board.percentile = board.percentile % 100
-				board.level_time = board.time
+				board.level_final_time = board.time
 				board.level_final_score = board.score
 				board.last_level = oldlv
 				PlaySFX("classic_levelup")
@@ -612,6 +617,23 @@ Board = {
 			--]]
         end
     end,
+
+	saveScore = function(board)
+		local finallevelname = board.speedcurve[board.level].level_name
+		local isClear = (finallevelname == math.huge or finallevelname == -math.huge) and board.level ~= board.startlevel
+		table.insert(HighScores[board.speedcurve.name],
+			{
+				score 		= board.score,
+				clear_score	= isClear and (board.level_final_score or 0),
+				lines		= board.lines,
+				start_level	= board.startlevel,
+				final_level	= board.level or board.startlevel,
+				time		= board.time,
+				clear_time  = isClear and board.level_final_time
+			}
+		)
+		SaveHighScores()
+	end,
     
 	update = function(board, input, dt)
 		board.last_clear = 0
@@ -688,7 +710,7 @@ Board = {
 						board.spin = false
 						if(input.softdrop and not input.harddrop) then
 							board.drop_points = board.drop_points + 1
-							board.score = board.score + 1
+							board:addScore(1)
 						end
 						-- fall_dist = fall_dist + 1
 					end
@@ -704,7 +726,7 @@ Board = {
                     
                     local fall_height = old_height - (board.piece.y - board.gravity_acc)
 					if input.harddrop then
-						board.score = board.score + math.floor(fall_height*fall_height)
+						board:addScore(math.floor(fall_height*fall_height))
 					end
 					board:add_trails(fall_height)
 				end
@@ -770,8 +792,9 @@ Board = {
 			board.first_frame = false
 		else
 			board.prev = input
-			board.time = board.time + dt
-			board.animation_time = board.animation_time - dt
+			board.time           =  board.time           + dt
+			board.animation_time =  board.animation_time - dt
+			board.level_times[board.level] = (board.level_times[board.level] or 0) + dt
 		end
 	end,
 	
@@ -943,7 +966,10 @@ Board = {
         board.level       = level or board.startlevel
         board.startlevel  = level or board.startlevel
 		board.last_level  = 0
-		board.level_time  = -2
+		board.level_times  = {[board.level] = -2}
+		board.level_scores = {[board.level] = 0}
+		board.level_final_score = nil
+		board.level_final_time  = nil
         board.time        = -2
 		board.gravity     = Board.gravity
         board.gravity_acc = 0
@@ -1019,22 +1045,6 @@ Board = {
         love.graphics.clear(0,0,0,1)
         love.graphics.setCanvas()
 	end,
-
-	saveScore = function(board)
-		local isClear = (board.speedcurve[board.level].level_name == math.huge and board.level ~= board.startlevel)
-		table.insert(HighScores[board.speedcurve.name],
-			{
-				score 		= board.score,
-				clear_score	= isClear and (board.level_final_score or 0),
-				lines		= board.lines,
-				start_level	= board.startlevel,
-				final_level	= board.level or board.startlevel,
-				time		= board.time,
-				clear_time  = isClear and board.level_time
-			}
-		)
-		SaveHighScores()
-	end,
 	
 	new = function(curve, seed, blocksize, posx, posy)
 		local newboard = {
@@ -1064,6 +1074,7 @@ Board = {
 			glow_canvas    = love.graphics.newCanvas(),
 			overlay_canvas = love.graphics.newCanvas(),
 			getScore       = Board.getScore,
+			addScore       = Board.addScore,
 			check_cell     = Board.check_cell,
 			check_collision_with = Board.check_collision_with,
 			rotate_cw      = Board.rotate_cw,

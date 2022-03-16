@@ -162,6 +162,7 @@ function love.update(dt)
 		if key then love.keypressed(key) end
 	elseif STATE == "ingame" then
 		if not Game.dead then
+			Game.dead_time = 0
 			Game:update({
 				left     = CheckKeyInput(KeyBindings.left     ) or CheckPadInput(CurrentController, PadBindings.left     ),
 				right    = CheckKeyInput(KeyBindings.right    ) or CheckPadInput(CurrentController, PadBindings.right    ),
@@ -182,7 +183,7 @@ function love.update(dt)
             ScoreText:set(CommaValue(math.floor(Game.display_score+0.5)))
             SendShaderUniform("level", Game.level)
             SendShaderUniform("levelprev", Game.last_level)
-            SendShaderUniform("leveltime", Game.time - Game.level_time)
+            SendShaderUniform("leveltime", Game.level_times[Game.level])
 			-- bottomtext = "LV. "..(Game.level_type == "10L" and Game.level_name or Game.level*100+Game.percentile-100).."\nLines: "..Game.lines.."\n"..FormatTime(Game.time)
 			--[[
 			UpdateTime = UpdateTime + dt
@@ -219,6 +220,7 @@ function love.update(dt)
         else
             SetBGM()
             -- BGM:stop()
+			Game.dead_time = Game.dead_time + dt
 		end
 	elseif STATE == "battle2P" then
 		if not Games.P1.dead and not Games.P2.dead then
@@ -370,12 +372,14 @@ function love.draw()
 					local score = current_scores[i]
 					local st = ""
 					if(Title.highscores.show_clear) then
-						st = string.format("#%2s -%12s - %3s - %3s -%9s",
-											i,
-											score.clear_score and CommaValue(score.clear_score) or "NO CLEAR",
-											levelStr(curve[score.start_level].level_name),
-											levelStr(curve[score.final_level].level_name),
-											score.clear_time and FormatTime(score.clear_time) or "XX\'XX\"XX")
+						st = string.format(
+							"#%2s -%12s - %3s - %3s -%9s",
+							i,
+							CommaValue(score.clear_score),
+							levelStr(curve[score.start_level].level_name),
+							levelStr(curve[score.final_level].level_name),
+							FormatTime(score.clear_time)
+						)
 						if(curve[score.start_level].level_name == math.huge) then
 							DrawInfinitySymbol(left_x + char_width *(22+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(char_width *2)/10, Font.Menu:getHeight()/6)
 						end
@@ -383,12 +387,14 @@ function love.draw()
 							DrawInfinitySymbol(left_x + char_width *(28+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(char_width *2)/10, Font.Menu:getHeight()/6)
 						end
 					else
-						st = string.format("#%2s -%12s -%5d - %3s -%9s",
-                                            i,
-                                            tonumber(score.score) >= 1000000000 and score.score or CommaValue(score.score),
-                                            score.lines,
-                                            levelStr(curve[score.final_level].level_name),
-                                            FormatTime(score.time))
+						st = string.format(
+							"#%2s -%12s -%5d - %3s -%9s",
+                            i,
+                            tonumber(score.score) >= 1000000000 and score.score or CommaValue(score.score),
+                            score.lines,
+                            levelStr(curve[score.final_level].level_name),
+                            FormatTime(score.time)
+						)
 						if(curve[score.final_level].level_name == math.huge) then
 							DrawInfinitySymbol(left_x + char_width *(29+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(char_width *2)/10, Font.Menu:getHeight()/6)
 						end
@@ -418,7 +424,7 @@ function love.draw()
 		
 	else
 		Game:draw()
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(1,1,1)
         
         --[[
         love.graphics.setCanvas(CanvasBG)
@@ -474,10 +480,10 @@ function love.draw()
         local b = tonumber(Config.bg_brightness)/100
 		love.graphics.setColor(b, b, b)
         love.graphics.draw(CanvasBG)
-        love.graphics.setColor(1,1,1)
         -- [===[ activate this block comment to render none of the HUD and only the BG
 		-- love.graphics.setShader(ShaderShaking)
         love.graphics.draw(Game.canvas)
+        love.graphics.setColor(1,1,1)
 		love.graphics.setShader()
         love.graphics.draw(Game.overlay_canvas)
         
@@ -490,7 +496,39 @@ function love.draw()
             love.graphics.printf("HOLD",    0, Height*0.15, w7, "right")
         end
         love.graphics.printf("NEXT", Width-w7, Height*0.15, w7, "left")
-        love.graphics.setFont(Font.HUD)
+		
+		if Game.dead then
+			local deadtime = Game.dead_time
+			love.graphics.setColor(0,0,0,math.min(deadtime*0.25, 0.5))
+			love.graphics.rectangle("fill", 0, 0, Width, Height)
+			love.graphics.setColor(1,1,1,math.min(deadtime*0.5, 1))
+			love.graphics.setFont(Font.Title)
+			local gameoveroff = math.max((1-deadtime)*0.05, 0)
+			love.graphics.printf("GAME", Width*(0.00-gameoveroff), Height*0.02, Width*0.45, "right", 0, 1, 1, 0, 0, -0.3)
+			love.graphics.printf("OVER", Width*(0.55+gameoveroff), Height*0.02, Width*0.45, "left" , 0, 1, 1, 0, 0, -0.3)
+			love.graphics.setFont(Font.HUD)
+			local maxlv = Game.speedcurve.maxlevel
+			if maxlv == math.huge then maxlv = Game.level end
+			for lv = 1, maxlv do
+				local lvname = Game.speedcurve[lv].level_name
+				if lvname ~= math.huge and lvname ~= -math.huge then
+					local t = Clamp((deadtime-1 - lv*0.05)*4, 0, 1)
+					local xoff = (-1)^lv*(1-t)*Width*0.1
+					love.graphics.setColor(1,1,1,t)
+					love.graphics.printf(string.format(
+						"%3s -%10s - %s",
+						Game.speedcurve[lv].level_name,
+						CommaValue(Game.level_scores[lv]),
+						FormatTime(Game.level_times [lv]),
+						CommaValue(Game.level_scores[lv]),
+						FormatTime(Game.level_times [lv])
+					), xoff, Height*(0.06+0.025*lv), Width, "center", 0, 1, 1, 0, 0, -0.3)
+				end
+			end
+		end
+		
+		love.graphics.setColor(1,1,1,1)
+		love.graphics.setFont(Font.HUD)
         love.graphics.printf("LINE CLEAR STATISTICS", 0, Height*0.4, w6, "center")
         
 		for k, id in ipairs(Piece.IDs) do
@@ -517,7 +555,26 @@ function love.draw()
             love.graphics.printf("PERFECT CLEARS:", w6*0.05, Height*(0.55+0.025*#LineClearTypes), w6*0.90, "left")
             love.graphics.printf(Game.all_clears  , w6*0.05, Height*(0.55+0.025*#LineClearTypes), w6*0.90, "right")
         end
-        
+		
+		local lvdisp = 5
+		for d = 0, math.min(lvdisp-1, Game.level-1) do
+			local lv = Game.level - d
+			local xoff = 0
+			love.graphics.setColor(1,1,1,1-d/lvdisp)
+			if d == 0 then
+				local t = math.min(Game.level_times[lv]*3, 1)
+				love.graphics.setColor(1,1,1,t)
+				xoff = (1-t)*Height*(-0.05)
+			end
+			love.graphics.printf(string.format(
+				"%s%3s -%6sK - %s",
+				d == 0 and ">" or " ",
+				Game.speedcurve[lv].level_name,
+				CommaValue(math.floor((Game.level_scores[lv] or 0)/1000)),
+				FormatTime(Game.level_times[lv]):sub(1, -3)
+			), w6*0.05 + xoff, Height*(0.9-0.025*d), w6*0.90, "left", 0, 1, 1, 0, 0, -0.3)
+		end
+		
         local lastentry
         repeat
             lastentry = table.remove(Game.recent_actions)
@@ -559,7 +616,8 @@ function love.draw()
 			DrawInfinitySymbol(Width*0.95-scx/10, Height*0.425, 0, -scx/10, scy/6)
 			
 			love.graphics.setFont(Font.HUD)
-			love.graphics.printf("("..FormatTime(Game.level_time)..")",  Width*0.75, Height*0.625 + Font.Menu:getHeight(), Width*0.2, "right")
+			love.graphics.printf("("..FormatTime(Game.level_final_time )..")",  Width*0.75, Height*0.625 + Font.Menu:getHeight(), Width*0.2, "right")
+			love.graphics.printf("("..CommaValue(Game.level_final_score)..")",  Width*0.75, Height*0.850 + ScoreText:getHeight(), Width*0.2, "right")
 			love.graphics.setFont(Font.Menu)
 		end
 		
@@ -572,7 +630,7 @@ function love.draw()
 		love.graphics.printf(leveldisplay,           Width*0.75, Height*0.425, Width*0.2, "right")
         love.graphics.printf(Game.lines,             Width*0.75, Height*0.525, Width*0.2, "right")
         love.graphics.printf(FormatTime(Game.time),  Width*0.75, Height*0.625, Width*0.2, "right")
-        
+		
         local stw, sth = ScoreText:getDimensions()
         love.graphics.draw(ScoreText, Width*0.95-stw/2, Height*0.85+sth/2, math.log(math.max(Game.score-Game.display_score, 0)+1)/math.log(Game.score+2)*0.1, 1, 1, stw/2, sth/2, -0.3)
         

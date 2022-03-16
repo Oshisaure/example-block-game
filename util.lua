@@ -91,12 +91,15 @@ function CheckPadInput(pad, input)
 end
 
 function FormatTime(s)
+	if not s then return [[--'--"--]] end
+	if s < 0 then s = 0 end
     local sec, cen, min = math.modf(math.max(0,s))
     sec, min = sec % 60, math.floor(sec/60)
     return string.format("%02d\'%02d\"%02d", min, sec, math.floor(cen*100))
 end
 
 function CommaValue(n) -- credit http://richard.warburton.it
+	if not n then return "--" end
 	local left,num,right = string.match(n,'^([^%d]*%d)(%d*)(.-)$')
 	return left..(num:reverse():gsub('(%d%d%d)','%1,'):reverse())..right
 end
