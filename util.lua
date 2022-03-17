@@ -209,7 +209,7 @@ function SendShaderUniform(name, value)
 end
 
 local buffercanvas
-function DrawBlurred(drawable, ...)
+function DrawBlurred(drawable, blurfactor, ...)
     local _c = love.graphics.getCanvas()
     local r, g, b, a = love.graphics.getColor()
     love.graphics.setCanvas(buffercanvas)
@@ -217,7 +217,7 @@ function DrawBlurred(drawable, ...)
     
     if tonumber(Config.blur_spread) > 0 then
         love.graphics.setShader(ShaderBlur)
-        ShaderBlur:send("Spread", tonumber(Config.blur_spread))
+        ShaderBlur:send("Spread", blurfactor)
         ShaderBlur:send("Direction", {0,1})
     end
     love.graphics.setBlendMode("add")

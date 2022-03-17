@@ -250,8 +250,10 @@ Board = {
 				board.percentile = 99
 			else
 				board.percentile = board.percentile % 100
-				board.level_final_time = board.time
-				board.level_final_score = board.score
+				board.level_final_time    = board.time
+				board.level_final_score   = board.score
+				board.cumul_times [oldlv] = board.time
+				board.cumul_scores[oldlv] = board.score
 				board.last_level = oldlv
 				PlaySFX("classic_levelup")
 			end
@@ -876,7 +878,7 @@ Board = {
 		end
         
         love.graphics.setColor(1,1,1,1)
-        DrawBlurred(board.glow_canvas, -board_x0, -board_y0)
+        DrawBlurred(board.glow_canvas, tonumber(Config.blur_spread), -board_x0, -board_y0)
         
 		
 		local xoff, yoff, roff = 0, 0, 0
@@ -968,6 +970,8 @@ Board = {
 		board.last_level  = 0
 		board.level_times  = {[board.level] = -2}
 		board.level_scores = {[board.level] = 0}
+		board.cumul_times  = {}
+		board.cumul_scores = {}
 		board.level_final_score = nil
 		board.level_final_time  = nil
         board.time        = -2

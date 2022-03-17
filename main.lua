@@ -148,8 +148,9 @@ function love.load()
 	bottomtext = ""
 	STATE = "splash"
     SetBGM()
-	UpdateTime = 0
-	UpdateRate = 30
+	-- UpdateTime = 0
+	-- UpdateRate = 30
+	ResultsScreenTimer = 0
 end
 
 
@@ -221,7 +222,11 @@ function love.update(dt)
             SetBGM()
             -- BGM:stop()
 			Game.dead_time = Game.dead_time + dt
+			ResultsScreenTimer = ResultsScreenTimer - dt
 		end
+	elseif STATE == "results" then
+		Game.dead_time = Game.dead_time + dt
+		ResultsScreenTimer = ResultsScreenTimer + dt
 	elseif STATE == "battle2P" then
 		if not Games.P1.dead and not Games.P2.dead then
 			Games.P1:update({
@@ -482,8 +487,8 @@ function love.draw()
         love.graphics.draw(CanvasBG)
         -- [===[ activate this block comment to render none of the HUD and only the BG
 		-- love.graphics.setShader(ShaderShaking)
-        love.graphics.draw(Game.canvas)
         love.graphics.setColor(1,1,1)
+        love.graphics.draw(Game.canvas)
 		love.graphics.setShader()
         love.graphics.draw(Game.overlay_canvas)
         
@@ -497,37 +502,6 @@ function love.draw()
         end
         love.graphics.printf("NEXT", Width-w7, Height*0.15, w7, "left")
 		
-		if Game.dead then
-			local deadtime = Game.dead_time
-			love.graphics.setColor(0,0,0,math.min(deadtime*0.25, 0.5))
-			love.graphics.rectangle("fill", 0, 0, Width, Height)
-			love.graphics.setColor(1,1,1,math.min(deadtime*0.5, 1))
-			love.graphics.setFont(Font.Title)
-			local gameoveroff = math.max((1-deadtime)*0.05, 0)
-			love.graphics.printf("GAME", Width*(0.00-gameoveroff), Height*0.02, Width*0.45, "right", 0, 1, 1, 0, 0, -0.3)
-			love.graphics.printf("OVER", Width*(0.55+gameoveroff), Height*0.02, Width*0.45, "left" , 0, 1, 1, 0, 0, -0.3)
-			love.graphics.setFont(Font.HUD)
-			local maxlv = Game.speedcurve.maxlevel
-			if maxlv == math.huge then maxlv = Game.level end
-			for lv = 1, maxlv do
-				local lvname = Game.speedcurve[lv].level_name
-				if lvname ~= math.huge and lvname ~= -math.huge then
-					local t = Clamp((deadtime-1 - lv*0.05)*4, 0, 1)
-					local xoff = (-1)^lv*(1-t)*Width*0.1
-					love.graphics.setColor(1,1,1,t)
-					love.graphics.printf(string.format(
-						"%3s -%10s - %s",
-						Game.speedcurve[lv].level_name,
-						CommaValue(Game.level_scores[lv]),
-						FormatTime(Game.level_times [lv]),
-						CommaValue(Game.level_scores[lv]),
-						FormatTime(Game.level_times [lv])
-					), xoff, Height*(0.06+0.025*lv), Width, "center", 0, 1, 1, 0, 0, -0.3)
-				end
-			end
-		end
-		
-		love.graphics.setColor(1,1,1,1)
 		love.graphics.setFont(Font.HUD)
         love.graphics.printf("LINE CLEAR STATISTICS", 0, Height*0.4, w6, "center")
         
@@ -638,7 +612,46 @@ function love.draw()
 		-- love.graphics.print("Bag:"..table.concat(Game.bag).."\nHistory:"..table.concat(Game.history), Width*0.62, Height*0.86)
         
         --]===]
-        if STATE == "pause" then DrawPause() end
+		
+		if STATE == "pause" then DrawPause() end
+
+		if Game.dead then
+			local deadtime = Game.dead_time
+			love.graphics.setColor(1,1,1,math.min(deadtime*0.5, 1))
+			love.graphics.setFont(Font.Title)
+			local gameoveroff = math.max((1-deadtime)*0.05, 0)
+			love.graphics.printf("GAME", Width*(0.00-gameoveroff), Height*0.05, Width*0.45, "right", 0, 1, 1, 0, 0, -0.3)
+			love.graphics.printf("OVER", Width*(0.55+gameoveroff), Height*0.05, Width*0.45, "left" , 0, 1, 1, 0, 0, -0.3)
+			love.graphics.setFont(Font.Menu)
+			love.graphics.setColor(1,1,1,math.min(deadtime-0.5, 1))
+			love.graphics.printf("PRESS [TAB] TO SHOW PER LEVEL RESULTS", Width*0.1, Height*0.95, Width*0.8, "center")
+			
+			love.graphics.setColor(0,0,0,Clamp(ResultsScreenTimer*0.5, 0, 0.75))
+			love.graphics.rectangle("fill", 0, 0, Width, Height)
+			love.graphics.setFont(Font.HUD)
+			love.graphics.setColor(1,1,1,Clamp(ResultsScreenTimer, 0, 1))
+			love.graphics.printf("LEVEL -  ISOLATED SCORE-TIME -  CUMULATIVE SCORE-TIME", 0, Height*0.06, Width, "center", 0, 1, 1, 0, 0, -0.3)
+			local maxlv = Game.speedcurve.maxlevel
+			if maxlv == math.huge then maxlv = Game.level end
+			for lv = 1, maxlv do
+				local lvname = Game.speedcurve[lv].level_name
+				if lvname ~= math.huge and lvname ~= -math.huge then
+					local offt = (STATE == "results" and lv*0.05 or 0.75)
+					local t = Clamp((ResultsScreenTimer - offt)*4, 0, 1)
+					local xoff = (-1)^lv*(1-t)*Width*0.1
+					love.graphics.setColor(1,1,1,t)
+					love.graphics.printf(string.format(
+						"%3s -%10s - %s -%10s - %s",
+						Game.speedcurve[lv].level_name,
+						CommaValue(Game.level_scores[lv]),
+						FormatTime(Game.level_times [lv]),
+						CommaValue(Game.cumul_scores[lv]),
+						FormatTime(Game.cumul_times [lv])
+					), xoff, Height*(0.06+0.025*lv), Width, "center", 0, 1, 1, 0, 0, -0.3)
+				end
+			end
+		end
+		
 	end
     
     love.graphics.setFont(Font.Menu)
@@ -655,7 +668,7 @@ function love.keypressed(key)
         ShaderInfinity:release()
         LoadShaders()
     end
-	if STATE == "ingame" and (key == "return" or key == KeyBindings.pause) and Game.dead then
+	if (STATE == "ingame" or STATE == "results") and (key == "return" or key == KeyBindings.pause) and Game.dead then
 		Game:reset(os.time())
 		Game:setLV(1)
 		-- DisconnectServer()
@@ -672,6 +685,12 @@ function love.keypressed(key)
         if key == "kp4" then Game.position_x = Game.position_x - 0.1 end
         if key == "kp6" then Game.position_x = Game.position_x + 0.1 end
     ]]
+	elseif STATE == "ingame" and key == "tab" and Game.dead then
+		STATE = "results"
+		ResultsScreenTimer = 0
+	elseif STATE == "results" and key == "tab" then
+		STATE = "ingame"
+		ResultsScreenTimer = 1
 	elseif STATE == "battle2P" and key == "return" and (Games.P1.dead or Games.P2.dead) then
 		Games.P1:reset(os.time())
 		Games.P2:reset(os.time())
