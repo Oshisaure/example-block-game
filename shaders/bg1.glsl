@@ -95,7 +95,7 @@ vec4 effect(vec4 color, Image image, vec2 uvs, vec2 screen_coords){
         newpixel += getCloudColor()*uv2.y*noise(25.*vec2(uv2.x/uv2.y, time-1./uv2.y));
     }
     
-    return color * mix(oldpixel, newpixel, 1-pow(64, -max(dt, 0.01)));
+    return color * mix(oldpixel, newpixel, 1-pow(64, -dt));
     // return newpixel;
 }
 #endif

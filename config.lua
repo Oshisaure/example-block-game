@@ -113,6 +113,7 @@ ConfigDefaults = {
 	sway_speed      = "5",
     
     bg_brightness  = "40",
+    bg_framerate   = "240",
     dynamic_bg     = "O",
     blur_spread    = "5",
     trail_duration = "5",

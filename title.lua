@@ -245,11 +245,28 @@ Title.graphics = Menu.new("Menu", {
         end
 	},
 
-	{x = 0, y =  0.1, label = ("DYNAMIC BACKGROUNDS : < %s >"):format(Config.dynamic_bg),
+	{x = 0, y =  0.0, label = ("DYNAMIC BACKGROUNDS : < %s >"):format(Config.dynamic_bg),
         update = function(button)
             Config.dynamic_bg = (Config.dynamic_bg == "O" and "X" or "O")
             button.label = ("DYNAMIC BACKGROUNDS : < %s >"):format(Config.dynamic_bg)
             if Config.dynamic_bg == "X" then PrerenderBG() end
+        end
+    },
+	
+	{x = 0, y =  0.1, label = ("BG REFRESH RATE CAP : < %sHz >"):format(Config.bg_framerate),
+		action_e = function(button)
+			Config.bg_framerate = tostring(Mod1(tonumber(Config.bg_framerate) + 5, 500))
+		end,
+		action_r = function(button)
+			button.param = 5
+		end,
+		action_l = function(button)
+			button.param = -5
+		end,
+        update = function(button)
+			Config.bg_framerate = tostring(Clamp(tonumber(Config.bg_framerate) + button.param, 5, 500))
+			button.param = 0
+            button.label = ("BG REFRESH RATE CAP : < %sHz >"):format(Config.bg_framerate)
         end
     },
 
