@@ -533,16 +533,21 @@ function love.draw()
 		local lvdisp = 5
 		for d = 0, math.min(lvdisp-1, Game.level-1) do
 			local lv = Game.level - d
+            local currentlevel = (d == 0)
+            if Game.level_name == math.huge or Game.level_name == -math.huge then
+                currentlevel = false
+                lv = lv - 1
+            end
 			local xoff = 0
 			love.graphics.setColor(1,1,1,1-d/lvdisp)
-			if d == 0 then
+			if currentlevel then
 				local t = math.min(Game.level_times[lv]*3, 1)
 				love.graphics.setColor(1,1,1,t)
 				xoff = (1-t)*Height*(-0.05)
 			end
 			love.graphics.printf(string.format(
 				"%s%3s -%6sK - %s",
-				d == 0 and ">" or " ",
+				currentlevel and ">" or " ",
 				Game.speedcurve[lv].level_name,
 				CommaValue(math.floor((Game.level_scores[lv] or 0)/1000)),
 				FormatTime(Game.level_times[lv]):sub(1, -3)
@@ -578,7 +583,15 @@ function love.draw()
         
 		local leveldisplay = Game.level_name
 		if Game.level_type == "SEC" then
-			leveldisplay = string.format("%03d/%03d", leveldisplay+Game.percentile, leveldisplay+100)
+            if leveldisplay == math.huge then
+                leveldisplay = string.format("%03d/", Game.speedcurve[Game.level-1].level_name+Game.percentile+100)
+                local scx, scy = Font.Menu:getWidth("AA"), Font.Menu:getHeight()
+				love.graphics.printf(leveldisplay, Width*0.75-scx, Height*0.425, Width*0.2, "right")
+                DrawInfinitySymbol(Width*0.95-scx/10, Height*0.425, 0, -scx/10, scy/6)
+                leveldisplay = ""
+            else 
+                leveldisplay = string.format("%03d/%03d", leveldisplay+Game.percentile, leveldisplay+100)
+            end
 		elseif leveldisplay == math.huge or leveldisplay == -math.huge then
 			local scx, scy = Font.Menu:getWidth("AA"), Font.Menu:getHeight()
 			if leveldisplay < 0 then

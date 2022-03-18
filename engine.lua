@@ -243,12 +243,10 @@ Board = {
 		board.lines = board.lines + ln
 		if (board.level_type == "10L" and board.level * 10 <= board.lines) 
 		or (board.level_type == "SEC" and board.percentile >= 100)
-		then 
+        then 
 			local oldlv = board.level
 			board:setLV(board.level + 1)
-			if oldlv == board.level then	
-				board.percentile = 99
-			else
+			if oldlv ~= board.level then
 				board.percentile = board.percentile % 100
 				board.level_final_time    = board.time
 				board.level_final_score   = board.score
@@ -746,7 +744,10 @@ Board = {
 				if board.spawn_timer >= board.spawn_delay then
 					-- reset hold flag, update percentile
 					board.held = false
-					board.percentile = math.min(board.percentile + 1, 99)
+					board.percentile = board.percentile + 1
+                    if board.level < board.speedcurve.maxlevel then
+                        board.percentile = math.min(board.percentile, 99)
+                    end
                     
 					-- reset timer, spawn, prerotate/prehold
 					board.spawn_timer = 0

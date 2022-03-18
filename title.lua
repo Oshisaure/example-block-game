@@ -70,9 +70,13 @@ Title.play = Menu.new(MenuFont, {
 	{x = 0, y =  0.3, label = "BACK", action_e = change("main")},
 })
 --]]
+local today = os.date("*t")
+local carnivalhours = (today.month == 2 and today.day >= 28)
+                   or (today.month == 3)
+                   or (today.month == 4 and today.day == 1)
 local gamemodes = {}
 for i, mode in ipairs(Levels) do
-    -- if mode.name ~= "Death" then -- keep that for carnival?
+    if mode.name ~= "Death" or #HighScores["Death"] > 0 or carnivalhours then
         table.insert(gamemodes, 
             {x = -0.5, y = -0.5+0.1*i, label = mode.name, id = i,
                 action_e = function(button)
@@ -96,7 +100,7 @@ for i, mode in ipairs(Levels) do
                 end,
             }
         )
-    -- end
+    end
 end
 table.insert(gamemodes, {x = 0, y =  0.7, label = "BACK", action_e = change("main")})
 Title.play = Menu.new("Menu", gamemodes)
@@ -107,7 +111,7 @@ Title.play.updateSelected = function(self, key)
 	local modeid = Title.play.items[Title.play.highlight].id
 
 	if modeid then
-		self.text:addf({{1,1,1}, Levels[modeid].description}, Width*0.4, "right", math.floor(Width*0.5), math.floor(Height*0.4))
+		self.text:addf({{1,1,1}, Levels[modeid].description}, Width*0.4, "right", math.floor(Width*0.5), math.floor(Height*0.35))
 		local leveldisp = Levels[modeid][Title.play.startlv].level_name
 		if leveldisp == math.huge then leveldisp = "  " end
 		self.text:addf({{1, 0.7, 0.5}, string.format("Start level: < %s >", leveldisp)}, Width, "center", 0, math.floor(Height*0.7))
@@ -428,7 +432,9 @@ Title.window = Menu.new("Menu", {
 local mode_list = {}
 local mode_indices = {} -- to prevent unnecessary lookups
 for k, _ in pairs(HighScores) do
-	if k ~= "Death" then table.insert(mode_list, k) end -- death is technically a secret mode
+	if k ~= "Death" or #HighScores["Death"] > 0 or carnivalhours then -- death is technically a secret mode, only show it if you have a score in it
+        table.insert(mode_list, k)
+    end
     for i = 1, #Levels do
 		if Levels[i].name == k then mode_indices[k] = i end
 	end
