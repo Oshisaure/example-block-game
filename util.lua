@@ -193,12 +193,14 @@ function SetSFXVolume(v)
     end
 end
 
+local bgframetimeacc = 0
 function UpdateShadersUniforms(dt)
     local time = os.clock()
+    bgframetimeacc = bgframetimeacc + dt
     pcall(function() ShaderRainbow:send("time", time) end)
     for _, v in pairs(ShaderBG) do
-        pcall(function() v:send("time", time) end)
-        pcall(function() v:send("dt", dt)     end)
+        pcall(function() v:send("time", time          ) end)
+        pcall(function() v:send("dt"  , bgframetimeacc) end)
     end
 end
 
@@ -289,7 +291,11 @@ end
 
 function RenderBG(id)
     if Config.dynamic_bg == "O" then
-        return RenderBGShader(id)
+        if bgframetimeacc >= 1/tonumber(Config.bg_framerate) then
+            bgframetimeacc = 0
+            RenderBGShader(id)
+        end
+        return
     end
     id = id or "menu"
     
