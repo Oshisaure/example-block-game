@@ -418,13 +418,18 @@ local arrow_buttons = {
 	left  = 0,
 	right = 0,
 }
+local controller_buttons = {}
 local autorepeat_delay = 0.5
 local tick_count, last_tick_time, last_key = 1, 0, nil
 function ProcessMenuAutorepeat(dt)
+    -- update the state of the button presses on gamepad to check with them
+    for button, key in pairs(MenuPadControls) do 
+        controller_buttons[key] = CheckPadInput(CurrentController, button)
+    end
 	-- check for the key that has been held for the least amount of time
 	local recent_key, recent_time = nil, math.huge
 	for key, time_held in pairs(arrow_buttons) do
-		if love.keyboard.isDown(key) then
+		if love.keyboard.isDown(key) or controller_buttons[key] then
 			local newtime = time_held + dt
 			arrow_buttons[key] = newtime
 			if newtime < recent_time then
