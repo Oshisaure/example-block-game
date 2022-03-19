@@ -530,30 +530,32 @@ function love.draw()
             love.graphics.printf(Game.all_clears  , w6*0.05, Height*(0.55+0.025*#LineClearTypes), w6*0.90, "right")
         end
 		
-		local lvdisp = 5
-		for d = 0, math.min(lvdisp-1, Game.level-1) do
-			local lv = Game.level - d
-            local currentlevel = (d == 0)
-            if Game.level_name == math.huge or Game.level_name == -math.huge then
-                currentlevel = false
-                lv = lv - 1
+        if #Game.speedcurve > 1 then 
+            local lvdisp = 5
+            for d = 0, math.min(lvdisp-1, Game.level-1) do
+                local lv = Game.level - d
+                local currentlevel = (d == 0)
+                if Game.level_name == math.huge or Game.level_name == -math.huge then
+                    currentlevel = false
+                    lv = lv - 1
+                end
+                local xoff = 0
+                love.graphics.setColor(1,1,1,1-d/lvdisp)
+                if currentlevel then
+                    local t = math.min(Game.level_times[lv]*3, 1)
+                    love.graphics.setColor(1,1,1,t)
+                    xoff = (1-t)*Height*(-0.05)
+                end
+                love.graphics.printf(string.format(
+                    "%s%3s -%6sK - %s",
+                    currentlevel and ">" or " ",
+                    Game.speedcurve[lv].level_name,
+                    CommaValue(math.floor((Game.level_scores[lv] or 0)/1000)),
+                    FormatTime(Game.level_times[lv]):sub(1, -3)
+                ), w6*0.05 + xoff, Height*(0.9-0.025*d), w6*0.90, "left", 0, 1, 1, 0, 0, -0.3)
             end
-			local xoff = 0
-			love.graphics.setColor(1,1,1,1-d/lvdisp)
-			if currentlevel then
-				local t = math.min(Game.level_times[lv]*3, 1)
-				love.graphics.setColor(1,1,1,t)
-				xoff = (1-t)*Height*(-0.05)
-			end
-			love.graphics.printf(string.format(
-				"%s%3s -%6sK - %s",
-				currentlevel and ">" or " ",
-				Game.speedcurve[lv].level_name,
-				CommaValue(math.floor((Game.level_scores[lv] or 0)/1000)),
-				FormatTime(Game.level_times[lv]):sub(1, -3)
-			), w6*0.05 + xoff, Height*(0.9-0.025*d), w6*0.90, "left", 0, 1, 1, 0, 0, -0.3)
 		end
-		
+        
         local lastentry
         repeat
             lastentry = table.remove(Game.recent_actions)
@@ -689,6 +691,7 @@ function love.keypressed(key)
         if Config.dynamic_bg == "X" then PrerenderBG() end
 		STATE = "menu"
         SetBGM("menu")
+        ResultsScreenTimer = 0
 	elseif STATE == "ingame" and key == KeyBindings.pause then
         STATE = "pause"
     --[[
