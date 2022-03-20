@@ -194,6 +194,7 @@ function SetSFXVolume(v)
 end
 
 local bgframetimeacc = 0
+local newframe = false
 function UpdateShadersUniforms(dt)
     local time = os.clock()
     bgframetimeacc = bgframetimeacc + dt
@@ -291,7 +292,8 @@ end
 
 function RenderBG(id)
     if Config.dynamic_bg == "O" then
-        if bgframetimeacc >= 1/tonumber(Config.bg_framerate) then
+		newframe = (bgframetimeacc >= 1/tonumber(Config.bg_framerate))
+        if newframe then
             bgframetimeacc = 0
             RenderBGShader(id)
         end
@@ -310,6 +312,17 @@ function RenderBG(id)
     love.graphics.pop()
     love.graphics.setCanvas(_c)
     love.graphics.setColor(r, g, b, a)
+end
+
+function DrawOnBG(...)
+	if Config.dynamic_bg == "O" and newframe then		
+		local _c = love.graphics.getCanvas()
+		
+		love.graphics.setCanvas(CanvasBG)
+		love.graphics.draw(...)
+		
+		love.graphics.setCanvas(_c)
+	end
 end
 
 function GetAdjustedFontSize(size)

@@ -477,9 +477,7 @@ function love.draw()
         --]]
         
         RenderBG(Game.speedcurve.BG)
-        love.graphics.setCanvas(CanvasBG)
-		-- love.graphics.setShader(ShaderShaking)
-        love.graphics.draw(Game.canvas)
+		DrawOnBG(Game.canvas)
 		love.graphics.setShader()
         love.graphics.setCanvas()
         local b = tonumber(Config.bg_brightness)/100
