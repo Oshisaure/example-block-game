@@ -259,6 +259,9 @@ Board = {
 		
 		-- nil the current piece to signify spawn delay started
 		board.piece = nil
+		
+		-- set the safelock flag to help with accidentally locking the next piece in fast speeds
+		board.safe_lock = true
 	end,
 	
 	place = function(board)
@@ -678,6 +681,9 @@ Board = {
 					board:update_ghost() -- update ghost when the piece moves
 				end
 				
+				-- cancel safelock if we're not pressing softdrop anymore
+				if not input.softdrop then board.safe_lock = false end
+				
 				-- gravity
 				board.piece.y = board.piece.y - 1 -- check for grounded
 				if board:check_collision_with(board.piece) then
@@ -686,7 +692,7 @@ Board = {
 					board.piece.y = board.piece.y + 1
 					board:add_trails(0)
 					board.cur_lock = board.cur_lock + dt
-					if board.cur_lock > board.lock_delay or board.cur_rots > Board.maxrots or input.softdrop then
+					if board.cur_lock > board.lock_delay or board.cur_rots > Board.maxrots or (input.softdrop and not board.safe_lock) then
 						board:place()
 						board.pieces = board.pieces + 1
 						board.cur_lock = 0
@@ -720,6 +726,9 @@ Board = {
                         board.last_collision_down_impact_force = ImpactFormula(math.min(fall_force, 1200))
                         -- print(fall_force, board.last_collision_down_impact_force)
                         board.current_grounded = true
+					else
+						-- cancel safelock when in the air for more than one frame
+						board.safe_lock = false
                     end
 					board.gravity_acc = math.min(1, board.gravity_acc)
 					board.piece.y = board.piece.y + 1
@@ -729,6 +738,7 @@ Board = {
 						board:addScore(math.floor(fall_height*fall_height))
 					end
 					board:add_trails(fall_height)
+					
 				end
 			else
 			-- in spawn delay
@@ -739,6 +749,9 @@ Board = {
 				end
 				board.AS_timer = math.min(board.AS_timer, board.AS_delay)
 				
+				-- cancel safelock if we're not pressing softdrop anymore
+				if not input.softdrop then board.safe_lock = false end
+			
 				--check if the piece should spawn
 				board.spawn_timer = board.spawn_timer + dt
 				if board.spawn_timer >= board.spawn_delay then
@@ -1022,6 +1035,7 @@ Board = {
         board.last_rotate_point    = nil
         board.last_rotate_time     = nil
         board.last_rotate_dir      = 0
+		board.safe_lock = false
 		
 		board.random:setSeed(seed)
 		-- board:shuffle_bag()
