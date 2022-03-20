@@ -214,7 +214,7 @@ Title.graphics = Menu.new("Menu", {
         end
 	},
 
-	{x = 0, y = -0.3,
+	{x = 0, y = -0.3, param = 0,
 		label = ("MATRIX SWAY SPEED: <%s>"):format(DrawBar(Config.sway_speed, 10)),
 		action_e = function(button)
 			Config.sway_speed = tostring(Mod1(tonumber(Config.sway_speed) + 1, 10))
@@ -257,7 +257,7 @@ Title.graphics = Menu.new("Menu", {
         end
     },
 	
-	{x = 0, y =  0.1, label = ("BG REFRESH RATE CAP : < %sHz >"):format(Config.bg_framerate),
+	{x = 0, y =  0.1, param = 0, label = ("BG REFRESH RATE CAP : < %sHz >"):format(Config.bg_framerate),
 		action_e = function(button)
 			Config.bg_framerate = tostring(Mod1(tonumber(Config.bg_framerate) + 5, 500))
 		end,
@@ -308,7 +308,7 @@ Title.graphics = Menu.new("Menu", {
         end
 	},
 
-	{x = 0, y =  0.4, label = ("TRAIL FADEOUT DURATION: <%s>"):format(DrawBar(Config.trail_duration, 10)),
+	{x = 0, y =  0.4, param = 0, label = ("TRAIL FADEOUT DURATION: <%s>"):format(DrawBar(Config.trail_duration, 10)),
 		action_e = function(button)
 			Config.trail_duration = tostring((tonumber(Config.trail_duration) + 1) % 11)
 		end,
