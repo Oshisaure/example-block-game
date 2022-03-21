@@ -24,7 +24,13 @@ local open   = function(menu) return function(button)                           
 Title.main = Menu.new("Menu", {
 	{x = 0, y = -0.2, label = "START GAME",  action_e = open("play")},
 	{x = 0, y =  0.0, label = "SETTINGS",    action_e = open("settings")},
-	{x = 0, y =  0.2, label = "HIGH SCORES", action_e = open("highscores")}
+	{x = 0, y =  0.2, label = "HIGH SCORES", action_e = open("highscores")},
+	{x = 0, y =  0.4, label = "CREDITS", 
+		action_e = function(button)
+			STATE = "credits"
+			ResetSplashScreen()
+		end,
+	},
 	--[[
 	{x = 0, y =  0.2, label = "Networking test",
 		action_e = function(button)

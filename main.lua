@@ -41,6 +41,7 @@ function love.load()
 	require("title")
 	require("pause")
 	require("splash")
+	require("credits")
     
     -- love.window.setVSync(BoolNumber(Config.vsync == "O"))
     
@@ -158,6 +159,14 @@ function love.update(dt)
     UpdateShadersUniforms(dt)
 	if STATE == "splash" then
         UpdateSplashScreen(dt)
+	elseif STATE == "credits" then
+        UpdateSplashScreen(dt)
+		if Credits.screen == 2 then
+			local bgm = Credits.menus[2].highlight
+			if bgm == 5 then SetBGM("menu")
+			elseif bgm >= 6 and bgm <= 11 then SetBGM(bgm-5)
+			end
+		end
 	elseif STATE == "menu" then
 		key = ProcessMenuAutorepeat(dt)
 		if key then love.keypressed(key) end
@@ -302,6 +311,8 @@ function love.draw()
     love.graphics.setCanvas()
     if STATE == "splash" then
         DrawSplashScreen()
+	elseif STATE == "credits" then
+		Credits:draw()
 	elseif STATE == "menu" or STATE == "keyinput" or STATE == "padinput" then
         RenderBG()
 		love.graphics.setColor(1,1,1)
@@ -730,6 +741,8 @@ function love.keypressed(key)
 		STATE = "menu"
 	elseif STATE == "menu" then
 		Title[Title.current]:updateSelected(key)
+	elseif STATE == "credits" then
+		Credits.menus[Credits.screen]:updateSelected(key)
 	elseif STATE == "pause" then
 		Pause:updateSelected(key)
 	end

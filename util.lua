@@ -346,6 +346,7 @@ function LoadShaders()
         classic   = love.graphics.newShader("shaders/bgclassic.glsl"),
         death     = love.graphics.newShader("shaders/bgdeath.glsl"),
         menu      = love.graphics.newShader("shaders/bgmenu.glsl"),
+		credits   = love.graphics.newShader("shaders/creditball.glsl")
     }
     ShaderBlur     = love.graphics.newShader("shaders/blur.glsl")
     ShaderRainbow  = love.graphics.newShader("shaders/rainbow.glsl")
@@ -417,6 +418,7 @@ function ProcessResize(w, h)
         for name, menu in pairs(Title) do
             if name ~= "current" then menu:updateSelected() end
         end
+		Credits:resize()
 		UpdatePauseMenuFonts()
 		if Config.dynamic_bg == "X" then PrerenderBG(currentbg) end
     end
