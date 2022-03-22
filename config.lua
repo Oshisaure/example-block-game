@@ -118,7 +118,7 @@ ConfigDefaults = {
     blur_spread    = "5",
     trail_duration = "5",
 	
-	window_width   = "960",
+	window_width   = "1280",
 	window_height  = "720",
 	window_display = "1",
 	fullscreen     = "X",
