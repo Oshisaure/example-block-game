@@ -382,7 +382,7 @@ function love.draw()
 				local curve = Levels[Title.highscores.mode_indices[mode]]
 				local function levelStr(l)
 					-- Removes the level text if it's Lv. Inf so it can draw the infinity symbol instead
-					return l ~= math.huge and l or ""
+					return (l == math.huge or l == -math.huge) and "" or l
 				end
 				for i = 1, math.min(#current_scores, 10) do
 					local score = current_scores[i]
@@ -396,10 +396,20 @@ function love.draw()
 							levelStr(curve[score.final_level].level_name),
 							FormatTime(score.clear_time)
 						)
-						if(curve[score.start_level].level_name == math.huge) then
+						if(curve[score.start_level].level_name == math.huge or curve[score.start_level].level_name == -math.huge) then
+							if(curve[score.start_level].level_name == -math.huge) then
+								love.graphics.setShader(ShaderRainbow)
+								love.graphics.printf("M", left_x + char_width * (23+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), Width*0.2, "left")
+								love.graphics.setShader()
+							end
 							DrawInfinitySymbol(left_x + char_width *(22+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(char_width *2)/10, Font.Menu:getHeight()/6)
 						end
-						if(curve[score.final_level].level_name == math.huge) then
+						if(curve[score.final_level].level_name == math.huge or curve[score.final_level].level_name == -math.huge) then
+							if(curve[score.final_level].level_name == -math.huge) then
+								love.graphics.setShader(ShaderRainbow)
+								love.graphics.printf("M", left_x + char_width * (26), Height*0.3+(i-1)*Font.Menu:getHeight(), Width*0.2, "left")
+								love.graphics.setShader()
+							end
 							DrawInfinitySymbol(left_x + char_width *(28+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(char_width *2)/10, Font.Menu:getHeight()/6)
 						end
 					else
@@ -411,7 +421,12 @@ function love.draw()
                             levelStr(curve[score.final_level].level_name),
                             FormatTime(score.time)
 						)
-						if(curve[score.final_level].level_name == math.huge) then
+						if(curve[score.final_level].level_name == math.huge or curve[score.final_level].level_name == -math.huge) then
+							if(curve[score.final_level].level_name == -math.huge) then
+								love.graphics.setShader(ShaderRainbow)
+								love.graphics.printf("M", left_x + char_width * (27), Height*0.3+(i-1)*Font.Menu:getHeight(), Width*0.2, "left")
+								love.graphics.setShader()
+							end
 							DrawInfinitySymbol(left_x + char_width *(29+5/6), Height*0.3+(i-1)*Font.Menu:getHeight(), 0, -(char_width *2)/10, Font.Menu:getHeight()/6)
 						end
 					end
